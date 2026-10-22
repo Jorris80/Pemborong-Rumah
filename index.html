@@ -245,6 +245,34 @@ table.tbl{width:100%;border-collapse:collapse;font-size:.9rem}
   @page{size:A4;margin:16mm}
 }
 
+
+/* ---------- Denah & brosur ---------- */
+.modal.full{max-width:1320px;height:92vh;max-height:92vh}
+.ed{display:grid;grid-template-columns:minmax(0,1fr) 340px;flex:1;min-height:0}
+.ed-canvas{background:#DDE2E7;overflow:auto;padding:12px;display:flex;align-items:flex-start;justify-content:center;min-height:0}
+.ed-canvas svg{width:100%;max-width:100%;height:auto;max-height:calc(92vh - 150px);background:#fff;box-shadow:var(--shadow);touch-action:none;user-select:none}
+.ed-side{border-left:1px solid var(--line);overflow:auto;padding:14px 16px;min-height:0}
+.ed-side .form{grid-template-columns:1fr 1fr}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.plan-thumb{background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px;height:230px;display:flex;justify-content:center}
+.plan-thumb svg{height:100%;width:auto;max-width:100%}
+.plan-thumb.big{height:auto}.plan-thumb.big svg{height:auto;width:100%}
+.br-thumb{height:160px;border-radius:8px;overflow:hidden;border:1px solid var(--line)}
+.br-thumb svg,.br-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.br-preview{flex:1;overflow:auto;background:#7A8591;padding:16px;display:flex;flex-direction:column;align-items:center;gap:16px;min-height:0}
+.br-preview .br-page{box-shadow:0 6px 24px rgba(0,0,0,.35);flex:none}
+.br-preview .brochure{display:flex;flex-direction:column;align-items:center;gap:16px}
+@media (max-width:860px){
+  .modal.full{height:96vh;max-height:96vh}
+  .ed{grid-template-columns:1fr;grid-template-rows:auto 1fr;overflow:auto}
+  .ed-canvas{padding:6px}
+  .ed-canvas svg{max-height:58vh}
+  .ed-side{border-left:0;border-top:1px solid var(--line);overflow:visible}
+  .cards-grid{grid-template-columns:1fr}
+  .modal.full .modal-h{flex-wrap:wrap}
+  #edHint{display:none}
+}
+
 /* ---------- Responsif ---------- */
 @media (max-width:1100px){.g4{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:860px){
@@ -290,7 +318,7 @@ table.tbl{width:100%;border-collapse:collapse;font-size:.9rem}
 <script>
 /* Housing Contractor ERP — klien (vanilla JS). Inti: transport API, offline (IndexedDB + antrean), router, form, tabel, grafik. */
 'use strict';
-var CONFIG = { API_URL: 'https://script.google.com/macros/s/AKfycbxApoalXRMpIMBbsPSrhyQDYF-KrJjRSsZuxR4Jo4LqvTTDffYf6uwmIgALuzm_9uNS/exec', APP_VERSION: '2.0.0' };
+var CONFIG = { API_URL: 'https://script.google.com/macros/s/AKfycbxApoalXRMpIMBbsPSrhyQDYF-KrJjRSsZuxR4Jo4LqvTTDffYf6uwmIgALuzm_9uNS/exec', APP_VERSION: '2.1.0' };
 var IS_GAS = (typeof google !== 'undefined' && google.script && google.script.run) ? true : false;
 
 /* ============================ Util ============================ */
@@ -343,6 +371,7 @@ var ICONS = {
   check: '<path d="M9 12l2 2 4-4"/><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/>',
   chart: '<path d="M4 20V4M4 20h16M8 16l4-5 3 3 5-7"/>',
   gear: '<circle cx="12" cy="12" r="3.2"/><circle cx="12" cy="12" r="7.2"/><path d="M12 1.8v3M12 19.2v3M1.8 12h3M19.2 12h3M4.8 4.8l2.1 2.1M17.1 17.1l2.1 2.1M4.8 19.2l2.1-2.1M17.1 6.9l2.1-2.1"/>',
+  plan: '<rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 12h7v9M10 3v5M14 12h7M14 12v5"/>',
   menu: '<path d="M4 6h16M4 12h16M4 18h16"/>', plus: '<path d="M12 5v14M5 12h14"/>', x: '<path d="M6 6l12 12M18 6L6 18"/>',
   sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
   refresh: '<path d="M20 11a8 8 0 0 0-14.9-3M4 4v4h4M4 13a8 8 0 0 0 14.9 3M20 20v-4h-4"/>', printer: '<path d="M6 9V3h12v6M6 18H4v-7h16v7h-2M8 14h8v7H8z"/>',
@@ -679,7 +708,7 @@ function docHeader(title, no) {
 /* Kerangka aplikasi: login, shell, router, sinkronisasi data */
 var VIEWS = {};   // diisi oleh app-views*.js : VIEWS[name] = { title, icon, tabs:[[key,label,permFn?]], render(tab) }
 var NAV = [
-  ['dashboard', 'Dasbor', 'dash'], ['units', 'Proyek & Kavling', 'home'], ['rab', 'RAB, AHSP & Master', 'calc'], ['supply', 'Pengadaan & Gudang', 'truck'],
+  ['dashboard', 'Dasbor', 'dash'], ['units', 'Proyek & Kavling', 'home'], ['design', 'Denah & Brosur', 'plan'], ['rab', 'RAB, AHSP & Master', 'calc'], ['supply', 'Pengadaan & Gudang', 'truck'],
   ['field', 'Lapangan & Subkon', 'helmet'], ['finance', 'Keuangan', 'wallet'], ['qc', 'QC & Serah Terima', 'check'], ['reports', 'Laporan & Cetak', 'chart'], ['admin', 'Admin & Sistem', 'gear']
 ];
 var ACT = {};     // handler aksi data-act
@@ -992,7 +1021,7 @@ ACT['unit-detail'] = function (el) {
     '<h3 style="margin:16px 0 8px">Item RAB</h3>' + table([{ l: 'WBS', k: 'wbsCode' }, { l: 'Uraian', k: 'workDescription' }, { l: 'Volume', n: 1, f: function (i) { return qty(i.volume) + ' ' + esc(i.unit); } }, { l: 'Total', n: 1, f: function (i) { return rp(i.totalPrice); } }, { l: 'Dokumen', f: function (i) { var b = budgets[i.rabBudgetId]; return b ? esc(b.documentNumber) + ' ' + chip(b.status) : ''; } }], items, { empty: 'Belum ada RAB rinci' }) +
     '<h3 style="margin:16px 0 8px">Laporan harian terakhir</h3>' + table([{ l: 'Tanggal', f: function (r) { return dt(r.reportDate); } }, { l: 'Progres', n: 1, f: function (r) { return '+' + pct(r.progressAddedPct) + ' → ' + pct(r.cumulativeProgressPct); } }, { l: 'Ringkasan', k: 'workSummary' }], dsr, { empty: 'Belum ada laporan' }) +
     '<h3 style="margin:16px 0 8px">Inspeksi QC</h3>' + table([{ l: 'No.', k: 'inspectionNumber' }, { l: 'Tahap', k: 'stage' }, { l: 'Skor', n: 1, f: function (q) { return pct(q.checklistScorePct); } }, { l: 'Defect', f: function (q) { return chip(q.defectStatus); } }], qcs, { empty: 'Belum ada inspeksi' });
-  openForm({ title: 'Kavling ' + u.unitNumber, wide: true, fields: [{ type: 'info', name: 'i', html: html }], extraButtons: (can('UNIT_MANAGE') ? '<button class="btn" data-act="unit-edit" data-id="' + u.id + '">Ubah data</button>' : '') + '<button class="btn" data-act="print-unitcost" data-id="' + u.id + '">' + ico('printer') + ' Cetak laporan biaya</button>' });
+  openForm({ title: 'Kavling ' + u.unitNumber, wide: true, fields: [{ type: 'info', name: 'i', html: html }], extraButtons: (function () { var fp = (S.d.floorPlans || []).filter(function (p) { return p.unitType === u.unitType; })[0]; return fp ? '<button class="btn" data-act="plan-view" data-id="' + fp.id + '">Denah</button>' : ''; })() + (can('UNIT_MANAGE') ? '<button class="btn" data-act="unit-edit" data-id="' + u.id + '">Ubah data</button>' : '') + '<button class="btn" data-act="print-unitcost" data-id="' + u.id + '">' + ico('printer') + ' Cetak laporan biaya</button>' });
 };
 
 /* ============================ RAB, AHSP & MASTER ============================ */
@@ -1063,18 +1092,21 @@ ACT['rab-view'] = function (el) {
 };
 ACT['rab-approve'] = function (el) { var b = byId(S.d.rabBudgets)[el.dataset.id]; confirmBox('Setujui ' + b.documentNumber, '<p>RAB kavling ' + unitLabel(b.houseUnitId) + ' akan menjadi <b>' + rp(b.totalAmount) + '</b>. Kuota material ikut diperbarui.</p>', 'Setujui', function () { return doMutate('rab.decide', { rabBudgetId: b.id, decision: 'APPROVE' }, 'RAB disetujui.'); }); };
 ACT['rab-reject'] = function (el) { openForm({ title: 'Tolak RAB', fields: [{ name: 'reason', label: 'Alasan penolakan', type: 'textarea', required: true }], submitLabel: 'Tolak', onSubmit: function (v) { return doMutate('rab.decide', { rabBudgetId: el.dataset.id, decision: 'REJECT', reason: v.reason }, 'RAB ditolak.'); } }); };
-ACT['rab-new'] = function () {
+function openRabForm(prefill) {
+  prefill = prefill || {};
   var d = S.d, ah = d.ahspTemplates.map(function (a) { return { v: a.code, l: a.code + ' — ' + a.name + ' (' + rp(a.unitPrice) + '/' + a.unit + ')' }; });
   var prices = {}; d.ahspTemplates.forEach(function (a) { prices[a.code] = a.unitPrice; });
   var calc = function (F) { var t = 0; (F.rows.items || []).forEach(function (r) { t += n(String(r.volume || '').replace(',', '.')) * n(prices[r.ahspCode]); }); var el = $('#rabtotal'); if (el) el.textContent = rp(t); };
   openForm({ title: 'Ajukan RAB / revisi (CCO)', wide: true, intro: 'Kavling tanpa RAB rinci → menjadi RAB baseline. Kavling yang sudah punya RAB → menjadi revisi (penambahan) dan menunggu persetujuan PM bila diajukan QS.',
-    values: { items: [{ wbsCode: 'WBS-1' }] },
+    values: { houseUnitId: prefill.houseUnitId || '', revisionReason: prefill.revisionReason || '', items: prefill.items || [{ wbsCode: 'WBS-1' }] },
     fields: [{ name: 'houseUnitId', label: 'Kavling', type: 'select', required: true, options: unitOpts() }, { name: 'revisionReason', label: 'Keterangan / alasan revisi', required: true, max: 300 },
       { name: 'items', label: 'Item pekerjaan', type: 'rows', required: true, cols: [{ name: 'wbsCode', label: 'Kode WBS' }, { name: 'ahspCode', label: 'AHSP', type: 'select', options: ah }, { name: 'workDescription', label: 'Uraian (opsional)' }, { name: 'volume', label: 'Volume', num: 1 }] },
       { name: 't', type: 'info', html: '<div class="row"><span class="muted">Total item:</span><b id="rabtotal">Rp 0</b></div>' }],
     onRowsChange: calc,
     onSubmit: function (v) { return doMutate('rab.submit', { projectId: d.activeProjectId, houseUnitId: v.houseUnitId, revisionReason: v.revisionReason, items: v.items.map(function (r) { return { wbsCode: r.wbsCode, ahspCode: r.ahspCode, workDescription: r.workDescription, volume: String(r.volume || '').replace(',', '.') }; }) }, 'RAB diajukan.'); } });
-};
+  setTimeout(function () { if (FORM && FORM.spec.onRowsChange) FORM.spec.onRowsChange(FORM); }, 30);
+}
+ACT['rab-new'] = function () { openRabForm(); };
 function wbsForm(w) {
   w = w || {};
   openForm({ title: w.id ? 'Ubah WBS ' + w.wbsCode : 'Tambah WBS', values: w, fields: [
@@ -1595,6 +1627,507 @@ ACT.selftest = function () { call('system.selfTest', {}).then(function (r) { sho
 ACT.wipe = function () { openForm({ title: 'Kosongkan semua data', intro: 'Semua proyek, kavling, transaksi, master data, dan pengguna lain akan dihapus. Pengaturan, akun Anda, dan audit trail dipertahankan. Backup dibuat otomatis lebih dulu.', fields: [{ name: 'confirm', label: 'Ketik HAPUS SEMUA DATA', required: true }], submitLabel: 'Kosongkan', onSubmit: function (v) { return call('system.wipe', v).then(function (r) { toast('Data dikosongkan. Backup: ' + r.safetyBackup, 'ok'); S.projectId = null; return loadData(null); }); } }); $('#fsubmit').className = 'btn danger'; };
 ACT.seed = function () { openForm({ title: 'Isi data demo', intro: 'Hanya untuk database kosong. Membuat 2 proyek, 5 kavling, 7 pengguna demo (sandi Demo#2026), dan riwayat transaksi ±6 bulan. Proses bisa 1–3 menit.', fields: [{ name: 'confirm', label: 'Ketik DEMO', required: true }], submitLabel: 'Isi data demo', onSubmit: function (v) { return call('system.seedDemo', v).then(function () { toast('Data demo dibuat.', 'ok'); return loadData(null); }); } }); };
 ACT['audit-verify'] = function () { call('audit.verify', {}).then(function (r) { showInfo(r.chainValid ? 'Rantai audit utuh' : 'Rantai audit RUSAK', '<p>' + r.verifiedCount + ' dari ' + r.totalLogsScanned + ' catatan terverifikasi.</p>' + (r.chainBreaks.length ? table([{ l: '#', k: 'seq' }, { l: 'Aksi', k: 'action' }, { l: 'Hash tercatat', f: function (b) { return '<span class="tiny">' + esc(b.recordedHash.slice(0, 16)) + '</span>'; } }, { l: 'Hash dihitung', f: function (b) { return '<span class="tiny">' + esc(b.calculatedHash.slice(0, 16)) + '</span>'; } }], r.chainBreaks, { cards: false }) + '<p>Ada perubahan langsung pada sheet AuditLogs atau data sumbernya. Pulihkan dari backup terakhir yang valid dan telusuri riwayat versi spreadsheet (File → Histori versi).</p>' : '<p class="small muted">Hash terakhir: ' + esc(r.latestHash) + '</p>'), true); }).catch(function (e) { toast(errMsg(e), 'err'); }); };
+
+/* Denah lantai (editor SVG) & brosur pemasaran */
+var KIND_META = {
+  LIVING: { l: 'Ruang hunian', f: '#E8EEF6' }, BED: { l: 'Kamar tidur', f: '#E6F1E9' }, BATH: { l: 'Kamar mandi / WC', f: '#DFEEF7' },
+  KITCHEN: { l: 'Dapur', f: '#FBF0D9' }, STAIR: { l: 'Tangga', f: '#ECE7F4' }, SERVICE: { l: 'Servis / gudang', f: '#F0EEE9' },
+  OUTDOOR: { l: 'Teras / carport / balkon', f: '#F5F6F7' }, GARDEN: { l: 'Taman', f: '#E4F2E1' }
+};
+var OUTDOOR = { OUTDOOR: 1, GARDEN: 1 };
+var WALL_LABEL = { N: 'depan (atas)', S: 'belakang (bawah)', W: 'kiri', E: 'kanan' };
+var ROOM_PRESETS = [['Kamar tidur', 'BED', 3, 3], ['KM/WC', 'BATH', 1.5, 2], ['Ruang tamu', 'LIVING', 3, 3], ['Ruang keluarga', 'LIVING', 3, 4], ['Dapur', 'KITCHEN', 2, 2],
+  ['Ruang makan', 'LIVING', 2.5, 2.5], ['Tangga', 'STAIR', 1.5, 3], ['Gudang', 'SERVICE', 1.5, 1.5], ['Teras', 'OUTDOOR', 3, 1.5], ['Carport', 'OUTDOOR', 3, 5], ['Taman', 'GARDEN', 3, 2]];
+function m2(v) { return (Math.round(n(v) * 100) / 100).toLocaleString('id-ID', { maximumFractionDigits: 2 }); }
+function rnd(v, s) { s = s || 0.01; return Math.round(v / s) * s; }
+
+/* ---------- Perhitungan ---------- */
+function planStats(meta) {
+  var plan = meta.plan, area = 0, bed = 0, bath = 0, wall = 0, perFloor = [], netWall = 0, foot = 0;
+  var h = n(plan.wallHeightM) || 3;
+  plan.floors.forEach(function (f, i) {
+    var indoor = f.rooms.filter(function (r) { return !OUTDOOR[r.kind]; });
+    var a = 0; indoor.forEach(function (r) { a += r.w * r.h; if (r.kind === 'BED') bed++; if (r.kind === 'BATH') bath++; });
+    perFloor.push(a); area += a; if (i === 0) foot = a;
+    var wl = wallLen(indoor); wall += wl;
+    var op = 0; (f.openings || []).forEach(function (o) { op += o.width * (o.type === 'door' ? 2.1 : 1.2); });
+    netWall += Math.max(0, wl * h - op);
+  });
+  var top = perFloor[perFloor.length - 1] || 0;
+  var roofBase = Math.max(top, foot);
+  var land = n(meta.landWidthM) * n(meta.landDepthM);
+  return { area: area, perFloor: perFloor, bed: bed, bath: bath, wall: wall, netWall: netWall, roof: roofBase * 1.3, foot: foot, land: land, kdb: land ? foot / land * 100 : 0 };
+}
+function wallLen(rooms) {
+  function u(map) { var t = 0; Object.keys(map).forEach(function (k) { var iv = map[k].sort(function (a, b) { return a[0] - b[0]; }), s = null, e = null; iv.forEach(function (x) { if (s === null) { s = x[0]; e = x[1]; } else if (x[0] <= e + 1e-6) e = Math.max(e, x[1]); else { t += e - s; s = x[0]; e = x[1]; } }); if (s !== null) t += e - s; }); return t; }
+  var H = {}, Vv = {};
+  rooms.forEach(function (r) { [r.y, r.y + r.h].forEach(function (y) { var k = y.toFixed(2); (H[k] = H[k] || []).push([r.x, r.x + r.w]); }); [r.x, r.x + r.w].forEach(function (x) { var k = x.toFixed(2); (Vv[k] = Vv[k] || []).push([r.y, r.y + r.h]); }); });
+  return u(H) + u(Vv);
+}
+function planWarnings(meta) {
+  var w = [], W = n(meta.landWidthM), Dp = n(meta.landDepthM);
+  meta.plan.floors.forEach(function (f) {
+    var ind = f.rooms.filter(function (r) { return !OUTDOOR[r.kind]; });
+    for (var i = 0; i < ind.length; i++) for (var j = i + 1; j < ind.length; j++) {
+      var a = ind[i], b = ind[j];
+      var ox = Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x), oy = Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y);
+      if (ox > 0.02 && oy > 0.02) w.push(f.name + ': "' + a.name + '" bertumpuk dengan "' + b.name + '" (' + m2(ox * oy) + ' m²).');
+    }
+    f.rooms.forEach(function (r) { if (r.x < -0.01 || r.y < -0.01 || r.x + r.w > W + 0.01 || r.y + r.h > Dp + 0.01) w.push(f.name + ': "' + r.name + '" keluar dari batas kavling.'); });
+    (f.openings || []).forEach(function (o) { var r = f.rooms.filter(function (x) { return x.id === o.roomId; })[0]; if (r) { var len = (o.wall === 'N' || o.wall === 'S') ? r.w : r.h; if (o.offset + o.width > len + 0.01) w.push(f.name + ': ' + (o.type === 'door' ? 'pintu' : 'jendela') + ' di "' + r.name + '" melebihi panjang dinding.'); } });
+  });
+  return w;
+}
+
+/* ---------- Gambar SVG denah ---------- */
+function openingSeg(r, o) {
+  if (o.wall === 'N') return [r.x + o.offset, r.y, r.x + o.offset + o.width, r.y, 0, 1];
+  if (o.wall === 'S') return [r.x + o.offset, r.y + r.h, r.x + o.offset + o.width, r.y + r.h, 0, -1];
+  if (o.wall === 'W') return [r.x, r.y + o.offset, r.x, r.y + o.offset + o.width, 1, 0];
+  return [r.x + r.w, r.y + o.offset, r.x + r.w, r.y + o.offset + o.width, -1, 0];
+}
+function planSvg(meta, fi, opt) {
+  opt = opt || {};
+  var f = meta.plan.floors[fi] || { rooms: [], openings: [] };
+  var W = n(meta.landWidthM) || 6, Dp = n(meta.landDepthM) || 12, pad = opt.compact ? 0.6 : 1.7;
+  var vb = [-pad, -pad, W + pad * 2, Dp + pad * 2];
+  var s = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="' + vb.join(' ') + '" class="plan-svg" role="img" aria-label="Denah ' + esc(f.name) + '" font-family="Segoe UI, Arial, sans-serif"' + (opt.attrs || '') + '>';
+  s += '<rect x="' + vb[0] + '" y="' + vb[1] + '" width="' + vb[2] + '" height="' + vb[3] + '" fill="#fff"/>';
+  if (opt.grid) {
+    for (var gx = 0; gx <= W + 0.001; gx += 0.5) s += '<line x1="' + gx + '" y1="0" x2="' + gx + '" y2="' + Dp + '" stroke="' + (Math.abs(gx % 1) < 0.01 ? '#DCE2E8' : '#EEF1F4') + '" stroke-width="0.02"/>';
+    for (var gy = 0; gy <= Dp + 0.001; gy += 0.5) s += '<line x1="0" y1="' + gy + '" x2="' + W + '" y2="' + gy + '" stroke="' + (Math.abs(gy % 1) < 0.01 ? '#DCE2E8' : '#EEF1F4') + '" stroke-width="0.02"/>';
+  }
+  s += '<rect x="0" y="0" width="' + W + '" height="' + Dp + '" fill="none" stroke="#8D99A6" stroke-width="0.05" stroke-dasharray="0.3 0.15"/>';
+  if (!opt.compact) {
+    s += '<line x1="0" y1="-0.55" x2="' + W + '" y2="-0.55" stroke="#5B6773" stroke-width="0.025"/><line x1="0" y1="-0.7" x2="0" y2="-0.4" stroke="#5B6773" stroke-width="0.025"/><line x1="' + W + '" y1="-0.7" x2="' + W + '" y2="-0.4" stroke="#5B6773" stroke-width="0.025"/>';
+    s += '<text x="' + W / 2 + '" y="-0.7" font-size="0.32" text-anchor="middle" fill="#3D4955">' + m2(W) + ' m</text>';
+    s += '<text x="' + W / 2 + '" y="-1.15" font-size="0.3" text-anchor="middle" fill="#8D99A6">Depan / jalan</text>';
+    s += '<line x1="-0.55" y1="0" x2="-0.55" y2="' + Dp + '" stroke="#5B6773" stroke-width="0.025"/><line x1="-0.7" y1="0" x2="-0.4" y2="0" stroke="#5B6773" stroke-width="0.025"/><line x1="-0.7" y1="' + Dp + '" x2="-0.4" y2="' + Dp + '" stroke="#5B6773" stroke-width="0.025"/>';
+    s += '<text x="-0.75" y="' + Dp / 2 + '" font-size="0.32" text-anchor="middle" fill="#3D4955" transform="rotate(-90 -0.75 ' + Dp / 2 + ')">' + m2(Dp) + ' m</text>';
+    s += '<g transform="translate(0 ' + (Dp + 0.7) + ')"><rect x="0" y="0" width="1" height="0.12" fill="#3D4955"/><rect x="1" y="0" width="1" height="0.12" fill="#fff" stroke="#3D4955" stroke-width="0.02"/><text x="0" y="0.45" font-size="0.26" fill="#5B6773">0</text><text x="1" y="0.45" font-size="0.26" fill="#5B6773" text-anchor="middle">1</text><text x="2" y="0.45" font-size="0.26" fill="#5B6773" text-anchor="middle">2 m</text></g>';
+    s += '<text x="' + W + '" y="' + (Dp + 1.15) + '" font-size="0.36" font-weight="700" text-anchor="end" fill="#1F2A36">' + esc(f.name) + '</text>';
+  }
+  var rooms = f.rooms.slice().sort(function (a, b) { return (OUTDOOR[b.kind] ? 1 : 0) - (OUTDOOR[a.kind] ? 1 : 0); });
+  rooms.forEach(function (r) {
+    var out = OUTDOOR[r.kind], km = KIND_META[r.kind] || KIND_META.LIVING;
+    s += '<g data-room="' + esc(r.id) + '"' + (opt.editable ? ' style="cursor:move"' : '') + '><rect x="' + r.x + '" y="' + r.y + '" width="' + r.w + '" height="' + r.h + '" fill="' + km.f + '" stroke="' + (out ? '#8D99A6' : '#1F2A36') + '" stroke-width="' + (out ? 0.04 : 0.12) + '"' + (out ? ' stroke-dasharray="0.22 0.12"' : '') + '/>';
+    if (opt.labels !== false) {
+      var fs = Math.max(0.14, Math.min(0.36, Math.min(r.w, r.h) * 0.13, (r.w - 0.2) / (Math.max(4, r.name.length) * 0.56))), cx = r.x + r.w / 2, cy = r.y + r.h / 2;
+      var small = r.w < 1.7 || r.h < 1.3;
+      s += '<text x="' + cx + '" y="' + (cy - (small ? -fs * 0.3 : fs * 0.35)) + '" font-size="' + fs + '" font-weight="600" text-anchor="middle" fill="#1F2A36">' + esc(r.name) + '</text>';
+      if (!small) s += '<text x="' + cx + '" y="' + (cy + fs * 0.85) + '" font-size="' + fs * 0.78 + '" text-anchor="middle" fill="#4A5562">' + m2(r.w) + ' × ' + m2(r.h) + ' m, ' + m2(r.w * r.h) + ' m²</text>';
+    }
+    s += '</g>';
+  });
+  var byR = {}; f.rooms.forEach(function (r) { byR[r.id] = r; });
+  (f.openings || []).forEach(function (o) {
+    var r = byR[o.roomId]; if (!r) return;
+    var g = openingSeg(r, o), x1 = g[0], y1 = g[1], x2 = g[2], y2 = g[3], nx = g[4], ny = g[5];
+    s += '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" stroke="#fff" stroke-width="0.17"/>';
+    if (o.type === 'door') {
+      var ex = x1 + nx * o.width, ey = y1 + ny * o.width;
+      var sweep = (o.wall === 'S' || o.wall === 'W') ? 1 : 0;
+      s += '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + ex + '" y2="' + ey + '" stroke="#1F2A36" stroke-width="0.035"/><path d="M' + ex + ' ' + ey + ' A' + o.width + ' ' + o.width + ' 0 0 ' + sweep + ' ' + x2 + ' ' + y2 + '" fill="none" stroke="#1F2A36" stroke-width="0.018" stroke-dasharray="0.06 0.04"/>';
+    } else {
+      var dx = Math.abs(nx) * 0.05, dy = Math.abs(ny) * 0.05;
+      s += '<line x1="' + (x1 - dx) + '" y1="' + (y1 - dy) + '" x2="' + (x2 - dx) + '" y2="' + (y2 - dy) + '" stroke="#2B6CB0" stroke-width="0.03"/><line x1="' + (x1 + dx) + '" y1="' + (y1 + dy) + '" x2="' + (x2 + dx) + '" y2="' + (y2 + dy) + '" stroke="#2B6CB0" stroke-width="0.03"/>';
+    }
+  });
+  if (opt.editable && opt.selId) {
+    var sr = byR[opt.selId];
+    if (sr) s += '<rect x="' + sr.x + '" y="' + sr.y + '" width="' + sr.w + '" height="' + sr.h + '" fill="rgba(242,169,0,.12)" stroke="#F2A900" stroke-width="0.07" pointer-events="none"/><rect data-handle="se" x="' + (sr.x + sr.w - 0.22) + '" y="' + (sr.y + sr.h - 0.22) + '" width="0.44" height="0.44" fill="#F2A900" stroke="#1F2A36" stroke-width="0.03" style="cursor:nwse-resize"/>';
+  }
+  return s + '</svg>';
+}
+
+/* ---------- Editor ---------- */
+var ED = null;
+function clonePlan(p) { return JSON.parse(JSON.stringify(p)); }
+function openPlanEditor(fp, tplKey) {
+  var tpls = S.d.floorPlanTemplates || [];
+  var meta;
+  if (fp) meta = { id: fp.id, code: fp.code, name: fp.name, unitType: fp.unitType, landWidthM: n(fp.landWidthM), landDepthM: n(fp.landDepthM), notes: fp.notes || '', plan: clonePlan(fp.plan) };
+  else {
+    var t = tpls.filter(function (x) { return x.key === tplKey; })[0];
+    meta = t ? { code: 'DNH-' + t.key.slice(1), name: t.unitType, unitType: t.unitType, landWidthM: t.landWidthM, landDepthM: t.landDepthM, notes: '', plan: clonePlan(t.plan) }
+      : { code: 'DNH-BARU', name: 'Denah baru', unitType: '', landWidthM: 7.5, landDepthM: 12, notes: '', plan: { wallHeightM: 3, floors: [{ name: 'Lantai 1', rooms: [], openings: [] }] } };
+  }
+  ED = { meta: meta, fi: 0, sel: null, snap: 0.25, hist: [], drag: null, readOnly: !can('DESIGN_MANAGE') };
+  closeModal();
+  var bg = document.createElement('div'); bg.className = 'modal-bg'; bg.id = 'modal';
+  bg.innerHTML = '<div class="modal full" role="dialog" aria-modal="true" aria-labelledby="mh"><div class="modal-h"><h3 id="mh">' + esc(fp ? 'Denah ' + fp.code : 'Denah baru') + '</h3><div class="row" id="edFloors"></div>' +
+    '<button class="iconbtn" data-act="ed-undo" title="Urungkan (Ctrl+Z)" aria-label="Urungkan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button><button class="iconbtn" data-act="modal-close" aria-label="Tutup">' + ico('x') + '</button></div>' +
+    '<div class="ed"><div class="ed-canvas" id="edCanvas"></div><aside class="ed-side" id="edSide"></aside></div>' +
+    '<div class="modal-f"><span class="small muted grow" id="edHint">Seret ruang untuk memindahkan, tarik kotak kuning untuk mengubah ukuran. Panah keyboard menggeser ruang terpilih.</span>' +
+    '<button class="btn" data-act="plan-print-ed">' + ico('printer') + ' Cetak</button><button class="btn" data-act="modal-close">Tutup</button>' + (ED.readOnly ? '' : '<button class="btn primary" data-act="ed-save">Simpan denah</button>') + '</div></div>';
+  document.body.appendChild(bg);
+  edRender();
+}
+function edPush() { ED.hist.push(JSON.stringify({ plan: ED.meta.plan, landWidthM: ED.meta.landWidthM, landDepthM: ED.meta.landDepthM })); if (ED.hist.length > 60) ED.hist.shift(); }
+function edFloor() { return ED.meta.plan.floors[ED.fi]; }
+function edRoom() { return edFloor().rooms.filter(function (r) { return r.id === ED.sel; })[0] || null; }
+function edRender() { edRenderCanvas(); edRenderSide(); edRenderFloors(); }
+function edRenderFloors() {
+  var box = $('#edFloors'); if (!box) return;
+  box.innerHTML = ED.meta.plan.floors.map(function (f, i) { return '<button class="btn sm ' + (i === ED.fi ? 'ink' : '') + '" data-act="ed-floor" data-i="' + i + '">' + esc(f.name) + '</button>'; }).join('');
+}
+function edRenderCanvas() {
+  var c = $('#edCanvas'); if (!c) return;
+  c.innerHTML = planSvg(ED.meta, ED.fi, { editable: !ED.readOnly, grid: true, selId: ED.sel, attrs: ' id="edSvg"' });
+}
+function numIn(id, v, label, step) { return '<div class="field"><label for="' + id + '">' + label + '</label><input id="' + id + '" type="number" step="' + (step || 0.05) + '" value="' + (Math.round(n(v) * 100) / 100) + '" inputmode="decimal"></div>'; }
+function edRenderSide() {
+  var side = $('#edSide'); if (!side) return;
+  var r = edRoom(), M = ED.meta, ro = ED.readOnly;
+  if (r) {
+    var ops = (edFloor().openings || []).filter(function (o) { return o.roomId === r.id; });
+    side.innerHTML = '<div class="row" style="justify-content:space-between"><h3>Ruang terpilih</h3><button class="btn sm" data-act="ed-desel">Selesai</button></div>' +
+      '<div class="form" style="margin-top:10px"><div class="field full"><label for="edName">Nama ruang</label><input id="edName" value="' + esc(r.name) + '" maxlength="40"' + (ro ? ' disabled' : '') + '></div>' +
+      '<div class="field full"><label for="edKind">Fungsi</label><select id="edKind"' + (ro ? ' disabled' : '') + '>' + Object.keys(KIND_META).map(function (k) { return '<option value="' + k + '"' + (k === r.kind ? ' selected' : '') + '>' + KIND_META[k].l + '</option>'; }).join('') + '</select></div>' +
+      numIn('edX', r.x, 'Posisi X (m)') + numIn('edY', r.y, 'Posisi Y (m)') + numIn('edW', r.w, 'Lebar (m)') + numIn('edH', r.h, 'Panjang (m)') + '</div>' +
+      '<p class="small">Luas <b>' + m2(r.w * r.h) + ' m²</b>' + (OUTDOOR[r.kind] ? ' (tidak dihitung luas bangunan)' : '') + '</p>' +
+      (ro ? '' : '<div class="row"><button class="btn sm" data-act="ed-dup">Duplikat</button><button class="btn sm" data-act="ed-rot">Putar 90°</button><button class="btn sm danger" data-act="ed-del">Hapus ruang</button></div>') +
+      '<h3 style="margin:16px 0 8px">Pintu & jendela</h3>' +
+      (ro ? '' : '<div class="row"><select id="edWall" class="input" style="max-width:150px" aria-label="Dinding">' + ['N', 'S', 'W', 'E'].map(function (w) { return '<option value="' + w + '">' + WALL_LABEL[w] + '</option>'; }).join('') + '</select><input id="edOpW" class="input" style="max-width:76px" type="number" step="0.05" value="0.9" aria-label="Lebar bukaan (m)"><button class="btn sm" data-act="ed-op" data-t="door">+ Pintu</button><button class="btn sm" data-act="ed-op" data-t="window">+ Jendela</button></div>') +
+      (ops.length ? '<div class="stack" style="gap:6px;margin-top:8px">' + ops.map(function (o) { return '<div class="row small" style="gap:6px"><b style="min-width:58px">' + (o.type === 'door' ? 'Pintu' : 'Jendela') + '</b><span class="muted">dinding ' + WALL_LABEL[o.wall] + ', lebar ' + m2(o.width) + ' m</span><span class="grow"></span>' + (ro ? '' : '<input class="input" style="max-width:70px;min-height:32px;padding:4px" type="number" step="0.05" value="' + o.offset + '" data-op-off="' + o.id + '" aria-label="Jarak dari ujung dinding"><button class="iconbtn" data-act="ed-op-del" data-id="' + o.id + '" aria-label="Hapus bukaan">' + ico('x') + '</button>') + '</div>'; }).join('') + '</div><p class="tiny muted">Angka = jarak bukaan dari ujung kiri/atas dinding (m).</p>' : '<p class="small muted">Belum ada pintu/jendela.</p>');
+    return;
+  }
+  var st = planStats(M), warn = planWarnings(M);
+  var types = {}; (S.d.houseUnits || []).forEach(function (u) { types[u.unitType] = 1; });
+  side.innerHTML = '<h3>Data denah</h3><div class="form" style="margin-top:10px">' +
+    '<div class="field"><label for="edCode">Kode</label><input id="edCode" value="' + esc(M.code) + '" maxlength="20"' + (ro ? ' disabled' : '') + '></div>' +
+    '<div class="field"><label for="edNm">Nama</label><input id="edNm" value="' + esc(M.name) + '" maxlength="80"' + (ro ? ' disabled' : '') + '></div>' +
+    '<div class="field full"><label for="edUT">Tipe unit (sama dengan tipe di data kavling)</label><input id="edUT" list="edUTl" value="' + esc(M.unitType) + '" maxlength="60"' + (ro ? ' disabled' : '') + '><datalist id="edUTl">' + Object.keys(types).map(function (t) { return '<option value="' + esc(t) + '">'; }).join('') + '</datalist></div>' +
+    numIn('edLW', M.landWidthM, 'Lebar tanah (m)', 0.1) + numIn('edLD', M.landDepthM, 'Panjang tanah (m)', 0.1) + numIn('edWH', M.plan.wallHeightM || 3, 'Tinggi dinding (m)', 0.1) +
+    '<div class="field"><label for="edSnap">Langkah geser</label><select id="edSnap">' + [0.05, 0.1, 0.25, 0.5].map(function (v) { return '<option value="' + v + '"' + (v === ED.snap ? ' selected' : '') + '>' + String(v).replace('.', ',') + ' m</option>'; }).join('') + '</select></div></div>' +
+    '<div class="kpis" style="margin:12px 0"><div class="kpi"><div class="k">Luas bangunan</div><div class="v">' + m2(st.area) + ' m²</div><div class="s">' + st.perFloor.map(function (a, i) { return 'L' + (i + 1) + ' ' + m2(a); }).join(', ') + '</div></div><div class="kpi"><div class="k">Luas tanah</div><div class="v">' + m2(st.land) + ' m²</div><div class="s">KDB ' + m2(st.kdb) + '%</div></div><div class="kpi"><div class="k">Kamar</div><div class="v">' + st.bed + ' KT, ' + st.bath + ' KM</div><div class="s">' + M.plan.floors.length + ' lantai</div></div></div>' +
+    (warn.length ? '<div class="alerts" style="margin-bottom:10px">' + warn.slice(0, 6).map(function (x) { return '<div class="alert warn small">' + esc(x) + '</div>'; }).join('') + '</div>' : '') +
+    (ro ? '' : '<h3 style="margin:14px 0 8px">Tambah ruang di ' + esc(edFloor().name) + '</h3><div class="row" style="gap:6px">' + ROOM_PRESETS.map(function (p, i) { return '<button class="btn sm" data-act="ed-add" data-i="' + i + '">' + esc(p[0]) + '</button>'; }).join('') + '</div>' +
+      '<h3 style="margin:14px 0 8px">Lantai</h3><div class="row"><input id="edFN" class="input" style="max-width:160px" value="' + esc(edFloor().name) + '" aria-label="Nama lantai"><button class="btn sm" data-act="ed-floor-add"' + (M.plan.floors.length >= 3 ? ' disabled' : '') + '>+ Lantai</button>' + (M.plan.floors.length > 1 ? '<button class="btn sm danger" data-act="ed-floor-del">Hapus lantai ini</button>' : '') + '</div>' +
+      '<h3 style="margin:14px 0 8px">Mulai dari template</h3><div class="row"><select id="edTpl" class="input" style="max-width:230px" aria-label="Template">' + (S.d.floorPlanTemplates || []).map(function (t) { return '<option value="' + t.key + '">' + esc(t.label) + '</option>'; }).join('') + '</select><button class="btn sm" data-act="ed-tpl">Terapkan</button></div>') +
+    '<h3 style="margin:14px 0 8px">Estimasi volume untuk RAB</h3><dl class="kv"><dt>Luas lantai (ruang tertutup)</dt><dd>' + m2(st.area) + ' m²</dd><dt>Panjang dinding</dt><dd>' + m2(st.wall) + ' m</dd><dt>Luas pasangan dinding</dt><dd>' + m2(st.netWall) + ' m²</dd><dt>Luas atap (≈ × 1,3)</dt><dd>' + m2(st.roof) + ' m²</dd></dl>' +
+    '<p class="tiny muted">Dinding bersama dihitung sekali; luas dinding = panjang × tinggi − bukaan (pintu × 2,1 m, jendela × 1,2 m). Atap memakai faktor 1,3 untuk kemiringan & overstek.</p>' +
+    (can('RAB_CREATE') && M.id ? '<button class="btn sm" data-act="ed-rab">Buat usulan RAB dari denah</button>' : (can('RAB_CREATE') ? '<p class="tiny muted">Simpan denah dulu untuk membuat usulan RAB.</p>' : '')) +
+    '<div class="field" style="margin-top:12px"><label for="edNotes">Catatan</label><textarea id="edNotes" maxlength="1000"' + (ro ? ' disabled' : '') + '>' + esc(M.notes || '') + '</textarea></div>';
+}
+function edReadMeta() {
+  var M = ED.meta, g = function (id) { var el = document.getElementById(id); return el ? el.value : null; };
+  if (g('edCode') !== null) { M.code = g('edCode'); M.name = g('edNm'); M.unitType = g('edUT'); M.notes = g('edNotes'); }
+}
+/* input samping */
+document.addEventListener('change', function (e) {
+  if (!ED || !e.target.closest || !e.target.closest('#edSide')) return;
+  var id = e.target.id, v = e.target.value, r = edRoom(), M = ED.meta;
+  if (id === 'edSnap') { ED.snap = Number(v); return; }
+  if (['edCode', 'edNm', 'edUT', 'edNotes'].indexOf(id) >= 0) { edReadMeta(); return; }
+  edPush();
+  if (r && id === 'edName') r.name = v.slice(0, 40) || r.name;
+  else if (r && id === 'edKind') r.kind = v;
+  else if (r && ['edX', 'edY', 'edW', 'edH'].indexOf(id) >= 0) { var k = { edX: 'x', edY: 'y', edW: 'w', edH: 'h' }[id]; var x = rnd(n(v)); if ((k === 'w' || k === 'h') && x < 0.5) x = 0.5; r[k] = x; }
+  else if (id === 'edLW') M.landWidthM = Math.max(3, rnd(n(v)));
+  else if (id === 'edLD') M.landDepthM = Math.max(3, rnd(n(v)));
+  else if (id === 'edWH') M.plan.wallHeightM = Math.max(2.4, Math.min(6, rnd(n(v))));
+  else if (id === 'edFN') { edFloor().name = v.slice(0, 30) || edFloor().name; edRenderFloors(); }
+  else if (e.target.dataset.opOff) { var o = edFloor().openings.filter(function (x) { return x.id === e.target.dataset.opOff; })[0]; if (o) o.offset = Math.max(0, rnd(n(v))); }
+  else { ED.hist.pop(); return; }
+  edRenderCanvas(); if (id === 'edKind' || id === 'edLW' || id === 'edLD' || id === 'edWH') edRenderSide();
+});
+/* seret & ubah ukuran */
+function svgPt(evt) { var svg = $('#edSvg'); var p = svg.createSVGPoint(); p.x = evt.clientX; p.y = evt.clientY; return p.matrixTransform(svg.getScreenCTM().inverse()); }
+document.addEventListener('pointerdown', function (e) {
+  if (!ED || ED.readOnly || !e.target.closest || !e.target.closest('#edSvg')) return;
+  var h = e.target.closest('[data-handle]'), g = e.target.closest('[data-room]');
+  if (!h && !g) { if (ED.sel) { ED.sel = null; edRenderCanvas(); edRenderSide(); } return; }
+  e.preventDefault();
+  if (g && (!ED.sel || ED.sel !== g.getAttribute('data-room'))) { ED.sel = g.getAttribute('data-room'); edRenderSide(); }
+  var r = edRoom(); if (!r) return;
+  var p = svgPt(e);
+  ED.drag = { mode: h ? 'resize' : 'move', sx: p.x, sy: p.y, r0: { x: r.x, y: r.y, w: r.w, h: r.h }, moved: false };
+  edRenderCanvas();
+});
+document.addEventListener('pointermove', function (e) {
+  if (!ED || !ED.drag) return;
+  var p = svgPt(e), d = ED.drag, r = edRoom(); if (!r) return;
+  var dx = rnd(p.x - d.sx, ED.snap), dy = rnd(p.y - d.sy, ED.snap);
+  if (!d.moved && (dx || dy)) { d.moved = true; edPush(); }
+  if (d.mode === 'move') { r.x = rnd(d.r0.x + dx); r.y = rnd(d.r0.y + dy); }
+  else { r.w = Math.max(0.5, rnd(d.r0.w + dx)); r.h = Math.max(0.5, rnd(d.r0.h + dy)); }
+  edRenderCanvas();
+});
+document.addEventListener('pointerup', function () { if (ED && ED.drag) { var m = ED.drag.moved; ED.drag = null; if (m) edRenderSide(); } });
+document.addEventListener('keydown', function (e) {
+  if (!ED || !$('#edSvg')) return;
+  var tag = (e.target.tagName || '').toLowerCase(); if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); ACT['ed-undo'](); return; }
+  var r = edRoom(); if (!r || ED.readOnly) return;
+  var mv = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key];
+  if (mv) { e.preventDefault(); edPush(); r.x = rnd(r.x + mv[0] * ED.snap); r.y = rnd(r.y + mv[1] * ED.snap); edRenderCanvas(); edRenderSide(); }
+  if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); ACT['ed-del'](); }
+});
+function newId(prefix) { return prefix + Date.now().toString(36) + Math.random().toString(36).slice(2, 5); }
+ACT['ed-floor'] = function (el) { edReadMeta(); ED.fi = Number(el.dataset.i); ED.sel = null; edRender(); };
+ACT['ed-desel'] = function () { ED.sel = null; edRenderCanvas(); edRenderSide(); };
+ACT['ed-undo'] = function () { if (!ED || !ED.hist.length) return toast('Tidak ada yang bisa diurungkan.'); var h = JSON.parse(ED.hist.pop()); ED.meta.plan = h.plan; ED.meta.landWidthM = h.landWidthM; ED.meta.landDepthM = h.landDepthM; if (ED.fi >= ED.meta.plan.floors.length) ED.fi = 0; if (!edRoom()) ED.sel = null; edRender(); };
+ACT['ed-add'] = function (el) {
+  edReadMeta(); edPush();
+  var p = ROOM_PRESETS[Number(el.dataset.i)], f = edFloor(), M = ED.meta;
+  var r = { id: newId('r'), name: p[0], kind: p[1], w: p[2], h: p[3], x: rnd(Math.max(0, (M.landWidthM - p[2]) / 2), 0.5), y: rnd(Math.max(0, (M.landDepthM - p[3]) / 2), 0.5) };
+  var same = f.rooms.filter(function (x) { return x.name.indexOf(p[0]) === 0; }).length; if (same) r.name = p[0] + ' ' + (same + 1);
+  f.rooms.push(r); ED.sel = r.id; edRenderCanvas(); edRenderSide();
+};
+ACT['ed-dup'] = function () { var r = edRoom(); if (!r) return; edPush(); var c = Object.assign({}, r, { id: newId('r'), name: r.name + ' (salin)', x: rnd(r.x + 0.5), y: rnd(r.y + 0.5) }); edFloor().rooms.push(c); ED.sel = c.id; edRenderCanvas(); edRenderSide(); };
+ACT['ed-rot'] = function () { var r = edRoom(); if (!r) return; edPush(); var w = r.w; r.w = r.h; r.h = w; edFloor().openings = (edFloor().openings || []).filter(function (o) { return o.roomId !== r.id; }); edRenderCanvas(); edRenderSide(); toast('Ruang diputar; pintu/jendela ruang ini dihapus, tambahkan ulang.'); };
+ACT['ed-del'] = function () { var r = edRoom(); if (!r) return; edPush(); var f = edFloor(); f.rooms = f.rooms.filter(function (x) { return x.id !== r.id; }); f.openings = (f.openings || []).filter(function (o) { return o.roomId !== r.id; }); ED.sel = null; edRenderCanvas(); edRenderSide(); };
+ACT['ed-op'] = function (el) {
+  var r = edRoom(); if (!r) return; edPush();
+  var wall = $('#edWall').value, w = Math.max(0.4, n($('#edOpW').value) || 0.9), len = (wall === 'N' || wall === 'S') ? r.w : r.h;
+  if (w > len) w = len;
+  var f = edFloor(); f.openings = f.openings || [];
+  f.openings.push({ id: newId('o'), roomId: r.id, wall: wall, offset: rnd(Math.max(0, (len - w) / 2)), width: w, type: el.dataset.t });
+  edRenderCanvas(); edRenderSide();
+};
+ACT['ed-op-del'] = function (el) { edPush(); var f = edFloor(); f.openings = f.openings.filter(function (o) { return o.id !== el.dataset.id; }); edRenderCanvas(); edRenderSide(); };
+ACT['ed-floor-add'] = function () { edReadMeta(); edPush(); var P = ED.meta.plan; if (P.floors.length >= 3) return; P.floors.push({ name: 'Lantai ' + (P.floors.length + 1), rooms: [], openings: [] }); ED.fi = P.floors.length - 1; ED.sel = null; edRender(); };
+ACT['ed-floor-del'] = function () { var P = ED.meta.plan; if (P.floors.length < 2) return; edPush(); P.floors.splice(ED.fi, 1); ED.fi = 0; ED.sel = null; edRender(); };
+ACT['ed-tpl'] = function () {
+  edReadMeta(); var t = (S.d.floorPlanTemplates || []).filter(function (x) { return x.key === $('#edTpl').value; })[0]; if (!t) return;
+  edPush(); var M = ED.meta; M.plan = clonePlan(t.plan); M.landWidthM = t.landWidthM; M.landDepthM = t.landDepthM; if (!M.unitType) M.unitType = t.unitType; ED.fi = 0; ED.sel = null; edRender();
+  toast('Template diterapkan. Urungkan bila ingin kembali.');
+};
+function planPayload() { edReadMeta(); var M = ED.meta; return { id: M.id, code: M.code, name: M.name, unitType: M.unitType, landWidthM: M.landWidthM, landDepthM: M.landDepthM, notes: M.notes, plan: M.plan }; }
+ACT['ed-save'] = function (el) {
+  var p = planPayload(), w = planWarnings(ED.meta);
+  var go = function () {
+    el.disabled = true;
+    doMutate('design.plan.save', p, 'Denah disimpan.').then(function (r) { if (r && r.id) { ED.meta.id = r.id; } closeModal(); ED = null; }).catch(function (e) { el.disabled = false; toast(errMsg(e), 'err'); });
+  };
+  if (w.length) toast('Disimpan dengan ' + w.length + ' peringatan (lihat panel kanan).');
+  go();
+};
+ACT['ed-rab'] = function () {
+  var st = planStats(ED.meta), M = ED.meta, ah = S.d.ahspTemplates || [];
+  var pick = function (re) { var a = ah.filter(function (x) { return re.test(x.workCategory + ' ' + x.name) && /m2/i.test(x.unit); })[0]; return a ? a.code : ''; };
+  var units = (S.d.houseUnits || []).filter(function (u) { return u.unitType === M.unitType; });
+  closeModal(); ED = null;
+  location.hash = '#/rab/rab';
+  setTimeout(function () {
+    openRabForm({ houseUnitId: units[0] ? units[0].id : '', revisionReason: 'Volume dari denah ' + M.code, items: [
+      { wbsCode: 'WBS-2', ahspCode: pick(/ARSITEKTUR|DINDING/i), workDescription: 'Pasangan dinding (denah ' + M.code + ')', volume: st.netWall.toFixed(2) },
+      { wbsCode: 'WBS-3', ahspCode: pick(/ATAP/i), workDescription: 'Rangka & penutup atap (denah ' + M.code + ')', volume: st.roof.toFixed(2) },
+      { wbsCode: 'WBS-4', ahspCode: pick(/FINISHING|LANTAI/i), workDescription: 'Lantai (denah ' + M.code + ')', volume: st.area.toFixed(2) }] });
+    toast('Periksa AHSP dan volume sebelum mengajukan.');
+  }, 120);
+};
+ACT['plan-print-ed'] = function () { printPlan(ED.meta); };
+
+/* ---------- Cetak & unduh denah ---------- */
+function roomSchedule(meta) {
+  return meta.plan.floors.map(function (f) {
+    return '<table><tr><th colspan="3">' + esc(f.name) + '</th></tr><tr><th>Ruang</th><th class="r">Ukuran (m)</th><th class="r">Luas (m²)</th></tr>' + f.rooms.map(function (r) { return '<tr><td>' + esc(r.name) + (OUTDOOR[r.kind] ? ' *' : '') + '</td><td class="r">' + m2(r.w) + ' × ' + m2(r.h) + '</td><td class="r">' + m2(r.w * r.h) + '</td></tr>'; }).join('') + '</table>';
+  }).join('');
+}
+function printPlan(meta) {
+  var st = planStats(meta), s = S.d.settings || {};
+  var pages = meta.plan.floors.map(function (f, i) {
+    return '<section class="plan-print"><div class="pp-svg">' + planSvg(meta, i, { grid: false }) + '</div><div class="pp-side"><div class="pp-co">' + esc(s.companyName || '') + '</div><h1>' + esc(meta.name) + '</h1><div>' + esc(meta.code) + (meta.unitType ? ' — ' + esc(meta.unitType) : '') + '</div>' +
+      '<table><tr><td>Lantai</td><td class="r">' + esc(f.name) + '</td></tr><tr><td>Luas tanah</td><td class="r">' + m2(st.land) + ' m² (' + m2(meta.landWidthM) + ' × ' + m2(meta.landDepthM) + ')</td></tr><tr><td>Luas bangunan</td><td class="r">' + m2(st.area) + ' m²</td></tr><tr><td>Luas lantai ini</td><td class="r">' + m2(st.perFloor[i]) + ' m²</td></tr><tr><td>Kamar</td><td class="r">' + st.bed + ' KT, ' + st.bath + ' KM</td></tr></table>' +
+      roomSchedule({ plan: { floors: [f] } }) + '<p class="pp-n">* tidak dihitung luas bangunan. Skala grafis; ukuran dalam meter (as dinding). Dicetak ' + dt(todayIso()) + '.</p></div></section>';
+  }).join('');
+  var root = $('#print-root'); root.innerHTML = '<style>' + PLAN_PRINT_CSS + '</style>' + pages;
+  setTimeout(function () { window.print(); }, 80);
+}
+var PLAN_PRINT_CSS = '@page denah{size:A4 landscape;margin:10mm}.plan-print{page:denah;break-after:page;display:grid;grid-template-columns:1fr 70mm;gap:8mm;height:186mm;font-family:Arial,sans-serif;color:#1F2A36}.plan-print:last-child{break-after:auto}.pp-svg svg{width:100%;height:186mm}.pp-side{font-size:8.5pt;border-left:.4mm solid #1F2A36;padding-left:5mm}.pp-side h1{font-size:14pt;margin:2mm 0}.pp-co{font-weight:700;font-size:9pt}.pp-side table{width:100%;border-collapse:collapse;margin-top:4mm}.pp-side td,.pp-side th{border-bottom:.2mm solid #C7CED6;padding:1mm 1.5mm;text-align:left}.pp-side .r{text-align:right}.pp-n{font-size:7pt;color:#5B6773}';
+function standaloneSvg(meta, i) { return '<' + '?xml version="1.0" encoding="UTF-8"?' + '>\n' + planSvg(meta, i, { grid: false }); }
+function fpMeta(fp) { return { id: fp.id, code: fp.code, name: fp.name, unitType: fp.unitType, landWidthM: n(fp.landWidthM), landDepthM: n(fp.landDepthM), notes: fp.notes, plan: fp.plan }; }
+
+/* ============================ BROSUR ============================ */
+var BR_THEMES = { BIRU: { l: 'Biru cetak-biru', c1: '#1D3A5F', c2: '#F2A900', c3: '#E9EEF4' }, HIJAU: { l: 'Hijau asri', c1: '#234E3A', c2: '#E2B04A', c3: '#E8F0EA' }, ARANG: { l: 'Arang & emas', c1: '#2B2F36', c2: '#C9A227', c3: '#EFEEEA' } };
+function priceShort(v) { var x = n(v); if (x >= 1e9) return 'Rp ' + (x / 1e9).toLocaleString('id-ID', { maximumFractionDigits: 2 }) + ' M'; if (x >= 1e6) return 'Rp ' + (x / 1e6).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' jt'; return rp(x); }
+function kprRows(price, k) {
+  var P = n(price), dp = P * n(k.dpPct) / 100, pl = P - dp, r = n(k.ratePct) / 1200;
+  return { dp: dp, plafon: pl, rows: (k.tenors || [10, 15, 20]).map(function (t) { var N = t * 12; return { tenor: t, inst: r ? pl * r / (1 - Math.pow(1 + r, -N)) : pl / N }; }) };
+}
+function facadeSvg(meta, th) {
+  var W = n(meta.landWidthM) || 7.5, fl = meta.plan.floors, f1 = fl[0] || { rooms: [] };
+  var ind = f1.rooms.filter(function (r) { return !OUTDOOR[r.kind]; });
+  var minX = Math.min.apply(null, ind.map(function (r) { return r.x; }).concat([W])), maxX = Math.max.apply(null, ind.map(function (r) { return r.x + r.w; }).concat([0]));
+  if (maxX <= minX) { minX = 0; maxX = W * 0.6; }
+  var cp = f1.rooms.filter(function (r) { return /carport/i.test(r.name); })[0];
+  var k = 150 / (W + 2), ox = 25 + k, gy = 92, fh = 26, nf = fl.length;
+  var bx = ox + minX * k, bw = (maxX - minX) * k, top = gy - fh * nf;
+  var s = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 110" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Ilustrasi tampak depan">';
+  s += '<rect width="200" height="110" fill="' + th.c3 + '"/><circle cx="168" cy="22" r="9" fill="' + th.c2 + '" opacity=".55"/>';
+  s += '<rect x="0" y="' + gy + '" width="200" height="18" fill="#C9D3C3"/><rect x="0" y="' + (gy + 6) + '" width="200" height="12" fill="#AEB7BF"/>';
+  [[12, 70, 13], [188, 74, 11]].forEach(function (t) { s += '<rect x="' + (t[0] - 1) + '" y="' + (t[1] + 6) + '" width="2" height="' + (gy - t[1] - 6) + '" fill="#6B5B45"/><circle cx="' + t[0] + '" cy="' + t[1] + '" r="' + t[2] / 1.6 + '" fill="#6E9A62"/>'; });
+  if (cp) { var cx = ox + cp.x * k, cw = cp.w * k; s += '<rect x="' + cx + '" y="' + (gy - 20) + '" width="' + cw + '" height="2.4" fill="' + th.c1 + '"/><rect x="' + (cx + cw - 2) + '" y="' + (gy - 18) + '" width="1.6" height="18" fill="' + th.c1 + '"/><rect x="' + (cx + 4) + '" y="' + (gy - 9) + '" width="' + Math.min(cw - 8, 30) + '" height="7" rx="2.5" fill="#7A8794"/>'; }
+  for (var i = 0; i < nf; i++) {
+    var y = gy - fh * (i + 1);
+    s += '<rect x="' + bx + '" y="' + y + '" width="' + bw + '" height="' + fh + '" fill="#FAF9F6" stroke="#B9C0C7" stroke-width=".5"/>';
+    var nwin = Math.max(1, Math.floor(bw / 22));
+    for (var j = 0; j < nwin; j++) {
+      var wx = bx + 6 + j * (bw - 12) / nwin, ww = Math.min(14, (bw - 12) / nwin - 4);
+      if (i === 0 && j === 0) { s += '<rect x="' + wx + '" y="' + (y + 6) + '" width="' + Math.min(9, ww) + '" height="' + (fh - 6) + '" fill="' + th.c1 + '"/><circle cx="' + (wx + Math.min(9, ww) - 2) + '" cy="' + (y + 16) + '" r=".8" fill="' + th.c2 + '"/>'; continue; }
+      s += '<rect x="' + wx + '" y="' + (y + 6) + '" width="' + ww + '" height="11" fill="#9DB7CF" stroke="' + th.c1 + '" stroke-width="1"/><line x1="' + (wx + ww / 2) + '" y1="' + (y + 6) + '" x2="' + (wx + ww / 2) + '" y2="' + (y + 17) + '" stroke="' + th.c1 + '" stroke-width=".6"/>';
+    }
+  }
+  s += '<polygon points="' + (bx - 5) + ',' + top + ' ' + (bx + bw / 2) + ',' + (top - 17) + ' ' + (bx + bw + 5) + ',' + top + '" fill="' + th.c1 + '"/><rect x="' + (bx - 5) + '" y="' + (top - 1) + '" width="' + (bw + 10) + '" height="2" fill="' + th.c2 + '"/>';
+  return s + '</svg>';
+}
+function brochureCtx(b) {
+  var d = S.d, fp = byId(d.floorPlans)[b.floorPlanId], prj = byId(d.projects)[b.projectId] || L().prj;
+  var meta = fp ? fpMeta(fp) : null, st = meta ? planStats(meta) : null;
+  var avail = (d.houseUnits || []).filter(function (u) { return b.unitType && u.unitType === b.unitType && !u.buyerName && u.status !== 'HANDED_OVER'; });
+  var total = (d.houseUnits || []).filter(function (u) { return b.unitType && u.unitType === b.unitType; });
+  return { fp: fp, meta: meta, st: st, prj: prj, avail: avail, total: total, th: BR_THEMES[b.theme] || BR_THEMES.BIRU, k: kprRows(b.price, b.kpr || { dpPct: 10, ratePct: 7.5, tenors: [10, 15, 20] }), s: d.settings || {} };
+}
+function brochureHtml(b) {
+  var c = brochureCtx(b), th = c.th, st = c.st, meta = c.meta, s = c.s;
+  var facts = st ? [[m2(st.land), 'm² luas tanah'], [m2(st.area), 'm² luas bangunan'], [st.bed, 'kamar tidur'], [st.bath, 'kamar mandi'], [meta.plan.floors.length, 'lantai'], [meta.plan.floors[0].rooms.some(function (r) { return /carport/i.test(r.name); }) ? 'Ada' : '—', 'carport']] : [];
+  var minInst = c.k.rows.length ? c.k.rows[c.k.rows.length - 1].inst : 0;
+  var hero = b.heroPhotoUrl ? '<img src="' + esc(b.heroPhotoUrl) + '" alt="Foto ' + esc(b.title) + '">' : (meta ? facadeSvg(meta, th) : '');
+  var p1 = '<section class="br-page"><div class="br-top"><b>' + esc(s.companyName || '') + '</b><span>' + esc(c.prj ? c.prj.location : '') + '</span></div>' +
+    '<div class="br-hero">' + hero + (b.heroPhotoUrl || !meta ? '' : '<span class="br-ill">Ilustrasi tampak depan</span>') + '</div>' +
+    '<div class="br-title">' + (n(b.price) ? '<div class="br-price"><small>Harga mulai</small>' + priceShort(b.price) + '</div>' : '') + '<h1>' + esc(b.title) + '</h1><div class="type">' + esc(b.unitType || '') + '</div>' + (b.tagline ? '<div class="tag">' + esc(b.tagline) + '</div>' : '') + '</div>' +
+    (facts.length ? '<div class="br-facts">' + facts.map(function (f) { return '<div><b>' + f[0] + '</b><span>' + f[1] + '</span></div>'; }).join('') + '</div>' : '') +
+    '<div class="br-cols"><div>' + ((b.facilities || []).length ? '<h3>Fasilitas</h3><ul class="br-list">' + b.facilities.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '') + '</div><div>' +
+    (b.locationText ? '<h3>Lokasi</h3><p class="br-p">' + esc(b.locationText) + '</p>' : '') +
+    (c.total.length ? '<h3>Ketersediaan</h3><p class="br-p"><b class="br-big">' + c.avail.length + '</b> dari ' + c.total.length + ' unit tersedia' + (c.avail.length ? ': ' + c.avail.slice(0, 12).map(function (u) { return esc(u.unitNumber); }).join(', ') : '') + '.</p>' : '') +
+    (n(b.price) ? '<h3>Angsuran KPR</h3><p class="br-p">Mulai <b class="br-big">' + rp(minInst) + '</b>/bulan* dengan DP ' + NF2.format(n(b.kpr && b.kpr.dpPct)) + '%.</p>' : '') + '</div></div>' +
+    '<div class="br-contact"><div><div class="lb">Informasi & pemesanan</div><div class="nm">' + esc(b.contactName || s.companyName || '') + '</div></div><div class="ph">' + esc(b.contactPhone || s.companyPhone || '') + '</div></div></section>';
+  var plans = meta ? meta.plan.floors.map(function (f, i) { return '<div class="br-plan">' + planSvg(meta, i, { grid: false }) + '</div>'; }).join('') : '<p class="br-p">Denah belum dipilih.</p>';
+  var rooms = meta ? '<table class="br-tbl"><tr><th>Ruang</th><th class="r">Ukuran</th><th class="r">Luas</th></tr>' + meta.plan.floors.map(function (f) { return (meta.plan.floors.length > 1 ? '<tr><td colspan="3" class="br-fl">' + esc(f.name) + '</td></tr>' : '') + f.rooms.filter(function (r) { return !OUTDOOR[r.kind]; }).map(function (r) { return '<tr><td>' + esc(r.name) + '</td><td class="r">' + m2(r.w) + ' × ' + m2(r.h) + ' m</td><td class="r">' + m2(r.w * r.h) + ' m²</td></tr>'; }).join(''); }).join('') + '</table>' : '';
+  var specs = (b.specs || []).length ? '<table class="br-tbl">' + b.specs.map(function (x) { return '<tr><th style="width:32%">' + esc(x.item) + '</th><td>' + esc(x.detail) + '</td></tr>'; }).join('') + '</table>' : '';
+  var kpr = n(b.price) ? '<table class="br-tbl"><tr><td>Harga</td><td class="r">' + rp(b.price) + '</td></tr><tr><td>Uang muka ' + NF2.format(n(b.kpr.dpPct)) + '%</td><td class="r">' + rp(c.k.dp) + '</td></tr><tr><td>Plafon KPR</td><td class="r">' + rp(c.k.plafon) + '</td></tr>' + c.k.rows.map(function (r) { return '<tr><th>Tenor ' + r.tenor + ' tahun</th><td class="r"><b>' + rp(r.inst) + '</b>/bulan</td></tr>'; }).join('') + '</table><p class="br-small">*Simulasi anuitas bunga ' + NF2.format(n(b.kpr.ratePct)) + '% per tahun. Angsuran sebenarnya mengikuti ketentuan bank.</p>' : '';
+  var p2 = '<section class="br-page"><div class="br-top"><b>' + esc(b.title) + '</b><span>' + esc(b.unitType || '') + '</span></div>' +
+    '<div class="br-sec"><h3>Denah ' + esc(meta ? meta.name : '') + '</h3><div class="br-plans n' + (meta ? meta.plan.floors.length : 1) + '">' + plans + '</div></div>' +
+    '<div class="br-grid2"><div>' + (rooms ? '<h3>Rincian ruang</h3>' + rooms : '') + (specs ? '<h3 style="margin-top:5mm">Spesifikasi teknis</h3>' + specs : '') + '</div><div>' + (kpr ? '<h3>Simulasi KPR</h3>' + kpr : '') + (b.notes ? '<h3 style="margin-top:5mm">Ketentuan</h3><p class="br-p">' + esc(b.notes) + '</p>' : '') + '</div></div>' +
+    '<div class="br-foot">Gambar, denah, dan spesifikasi dapat berubah sewaktu-waktu tanpa pemberitahuan. Ukuran denah dalam meter (as dinding). ' + esc(s.companyName || '') + (s.companyAddress ? ', ' + esc(s.companyAddress) : '') + '.</div></section>';
+  return '<div class="brochure" style="--c1:' + th.c1 + ';--c2:' + th.c2 + ';--c3:' + th.c3 + '">' + p1 + p2 + '</div>';
+}
+var BR_CSS = '.brochure{font-family:"Segoe UI",system-ui,Roboto,Arial,sans-serif;color:#1B232C;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
+  '.br-page{width:210mm;height:297mm;background:#fff;position:relative;overflow:hidden;box-sizing:border-box;display:flex;flex-direction:column;page:brochure;break-after:page}.br-page:last-child{break-after:auto}' +
+  '.br-top{background:var(--c1);color:#fff;padding:6mm 12mm;display:flex;justify-content:space-between;gap:6mm;font-size:9pt}.br-top b{font-weight:700}' +
+  '.br-hero{height:108mm;background:var(--c3);position:relative}.br-hero img,.br-hero svg{width:100%;height:100%;object-fit:cover;display:block}.br-ill{position:absolute;right:4mm;bottom:3mm;font-size:7pt;color:#3D4955;background:rgba(255,255,255,.7);padding:.6mm 2mm}' +
+  '.br-title{margin:-20mm 12mm 0;background:#fff;position:relative;padding:7mm 8mm 6mm;border-left:3mm solid var(--c2);box-shadow:0 1.5mm 5mm rgba(0,0,0,.14)}' +
+  '.br-title h1{font:700 25pt/1.05 Bahnschrift,"DIN Alternate","Arial Narrow",Arial,sans-serif;margin:0;color:var(--c1);max-width:120mm}.br-title .type{font-size:12pt;font-weight:600;margin-top:2mm}.br-title .tag{font-size:10.5pt;color:#4A5562;margin-top:1.5mm;max-width:125mm}' +
+  '.br-price{position:absolute;right:7mm;top:-8mm;background:var(--c2);color:#1B1B1B;padding:2.5mm 5mm;font:700 17pt Bahnschrift,"Arial Narrow",Arial,sans-serif;text-align:right;line-height:1.1}.br-price small{display:block;font:500 8pt "Segoe UI",Arial,sans-serif}' +
+  '.br-facts{display:grid;grid-template-columns:repeat(6,1fr);margin:7mm 12mm 0;border-top:.5mm solid var(--c1);border-bottom:.5mm solid var(--c1)}.br-facts div{padding:3mm 1mm;text-align:center;border-right:.2mm solid #D5DBE1}.br-facts div:last-child{border-right:0}.br-facts b{display:block;font:700 16pt Bahnschrift,"Arial Narrow",Arial,sans-serif;color:var(--c1)}.br-facts span{font-size:7.6pt;color:#5B6773}' +
+  '.br-cols{display:grid;grid-template-columns:1fr 1fr;gap:9mm;margin:7mm 12mm 6mm}.br-page h3{font:700 11.5pt Bahnschrift,"Arial Narrow",Arial,sans-serif;color:var(--c1);margin:0 0 2.5mm;padding-bottom:1.2mm;border-bottom:.7mm solid var(--c2);display:inline-block}' +
+  '.br-list{list-style:none;margin:0 0 4mm;padding:0;font-size:9.5pt}.br-list li{padding:1.1mm 0 1.1mm 5mm;position:relative}.br-list li:before{content:"";position:absolute;left:0;top:2.6mm;width:2mm;height:2mm;background:var(--c2)}' +
+  '.br-p{font-size:9.5pt;margin:0 0 4mm;line-height:1.45}.br-big{font:700 13pt Bahnschrift,"Arial Narrow",Arial,sans-serif;color:var(--c1)}.br-small{font-size:7.4pt;color:#5B6773;margin:1.5mm 0 0}' +
+  '.br-contact{background:var(--c1);color:#fff;padding:6mm 12mm;display:flex;justify-content:space-between;align-items:center;gap:6mm;margin-top:auto}.br-contact .lb{font-size:8pt;opacity:.8}.br-contact .nm{font-size:11pt;font-weight:600}.br-contact .ph{font:700 19pt Bahnschrift,"Arial Narrow",Arial,sans-serif;color:var(--c2);white-space:nowrap}' +
+  '.br-sec{margin:6mm 12mm 0}.br-plans{display:grid;gap:4mm}.br-plans.n2,.br-plans.n3{grid-template-columns:repeat(2,1fr)}.br-plan{border:.3mm solid #D5DBE1;padding:1.5mm;background:#fff}.br-plan svg{width:100%;height:auto;max-height:118mm;display:block}.br-plans.n1 .br-plan svg{max-height:120mm}' +
+  '.br-grid2{display:grid;grid-template-columns:1fr 1fr;gap:8mm;margin:6mm 12mm 0}.br-tbl{width:100%;border-collapse:collapse;font-size:8.4pt}.br-tbl td,.br-tbl th{padding:1.2mm 1.8mm;border-bottom:.2mm solid #D5DBE1;text-align:left;vertical-align:top}.br-tbl th{font-weight:600;color:#3D4955}.br-tbl .r{text-align:right;white-space:nowrap}.br-fl{font-weight:700;color:var(--c1);background:var(--c3)}' +
+  '.br-foot{margin-top:auto;padding:4mm 12mm 5mm;font-size:7.2pt;color:#5B6773;border-top:.3mm solid #D5DBE1}' +
+  '@page brochure{size:A4;margin:0}';
+
+/* ---------- Tampilan modul ---------- */
+VIEWS.design = {
+  title: 'Denah & Brosur',
+  tabs: [['plans', 'Denah tipe rumah'], ['brochures', 'Brosur pemasaran']],
+  headActions: function (tab) {
+    if (tab === 'plans' && can('DESIGN_MANAGE')) return btn('plan-new', ico('plus') + ' Denah baru', '', 'primary');
+    if (tab === 'brochures' && can('MARKETING_MANAGE')) return btn('br-new', ico('plus') + ' Brosur baru', '', 'primary');
+    return '';
+  },
+  render: function (tab) {
+    var d = S.d;
+    if (tab === 'brochures') {
+      var list = (d.brochures || []).slice().sort(function (a, b) { return String(b.updatedAt).localeCompare(String(a.updatedAt)); });
+      if (!list.length) return '<div class="panel"><div class="empty"><b>Belum ada brosur untuk proyek ini</b>' + (can('MARKETING_MANAGE') ? 'Buat brosur dari denah tipe rumah; harga dan unit tersedia diambil dari data kavling.' : '') + '</div></div>';
+      return '<div class="cards-grid">' + list.map(function (b) {
+        var c = brochureCtx(b);
+        return '<article class="panel br-card"><div class="br-thumb" style="background:' + c.th.c3 + '">' + (b.heroPhotoUrl ? '<img src="' + esc(b.heroPhotoUrl) + '" alt="">' : (c.meta ? facadeSvg(c.meta, c.th) : '')) + '</div><div class="row" style="justify-content:space-between;margin-top:10px"><h3>' + esc(b.title) + '</h3>' + chip(b.status === 'PUBLISHED' ? 'APPROVED' : 'SUBMITTED', b.status === 'PUBLISHED' ? 'Terbit' : 'Draf') + '</div>' +
+          '<div class="small muted">' + esc(b.unitType || '—') + ', ' + (n(b.price) ? 'mulai ' + rpS(b.price) : 'tanpa harga') + '. ' + c.avail.length + ' unit tersedia. Diperbarui ' + dt(b.updatedAt) + '.</div>' +
+          '<div class="row" style="margin-top:10px">' + btn('br-preview', 'Pratinjau', 'data-id="' + b.id + '"', 'sm primary') + btn('br-print', ico('printer') + ' PDF', 'data-id="' + b.id + '"') + btn('br-html', ico('download') + ' HTML', 'data-id="' + b.id + '"') + btn('br-wa', 'WhatsApp', 'data-id="' + b.id + '"') +
+          (can('MARKETING_MANAGE') ? btn('br-edit', 'Ubah', 'data-id="' + b.id + '"') + btn('master-del', 'Hapus', 'data-t="Brochures" data-id="' + b.id + '"', 'sm danger') : '') + '</div></article>';
+      }).join('') + '</div>';
+    }
+    var plans = d.floorPlans || [];
+    var types = {}; (d.houseUnits || []).forEach(function (u) { types[u.unitType] = (types[u.unitType] || 0) + 1; });
+    var tinfo = Object.keys(types).map(function (t) { var p = plans.filter(function (x) { return x.unitType === t; })[0]; return '<div class="row small"><b>' + esc(t) + '</b><span class="muted">' + types[t] + ' kavling</span>' + (p ? chip('APPROVED', 'Denah ' + p.code) : chip('SUBMITTED', 'Belum ada denah')) + '</div>'; }).join('');
+    return (tinfo ? '<div class="panel" style="margin-bottom:14px"><div class="panel-h"><h2>Tipe rumah di proyek ini</h2></div><div class="stack" style="gap:6px">' + tinfo + '</div><p class="small muted" style="margin-bottom:0">Denah terhubung ke kavling lewat "Tipe unit" yang sama persis. Denah berlaku untuk semua proyek.</p></div>' : '') +
+      (plans.length ? '<div class="cards-grid">' + plans.map(function (p) {
+        var meta = fpMeta(p);
+        return '<article class="panel"><div class="plan-thumb">' + planSvg(meta, 0, { compact: true }) + '</div><div class="row" style="justify-content:space-between;margin-top:10px"><h3>' + esc(p.name) + '</h3><span class="chip">' + esc(p.code) + '</span></div>' +
+          '<div class="small muted">' + esc(p.unitType || 'Tanpa tipe unit') + '. Tanah ' + m2(p.landWidthM) + ' × ' + m2(p.landDepthM) + ' m, bangunan ' + m2(p.buildingAreaM2) + ' m², ' + p.bedrooms + ' KT, ' + p.bathrooms + ' KM, ' + p.floors + ' lantai.</div>' +
+          '<div class="row" style="margin-top:10px">' + btn('plan-open', can('DESIGN_MANAGE') ? 'Buka editor' : 'Lihat', 'data-id="' + p.id + '"', 'sm primary') + btn('plan-print', ico('printer') + ' Cetak', 'data-id="' + p.id + '"') + btn('plan-svg', ico('download') + ' SVG', 'data-id="' + p.id + '"') +
+          (can('DESIGN_MANAGE') ? btn('plan-copy', 'Salin', 'data-id="' + p.id + '"') + btn('master-del', 'Hapus', 'data-t="FloorPlans" data-id="' + p.id + '"', 'sm danger') : '') + '</div></article>';
+      }).join('') + '</div>' : '<div class="panel"><div class="empty"><b>Belum ada denah</b>' + (can('DESIGN_MANAGE') ? 'Mulai dari template 36/72, 45/90, 54/108, atau 70/120 lalu sesuaikan.' : '') + '</div></div>');
+  }
+};
+ACT['plan-new'] = function () {
+  openForm({ title: 'Denah baru', fields: [{ name: 'tpl', label: 'Mulai dari', type: 'select', placeholder: false, options: [{ v: '', l: 'Kosong' }].concat((S.d.floorPlanTemplates || []).map(function (t) { return { v: t.key, l: t.label }; })), value: 'T45' }], submitLabel: 'Buka editor', onSubmit: function (v) { setTimeout(function () { openPlanEditor(null, v.tpl); }, 30); } });
+};
+ACT['plan-open'] = function (el) { openPlanEditor(byId(S.d.floorPlans)[el.dataset.id]); };
+ACT['plan-copy'] = function (el) { var p = byId(S.d.floorPlans)[el.dataset.id]; var c = JSON.parse(JSON.stringify(p)); delete c.id; c.code = (p.code + '-B').slice(0, 20); c.name = p.name + ' (varian)'; openPlanEditor(null, ''); ED.meta = Object.assign(fpMeta(c), { id: undefined }); edRender(); };
+ACT['plan-print'] = function (el) { printPlan(fpMeta(byId(S.d.floorPlans)[el.dataset.id])); };
+ACT['plan-svg'] = function (el) { var p = fpMeta(byId(S.d.floorPlans)[el.dataset.id]); p.plan.floors.forEach(function (f, i) { setTimeout(function () { download(p.code + '-' + f.name.replace(/\s+/g, '') + '.svg', standaloneSvg(p, i), 'image/svg+xml'); }, i * 400); }); };
+ACT['plan-view'] = function (el) {
+  var p = fpMeta(byId(S.d.floorPlans)[el.dataset.id]);
+  showInfo('Denah ' + p.name, '<div class="grid g2">' + p.plan.floors.map(function (f, i) { return '<div class="plan-thumb big">' + planSvg(p, i) + '</div>'; }).join('') + '</div>', true);
+};
+function defaultSpecs() { return [{ item: 'Pondasi', detail: 'Footplat & sloof beton bertulang' }, { item: 'Struktur', detail: 'Kolom & balok beton bertulang' }, { item: 'Dinding', detail: 'Bata ringan, plester aci, cat' }, { item: 'Atap', detail: 'Rangka baja ringan, genteng beton' }, { item: 'Lantai', detail: 'Granit 60 × 60' }, { item: 'Kusen & pintu', detail: 'Aluminium; pintu panel' }, { item: 'Plafon', detail: 'Gypsum rangka hollow' }, { item: 'Sanitair', detail: 'Closet duduk, shower' }, { item: 'Listrik', detail: '1.300 VA' }, { item: 'Air bersih', detail: 'PDAM / sumur bor' }]; }
+function minPriceFor(t) { var ps = (S.d.houseUnits || []).filter(function (u) { return u.unitType === t && n(u.salePrice) > 0; }).map(function (u) { return n(u.salePrice); }); return ps.length ? String(Math.min.apply(null, ps)) : ''; }
+function brochureForm(b) {
+  var d = S.d, prj = L().prj, isNew = !b;
+  b = b ? JSON.parse(JSON.stringify(b)) : { title: prj.name, theme: 'BIRU', specs: defaultSpecs(), facilities: [], kpr: { dpPct: 10, ratePct: 7.5, tenors: [10, 15, 20] }, contactName: '', contactPhone: d.settings.companyPhone || '', locationText: prj.location, status: 'DRAFT' };
+  var vals = Object.assign({}, b, { facilitiesText: (b.facilities || []).join('\n'), dpPct: String((b.kpr || {}).dpPct || 10), ratePct: String((b.kpr || {}).ratePct || 7.5), tenors: ((b.kpr || {}).tenors || [10, 15, 20]).join(', '), heroPhotoBase64: b.heroPhotoUrl || '' });
+  if (isNew && d.floorPlans && d.floorPlans.length) { var fp0 = d.floorPlans.filter(function (p) { return (d.houseUnits || []).some(function (u) { return u.unitType === p.unitType; }); })[0] || d.floorPlans[0]; vals.floorPlanId = fp0.id; vals.unitType = fp0.unitType; vals.price = minPriceFor(fp0.unitType); }
+  openForm({ title: isNew ? 'Brosur baru' : 'Ubah brosur', wide: true, values: vals, intro: 'Harga awal diambil dari harga jual terendah kavling bertipe sama; jumlah unit tersedia dihitung otomatis saat brosur dibuka.', fields: [
+    { name: 'title', label: 'Judul (nama proyek/cluster)', required: true, max: 80 }, { name: 'tagline', label: 'Kalimat utama', max: 160, placeholder: 'mis. Rumah 1 lantai siap huni dekat tol' },
+    { name: 'floorPlanId', label: 'Denah', type: 'select', options: (d.floorPlans || []).map(function (p) { return { v: p.id, l: p.code + ' — ' + p.name }; }), placeholder: 'Tanpa denah', onChange: function (v) { var p = byId(d.floorPlans)[v.floorPlanId]; if (p) { v.unitType = p.unitType; var mp = minPriceFor(p.unitType); if (mp) v.price = mp; } } },
+    { name: 'unitType', label: 'Tipe unit', max: 60 }, { name: 'price', label: 'Harga mulai (Rp)', type: 'money' },
+    { name: 'theme', label: 'Warna brosur', type: 'select', placeholder: false, options: Object.keys(BR_THEMES).map(function (k) { return { v: k, l: BR_THEMES[k].l }; }) },
+    { name: 'heroPhotoBase64', label: 'Foto utama (opsional — tanpa foto memakai ilustrasi tampak depan dari denah)', type: 'photo' },
+    { name: 'removePhoto', label: 'Hapus foto & pakai ilustrasi', type: 'check', show: function (v) { return !!b.heroPhotoUrl; } },
+    { name: 'facilitiesText', label: 'Fasilitas (satu per baris)', type: 'textarea', max: 1200 }, { name: 'locationText', label: 'Lokasi & akses', type: 'textarea', max: 300 },
+    { name: 'specs', label: 'Spesifikasi teknis', type: 'rows', cols: [{ name: 'item', label: 'Bagian' }, { name: 'detail', label: 'Keterangan' }] },
+    { name: 'dpPct', label: 'DP KPR (%)', type: 'pct' }, { name: 'ratePct', label: 'Bunga KPR per tahun (%)', type: 'pct' }, { name: 'tenors', label: 'Tenor (tahun, pisahkan koma)', placeholder: '10, 15, 20' },
+    { name: 'contactName', label: 'Nama kontak', max: 80 }, { name: 'contactPhone', label: 'No. telepon / WhatsApp', type: 'tel', max: 30 },
+    { name: 'notes', label: 'Ketentuan / cara pemesanan', type: 'textarea', max: 800 },
+    { name: 'status', label: 'Status', type: 'select', placeholder: false, options: [{ v: 'DRAFT', l: 'Draf' }, { v: 'PUBLISHED', l: 'Terbit' }] }
+  ], submitLabel: 'Simpan brosur', onSubmit: function (v) {
+    var p = Object.assign({}, v, { id: b.id, projectId: d.activeProjectId, facilities: String(v.facilitiesText || '').split('\n') });
+    if (p.heroPhotoBase64 && p.heroPhotoBase64.indexOf('data:') !== 0) delete p.heroPhotoBase64;
+    return doMutate('design.brochure.save', p, 'Brosur disimpan.').then(function (r) { if (r && r.id) setTimeout(function () { ACT['br-preview']({ dataset: { id: r.id } }); }, 60); });
+  } });
+}
+ACT['br-new'] = function () { if (!(S.d.floorPlans || []).length) toast('Tips: buat denah dulu agar brosur memuat denah & ilustrasi.'); brochureForm(); };
+ACT['br-edit'] = function (el) { brochureForm(byId(S.d.brochures)[el.dataset.id]); };
+ACT['br-preview'] = function (el) {
+  var b = byId(S.d.brochures)[el.dataset.id]; if (!b) return;
+  closeModal();
+  var bg = document.createElement('div'); bg.className = 'modal-bg'; bg.id = 'modal';
+  bg.innerHTML = '<div class="modal full" role="dialog" aria-modal="true" aria-labelledby="mh"><div class="modal-h"><h3 id="mh">Pratinjau brosur — ' + esc(b.title) + '</h3><button class="iconbtn" data-act="modal-close" aria-label="Tutup">' + ico('x') + '</button></div><div class="br-preview" id="brPrev"><style>' + BR_CSS + '</style>' + brochureHtml(b) + '</div>' +
+    '<div class="modal-f">' + btn('br-wa', 'Bagikan ke WhatsApp', 'data-id="' + b.id + '"', '') + btn('br-html', ico('download') + ' Unduh HTML', 'data-id="' + b.id + '"', '') + btn('br-print', ico('printer') + ' Cetak / simpan PDF', 'data-id="' + b.id + '"', 'primary') + '</div></div>';
+  document.body.appendChild(bg);
+  fitPreview();
+};
+function fitPreview() { var p = $('#brPrev'); if (!p) return; var z = Math.min(0.9, (p.clientWidth - 32) / 794); $$('.br-page', p).forEach(function (pg) { pg.style.zoom = z; }); }
+window.addEventListener('resize', function () { fitPreview(); });
+ACT['br-print'] = function (el) { var b = byId(S.d.brochures)[el.dataset.id]; closeModal(); $('#print-root').innerHTML = '<style>' + BR_CSS + '</style>' + brochureHtml(b); setTimeout(function () { window.print(); }, 150); };
+ACT['br-html'] = function (el) {
+  var b = byId(S.d.brochures)[el.dataset.id];
+  var html = '<!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' + esc(b.title + ' — ' + (b.unitType || '')) + '</title><style>body{margin:0;background:#7A8591}.brochure{display:flex;flex-direction:column;align-items:center;gap:8mm;padding:8mm 0}.br-page{box-shadow:0 2mm 8mm rgba(0,0,0,.3)}@media screen and (max-width:820px){.br-page{zoom:.45}}@media print{body{background:#fff}.brochure{padding:0;gap:0}.br-page{box-shadow:none;zoom:1}}' + BR_CSS + '</style></head><body>' + brochureHtml(b) + '</body></html>';
+  download('Brosur-' + b.title.replace(/[^\w]+/g, '-') + '.html', html, 'text/html;charset=utf-8');
+};
+ACT['br-wa'] = function (el) {
+  var b = byId(S.d.brochures)[el.dataset.id], c = brochureCtx(b), st = c.st;
+  var lines = ['*' + b.title + '*' + (b.unitType ? ' — ' + b.unitType : '')];
+  if (b.tagline) lines.push(b.tagline);
+  if (n(b.price)) lines.push('Harga mulai *' + rp(b.price) + '*');
+  if (st) lines.push('LT ' + m2(st.land) + ' m², LB ' + m2(st.area) + ' m², ' + st.bed + ' KT, ' + st.bath + ' KM');
+  if (n(b.price) && c.k.rows.length) lines.push('Angsuran mulai ' + rp(c.k.rows[c.k.rows.length - 1].inst) + '/bulan (simulasi, DP ' + NF2.format(n(b.kpr.dpPct)) + '%)');
+  if ((b.facilities || []).length) lines.push('Fasilitas: ' + b.facilities.join(', '));
+  if (c.total.length) lines.push('Unit tersedia: ' + c.avail.length + ' dari ' + c.total.length + (c.avail.length ? ' (' + c.avail.slice(0, 8).map(function (u) { return u.unitNumber; }).join(', ') + ')' : ''));
+  if (b.locationText) lines.push('Lokasi: ' + b.locationText);
+  lines.push('Info: ' + (b.contactName || '') + ' ' + (b.contactPhone || ''));
+  var text = lines.join('\n');
+  try { if (navigator.clipboard) navigator.clipboard.writeText(text); } catch (e) { }
+  window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank', 'noopener');
+  toast('Teks brosur disalin & WhatsApp dibuka. Lampirkan PDF/HTML brosur bila perlu.');
+};
 
 boot();
 </script>

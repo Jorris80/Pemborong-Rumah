@@ -3,7 +3,7 @@
  * - Permintaan API (POST ke script.google.com) tidak pernah di-cache; antrean offline ditangani aplikasi (IndexedDB).
  * - Naikkan VERSION setiap kali index.html diperbarui agar pengguna mendapat versi baru.
  */
-var VERSION = 'hcerp-v2.0.0';
+var VERSION = 'hcerp-v2.1.0';
 var SHELL = ['./', './index.html', './manifest.webmanifest', './icon.svg'];
 
 self.addEventListener('install', function (e) {
