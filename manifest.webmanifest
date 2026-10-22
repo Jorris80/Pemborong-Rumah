@@ -1,0 +1,17 @@
+{
+  "name": "Housing Contractor ERP",
+  "short_name": "HC-ERP",
+  "description": "ERP kontraktor perumahan: RAB, pengadaan, gudang, laporan lapangan, opname, keuangan, QC & serah terima per kavling.",
+  "lang": "id",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#E4E7EA",
+  "theme_color": "#1D3A5F",
+  "categories": ["business", "productivity"],
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon.svg", "sizes": "512x512", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}
