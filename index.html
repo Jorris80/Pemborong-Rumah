@@ -273,6 +273,21 @@ table.tbl{width:100%;border-collapse:collapse;font-size:.9rem}
   #edHint{display:none}
 }
 
+/* ---------- Kinerja, versi & legal ---------- */
+html.busy::before{content:"";position:fixed;left:0;top:0;height:3px;width:40%;background:var(--hivis);z-index:90;animation:busybar 1.1s ease-in-out infinite}
+@keyframes busybar{0%{transform:translateX(-100%)}100%{transform:translateX(260%)}}
+.side-link{color:#D5DFEA;text-decoration:underline;text-underline-offset:2px}
+.new-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:200px;border:2px dashed var(--line);background:transparent;box-shadow:none;cursor:pointer;color:var(--text)}
+.new-tile:hover{border-color:var(--hivis);background:var(--hivis-soft)}
+.new-tile svg{width:28px;height:28px}
+.howto{background:var(--surface-2);border-left:4px solid var(--hivis);padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:.92rem}
+.howto ol{margin:6px 0 0;padding-left:20px}
+.legal{max-width:78ch;font-size:.92rem;line-height:1.6}
+.legal h3{margin:14px 0 6px}
+.legal ul{padding-left:20px;margin:4px 0 8px}
+.legal-box{max-height:46vh;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:4px 14px;background:var(--surface-2)}
+@media (prefers-reduced-motion:reduce){html.busy::before{animation:none;width:100%;opacity:.6}}
+
 /* ---------- Responsif ---------- */
 @media (max-width:1100px){.g4{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:860px){
@@ -318,7 +333,7 @@ table.tbl{width:100%;border-collapse:collapse;font-size:.9rem}
 <script>
 /* Housing Contractor ERP — klien (vanilla JS). Inti: transport API, offline (IndexedDB + antrean), router, form, tabel, grafik. */
 'use strict';
-var CONFIG = { API_URL: 'https://script.google.com/macros/s/AKfycbxApoalXRMpIMBbsPSrhyQDYF-KrJjRSsZuxR4Jo4LqvTTDffYf6uwmIgALuzm_9uNS/exec', APP_VERSION: '2.1.0' };
+var CONFIG = { API_URL: 'https://script.google.com/macros/s/AKfycbxApoalXRMpIMBbsPSrhyQDYF-KrJjRSsZuxR4Jo4LqvTTDffYf6uwmIgALuzm_9uNS/exec', APP_VERSION: '2.2.0' };
 var IS_GAS = (typeof google !== 'undefined' && google.script && google.script.run) ? true : false;
 
 /* ============================ Util ============================ */
@@ -432,8 +447,15 @@ function AppErr(e) { this.name = 'AppErr'; this.code = e.code; this.message = e.
 AppErr.prototype = Object.create(Error.prototype);
 function apiUrl() { var u = lsGet('hc_api_url'); if (u) return u; return CONFIG.API_URL.indexOf('__') === 0 ? '' : CONFIG.API_URL; }
 
-function rpc(action, payload, opId) {
+var INFLIGHT = 0;
+function busy(d) { INFLIGHT = Math.max(0, INFLIGHT + d); document.documentElement.classList.toggle('busy', INFLIGHT > 0); }
+function rpc(action, payload, opId, extra) {
+  busy(1);
+  return rpc0(action, payload, opId, extra).then(function (r) { busy(-1); return r; }, function (e) { busy(-1); throw e; });
+}
+function rpc0(action, payload, opId, extra) {
   var req = { action: action, payload: payload || {}, token: S.token, opId: opId || null };
+  if (extra) for (var k in extra) req[k] = extra[k];
   if (IS_GAS) {
     return new Promise(function (res, rej) {
       google.script.run.withSuccessHandler(res).withFailureHandler(function (e) { rej(new NetError(e && e.message)); }).api(req);
@@ -447,14 +469,15 @@ function rpc(action, payload, opId) {
     .then(function (r) { clearTimeout(to); if (!r.ok) throw new NetError('Server merespons ' + r.status); return r.json(); })
     .catch(function (e) { clearTimeout(to); if (e instanceof NetError) throw e; throw new NetError(e && e.message); });
 }
-function call(action, payload, opId) {
-  return rpc(action, payload, opId).then(function (r) {
+function call(action, payload, opId, extra) {
+  return rpc(action, payload, opId, extra).then(function (r) {
     if (!r || !r.ok) {
       var e = new AppErr((r && r.error) || { code: 'UNKNOWN', message: 'Respons tidak dikenal.' });
       if (e.code === 'AUTH_REQUIRED' || e.code === 'AUTH_EXPIRED' || e.code === 'AUTH_INACTIVE_USER') { if (action !== 'auth.login') sessionEnded(e.message); }
       throw e;
     }
     if (r.duplicate) r.data = r.data || { duplicate: true };
+    if (r.boot) S.lastBoot = r.boot;
     return r.data;
   });
 }
@@ -468,7 +491,8 @@ function mutate(action, payload, okMsg) {
     return Store.set('outbox', opId, item).then(function () { S.outbox.push(item); updateNet(); toast('Disimpan di antrean offline. Akan dikirim otomatis saat online.', 'ok'); return { queued: true }; });
   };
   if (!S.online && !NO_OFFLINE.test(action)) return queueIt();
-  return call(action, payload, opId).then(function (d) {
+  S.lastBoot = null;
+  return call(action, payload, opId, S.projectId ? { refresh: S.projectId } : null).then(function (d) {
     if (okMsg) toast(okMsg, 'ok');
     return d;
   }).catch(function (e) {
@@ -725,15 +749,17 @@ function renderLogin(msg) {
     '<div class="field"><label for="lpass">Kata sandi</label><input id="lpass" type="password" autocomplete="current-password" required></div>' +
     '<button class="btn primary" type="submit" id="lbtn" style="justify-content:center;padding:11px">Masuk</button>' +
     (IS_GAS ? '' : '<details class="small"><summary>Pengaturan koneksi server</summary><div class="field" style="margin-top:8px"><label for="lapi">URL Web App Google Apps Script</label><input id="lapi" placeholder="https://script.google.com/macros/s/…/exec" value="' + esc(apiUrl()) + '"><div class="help">Diberikan oleh admin saat instalasi. Disimpan di perangkat ini.</div></div><button type="button" class="btn sm" data-act="test-api">Uji koneksi</button></details>') +
-    '<p class="small muted">Lupa kata sandi? Minta admin perusahaan melakukan reset dari menu Admin → Pengguna.</p></form></section></div>';
+    '<p class="small muted">Lupa kata sandi? Minta admin perusahaan melakukan reset dari menu Admin → Pengguna.</p><p class="small muted" style="margin:0">Dengan masuk, Anda menyetujui <a href="#" data-act="legal-terms">Syarat & Ketentuan</a> dan memahami <a href="#" data-act="legal-privacy">Pemberitahuan Privasi</a>.</p><p class="tiny muted" style="margin:0" id="loginVer">Versi aplikasi ' + esc(CONFIG.APP_VERSION) + '</p></form></section></div>';
+  if (!S.legal && (IS_GAS || apiUrl())) call('legal.info').then(function (i) { S.legal = i; var v = $('#loginVer'); if (v) v.textContent = 'Versi aplikasi ' + CONFIG.APP_VERSION + ', server ' + i.version + ', pengelola data: ' + (i.companyName || '-'); }).catch(function () { });
   $('#loginForm').onsubmit = function (e) {
     e.preventDefault();
     var api = $('#lapi'); if (api && api.value.trim()) lsSet('hc_api_url', api.value.trim());
     var email = $('#lemail').value.trim(), pw = $('#lpass').value;
     var b = $('#lbtn'); b.disabled = true; b.textContent = 'Memeriksa…';
-    call('auth.login', { email: email, password: pw, userAgent: navigator.userAgent }).then(function (r) {
+    call('auth.login', { email: email, password: pw, userAgent: navigator.userAgent, withBootstrap: true, projectId: lsGet('hc_project') || '' }).then(function (r) {
       S.token = r.token; lsSet('hc_token', r.token); lsSet('hc_last_email', email); S.user = r.user;
-      return start();
+      if (!r.boot) return start();
+      return loadOutbox().then(function () { applyBoot(r.boot); if (S.online) syncOutbox(); });
     }).catch(function (e) { renderLogin(e instanceof NetError ? 'Tidak dapat terhubung ke server. Periksa internet dan URL Web App.' : errMsg(e)); $('#lemail').value = email; });
   };
 }
@@ -743,30 +769,57 @@ ACT['test-api'] = function () {
   call('ping').then(function (r) { toast('Terhubung: ' + r.app + ' v' + r.version, 'ok'); }).catch(function (e) { toast('Gagal: ' + errMsg(e), 'err'); });
 };
 function sessionEnded(msg) {
-  S.token = null; lsSet('hc_token', null); closeModal();
+  S.token = null; S.d = null; lsSet('hc_token', null); closeModal();
   renderLogin(msg || 'Sesi berakhir. Silakan masuk kembali.');
+}
+/** Pasang data baru tanpa membongkar halaman (posisi gulir dipertahankan) */
+function applyBoot(d) {
+  var y = window.scrollY, same = S.d && S.d.actor && d.actor && S.d.actor.id === d.actor.id && $('#content');
+  S.d = d; S.fromCache = false; S.online = true; S.projectId = d.activeProjectId;
+  lsSet('hc_project', d.activeProjectId || ''); lsSet('hc_uid', d.actor.id);
+  Store.set('kv', 'boot:' + d.actor.id + ':' + (d.activeProjectId || ''), d); Store.set('kv', 'boot:last', d);
+  renderShell();
+  if (same) window.scrollTo(0, y);
 }
 
 /* ---------------- Data ---------------- */
+/** Muat data: tampilkan salinan tersimpan seketika (bila ada), lalu perbarui dari server di latar */
 function loadData(projectId, silent) {
-  if (!silent) $('#content') && ($('#content').innerHTML = '<div class="loading-full"><div class="spinner" aria-label="Memuat"></div></div>');
-  return call('bootstrap', { projectId: projectId || S.projectId }).then(function (d) {
-    S.d = d; S.fromCache = false; S.online = true; S.projectId = d.activeProjectId; lsSet('hc_project', d.activeProjectId || '');
-    Store.set('kv', 'boot:' + d.actor.id + ':' + (d.activeProjectId || ''), d); Store.set('kv', 'boot:last', d);
-    renderShell();
-  }).catch(function (e) {
-    if (!(e instanceof NetError)) throw e;
-    S.online = false;
-    return Store.get('kv', 'boot:last').then(function (d) {
-      if (!d) { $('#app').innerHTML = '<div class="loading-full"><div class="empty"><b>Tidak ada koneksi dan belum ada data tersimpan</b>Buka aplikasi sekali saat online agar data proyek tersimpan untuk mode offline.<br><br><button class="btn" onclick="location.reload()">Coba lagi</button></div></div>'; return; }
-      S.d = d; S.fromCache = true; S.projectId = d.activeProjectId; renderShell(); toast('Mode offline: menampilkan data tersimpan ' + dtt(d.serverTime) + '.');
+  var pid = projectId || S.projectId || '', uid = lsGet('hc_uid');
+  var fetchFresh = function (showedCache) {
+    if (showedCache) S.refreshing = true, updateNet();
+    else if (!silent && $('#content')) $('#content').innerHTML = '<div class="loading-full"><div class="spinner" aria-label="Memuat"></div></div>';
+    return call('bootstrap', { projectId: pid }).then(function (d) { S.refreshing = false; applyBoot(d); }).catch(function (e) {
+      S.refreshing = false; updateNet();
+      if (!(e instanceof NetError)) throw e;
+      S.online = false; updateNet();
+      if (showedCache) { toast('Offline: menampilkan data tersimpan ' + dtt(S.d.serverTime) + '.'); return; }
+      return Store.get('kv', 'boot:last').then(function (d) {
+        if (!d) { $('#app').innerHTML = '<div class="loading-full"><div class="empty"><b>Tidak ada koneksi dan belum ada data tersimpan</b>Buka aplikasi sekali saat online agar data proyek tersimpan untuk mode offline.<br><br><button class="btn" onclick="location.reload()">Coba lagi</button></div></div>'; return; }
+        S.d = d; S.fromCache = true; S.projectId = d.activeProjectId; renderShell(); toast('Mode offline: menampilkan data tersimpan ' + dtt(d.serverTime) + '.');
+      });
     });
+  };
+  if (silent || !uid) return fetchFresh(false);
+  return Store.get('kv', 'boot:' + uid + ':' + pid).then(function (c) {
+    if (!c && !pid) return Store.get('kv', 'boot:last');
+    return c;
+  }).then(function (c) {
+    if (c && c.actor && c.actor.id === uid && (!pid || c.activeProjectId === pid)) {
+      S.d = c; S.fromCache = false; S.projectId = c.activeProjectId; renderShell();
+      return fetchFresh(true);
+    }
+    return fetchFresh(false);
   });
 }
 function refresh() { return loadData(S.projectId, true); }
-/** jalankan mutasi lalu muat ulang data */
+/** jalankan mutasi; server mengembalikan data terbaru dalam respons yang sama */
 function doMutate(action, payload, okMsg) {
-  return mutate(action, payload, okMsg).then(function (r) { if (r && r.queued) return r; return refresh().then(function () { return r; }); });
+  return mutate(action, payload, okMsg).then(function (r) {
+    if (r && r.queued) return r;
+    if (S.lastBoot) { var b = S.lastBoot; S.lastBoot = null; applyBoot(b); return r; }
+    return refresh().then(function () { return r; });
+  });
 }
 
 /* ---------------- Shell ---------------- */
@@ -782,7 +835,7 @@ function renderShell() {
   }).join('');
   var projOpts = (d.projects || []).map(function (p) { return '<option value="' + p.id + '"' + (p.id === d.activeProjectId ? ' selected' : '') + '>' + esc(p.code + ' — ' + p.name) + '</option>'; }).join('');
   $('#app').innerHTML = '<div class="shell"><aside class="side" id="side"><div class="brand"><div class="brand-mark">HC</div><div><b>' + esc(d.settings.companyName || 'Housing Contractor ERP') + '</b><span>Housing Contractor ERP</span></div></div>' +
-    '<nav class="nav" aria-label="Menu utama">' + navHtml + '</nav><div class="side-foot"><div><b>' + esc(a.fullName) + '</b></div><div>' + esc(d.roleLabels[a.role] || a.role) + '</div><div style="margin-top:6px">Lisensi: ' + esc(lic.tierLabel || '-') + (lic.expiresAt ? ' s/d ' + dt(lic.expiresAt) : '') + '</div></div></aside>' +
+    '<nav class="nav" aria-label="Menu utama">' + navHtml + '</nav><div class="side-foot"><div><b>' + esc(a.fullName) + '</b></div><div>' + esc(d.roleLabels[a.role] || a.role) + '</div><div style="margin-top:6px">Lisensi: ' + esc(lic.tierLabel || '-') + (lic.expiresAt ? ' s/d ' + dt(lic.expiresAt) : '') + '</div><div style="margin-top:6px"><a href="#/admin/about" class="side-link">Versi ' + esc(CONFIG.APP_VERSION) + '</a>, <a href="#" data-act="legal-terms" class="side-link">Ketentuan</a>, <a href="#" data-act="legal-privacy" class="side-link">Privasi</a></div></div></aside>' +
     '<div class="main"><header class="topbar"><button class="iconbtn" id="navToggle" aria-label="Buka menu" style="display:none">' + ico('menu') + '</button>' +
     (projOpts ? '<label class="hide" for="projSel">Proyek aktif</label><select id="projSel" class="input" style="max-width:360px">' + projOpts + '</select>' : '<span class="muted small">Belum ada proyek</span>') +
     '<span class="grow"></span><span class="netpill" id="netpill" data-act="net-detail" role="button" tabindex="0"></span>' +
@@ -797,8 +850,11 @@ function renderShell() {
     }).join('') + '<a href="#" data-act="open-nav">' + ico('menu') + '<span>Menu</span></a></nav>';
   var mq = window.matchMedia('(max-width:860px)'); $('#navToggle').style.display = mq.matches ? 'inline-grid' : 'none';
   var sel = $('#projSel'); if (sel) sel.onchange = function () { S.projectId = sel.value; loadData(sel.value); };
+  var sv = d.app && d.app.version;
+  if (sv && sv !== CONFIG.APP_VERSION && a.role === 'COMPANY_ADMIN') { var ban = document.createElement('div'); ban.className = 'alert danger'; ban.style.margin = '12px 20px 0'; ban.innerHTML = 'Versi server (' + esc(sv) + ') berbeda dengan versi aplikasi (' + esc(CONFIG.APP_VERSION) + '). Fitur baru bisa tidak muncul atau gagal disimpan. <a href="#/admin/about">Lihat cara memperbarui</a>.'; $('#content').before(ban); }
   updateNet(); renderView();
   if (d.actor.mustChangePassword) forcePassword();
+  else if (needTerms() && !S.fromCache) askTerms();
 }
 function renderView() {
   var v = VIEWS[S.route]; var c = $('#content'); if (!c || !v) return;
@@ -821,14 +877,15 @@ function updateNet() {
   var p = $('#netpill'); if (!p) return;
   var pend = S.outbox.filter(function (x) { return x.status === 'PENDING'; }).length, fail = S.outbox.filter(function (x) { return x.status === 'FAILED'; }).length;
   p.className = 'netpill ' + (S.syncing ? 'sync' : (S.online ? '' : 'off'));
-  p.innerHTML = '<i></i>' + (S.syncing ? 'Sinkronisasi…' : (S.online ? 'Online' : 'Offline')) + (pend ? ', ' + pend + ' antre' : '') + (fail ? ', ' + fail + ' gagal' : '');
+  if (S.refreshing && !S.syncing) p.className += ' sync';
+  p.innerHTML = '<i></i>' + (S.syncing ? 'Sinkronisasi…' : (S.refreshing ? 'Memperbarui…' : (S.online ? 'Online' : 'Offline'))) + (pend ? ', ' + pend + ' antre' : '') + (fail ? ', ' + fail + ' gagal' : '');
 }
 function forcePassword() {
   openForm({ title: 'Ganti kata sandi awal', intro: 'Demi keamanan, ganti kata sandi sementara sebelum melanjutkan (minimal 8 karakter, huruf dan angka).',
     fields: [{ name: 'newPassword', label: 'Kata sandi baru', type: 'password', required: true }, { name: 'confirm', label: 'Ulangi kata sandi baru', type: 'password', required: true }],
     submitLabel: 'Simpan kata sandi', onSubmit: function (v) {
       if (v.newPassword !== v.confirm) throw new Error('Konfirmasi kata sandi tidak sama.');
-      return call('auth.changePassword', { newPassword: v.newPassword }).then(function () { S.d.actor.mustChangePassword = false; toast('Kata sandi diperbarui.', 'ok'); });
+      return call('auth.changePassword', { newPassword: v.newPassword }).then(function () { S.d.actor.mustChangePassword = false; toast('Kata sandi diperbarui.', 'ok'); if (needTerms()) setTimeout(askTerms, 80); });
     } });
   $$('#modal [data-act="modal-close"]').forEach(function (b) { b.remove(); });
 }
@@ -857,7 +914,14 @@ ACT['modal-close'] = closeModal;
 ACT.tab = function (el) { S.tab[S.route] = el.dataset.tab; history.replaceState(null, '', '#/' + S.route + '/' + el.dataset.tab); renderView(); };
 ACT.refresh = function () { syncOutbox().then(function () { return refresh(); }).then(function () { toast('Data diperbarui.'); }).catch(function (e) { toast(errMsg(e), 'err'); }); };
 ACT.theme = function () { var cur = document.documentElement.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); lsSet('hc_theme', cur === 'dark' ? 'light' : 'dark'); applyTheme(); };
-ACT.logout = function () { confirmBox('Keluar', '<p>Keluar dari aplikasi di perangkat ini?' + (S.outbox.length ? ' <b>Masih ada ' + S.outbox.length + ' data di antrean offline</b> — data tetap tersimpan di perangkat dan dikirim setelah Anda masuk lagi.' : '') + '</p>', 'Keluar', function () { return call('auth.logout', {}).catch(function () { }).then(function () { sessionEnded('Anda telah keluar.'); }); }); };
+ACT.logout = function () { confirmBox('Keluar', '<p>Keluar dari aplikasi di perangkat ini?' + (S.outbox.length ? ' <b>Masih ada ' + S.outbox.length + ' data di antrean offline</b> — data tetap tersimpan di perangkat dan dikirim setelah Anda masuk lagi.' : '') + '</p>', 'Keluar', function () { logoutNow(); }); };
+function logoutNow() {
+  var tok = S.token;
+  sessionEnded('Anda telah keluar.');
+  // pencabutan sesi di server berjalan di latar; tampilan tidak menunggu
+  var keep = S.token; S.token = tok; rpc('auth.logout', {}).catch(function () { }); S.token = keep;
+}
+ACT['logout-now'] = function () { closeModal(); logoutNow(); };
 ACT['open-nav'] = ACT['nav-toggle'] = function () { var s = $('#side'); s.classList.add('open'); var bg = document.createElement('div'); bg.className = 'drawer-bg'; bg.onclick = function () { s.classList.remove('open'); bg.remove(); }; document.body.appendChild(bg); };
 document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('#navToggle')) ACT['open-nav'](); });
 ACT['net-detail'] = function () { location.hash = '#/admin/sync'; };
@@ -1545,9 +1609,10 @@ ACT['print-inv'] = function (el) {
 /* ============================ ADMIN & SISTEM ============================ */
 VIEWS.admin = {
   title: 'Admin & Sistem', needsProject: false,
-  tabs: [['account', 'Akun saya'], ['sync', 'Sinkronisasi offline'], ['users', 'Pengguna', function () { return can('ORG_MANAGE'); }], ['org', 'Cabang & gudang', function () { return can('ORG_MANAGE'); }], ['settings', 'Pengaturan', function () { return can('COMPANY_MANAGE'); }], ['license', 'Lisensi', function () { return can('COMPANY_MANAGE'); }], ['backup', 'Backup & data', function () { return can('COMPANY_MANAGE'); }], ['audit', 'Audit trail', function () { return can('AUDIT_VIEW'); }]],
+  tabs: [['account', 'Akun saya'], ['about', 'Versi & legal'], ['sync', 'Sinkronisasi offline'], ['users', 'Pengguna', function () { return can('ORG_MANAGE'); }], ['org', 'Cabang & gudang', function () { return can('ORG_MANAGE'); }], ['settings', 'Pengaturan', function () { return can('COMPANY_MANAGE'); }], ['license', 'Lisensi', function () { return can('COMPANY_MANAGE'); }], ['backup', 'Backup & data', function () { return can('COMPANY_MANAGE'); }], ['audit', 'Audit trail', function () { return can('AUDIT_VIEW'); }]],
   render: function (tab) {
     var d = S.d;
+    if (tab === 'about') return aboutHtml();
     if (tab === 'sync') {
       return panel('Antrean offline di perangkat ini', '<p class="small muted">Input yang dibuat tanpa sinyal disimpan di perangkat dan dikirim berurutan saat online. Setiap item punya ID unik sehingga tidak tercatat dua kali walau dikirim ulang. Item gagal (mis. stok sudah habis) perlu ditinjau lalu dihapus atau dicoba lagi.</p>' +
         table([{ l: 'Waktu', f: function (x) { return dtt(x.createdAt); } }, { l: 'Transaksi', f: function (x) { return esc(x.label); } }, { l: 'Status', f: function (x) { return x.status === 'FAILED' ? chip('REJECTED', 'Gagal') : chip('SUBMITTED', 'Menunggu'); } }, { l: 'Keterangan', f: function (x) { return esc(x.error || ''); } }], S.outbox, { empty: 'Antrean kosong', actions: function (x) { return (x.status === 'FAILED' ? btn('ob-retry', 'Coba lagi', 'data-id="' + x.opId + '"') : '') + btn('ob-del', 'Hapus', 'data-id="' + x.opId + '"', 'sm danger'); } }), btn('sync-now', 'Kirim sekarang', '', 'primary'));
@@ -1563,7 +1628,7 @@ VIEWS.admin = {
     }
     if (tab === 'settings') {
       var s = d.settings;
-      return panel('Pengaturan perusahaan & aturan', '<dl class="kv">' + [['Nama perusahaan', s.companyName], ['Kode (prefiks nomor dokumen)', s.companyCode], ['Alamat', s.companyAddress], ['NPWP', s.companyTaxId], ['PPN default', pct(s.ppnPercent)], ['Tarif lembur per jam', pct(s.overtimeRatePct) + ' upah harian'], ['Ambang lulus QC', pct(s.qcPassScore)], ['Peringatan kuota', 'mulai ' + pct(s.quotaNearLimitPct)], ['Mode kuota material', s.quotaMode === 'STRICT' ? 'Ketat (material di luar RAB perlu alasan)' : 'Toleransi ' + s.quotaAllowanceQty], ['Garansi default', s.defaultWarrantyMonths + ' bulan'], ['Progres minimal BAST', pct(s.bastMinProgress)], ['Notifikasi WhatsApp (Fonnte)', s.fonnteToken ? 'Aktif ke ' + esc(s.notifyPhones) : 'Belum diatur'], ['Backup harian ke Drive', s.dailyBackup === 'OFF' ? 'Mati' : 'Aktif']].map(function (r) { return '<dt>' + r[0] + '</dt><dd>' + esc(r[1] || '—') + '</dd>'; }).join('') + '</dl>', btn('settings-edit', 'Ubah pengaturan', '', 'primary') + btn('notify-test', 'Tes WhatsApp'));
+      return panel('Pengaturan perusahaan & aturan', '<dl class="kv">' + [['Nama perusahaan', s.companyName], ['Kode (prefiks nomor dokumen)', s.companyCode], ['Alamat', s.companyAddress], ['NPWP', s.companyTaxId], ['PPN default', pct(s.ppnPercent)], ['Tarif lembur per jam', pct(s.overtimeRatePct) + ' upah harian'], ['Ambang lulus QC', pct(s.qcPassScore)], ['Peringatan kuota', 'mulai ' + pct(s.quotaNearLimitPct)], ['Mode kuota material', s.quotaMode === 'STRICT' ? 'Ketat (material di luar RAB perlu alasan)' : 'Toleransi ' + s.quotaAllowanceQty], ['Garansi default', s.defaultWarrantyMonths + ' bulan'], ['Progres minimal BAST', pct(s.bastMinProgress)], ['Notifikasi WhatsApp (Fonnte)', s.fonnteToken ? 'Aktif ke ' + esc(s.notifyPhones) : 'Belum diatur'], ['Backup harian ke Drive', s.dailyBackup === 'OFF' ? 'Mati' : 'Aktif'], ['Email perusahaan', s.companyEmail], ['Kontak pelindungan data', s.privacyContact], ['Jaga server tetap siap', s.keepWarm === 'OFF' ? 'Mati' : s.keepWarm === 'ALWAYS' ? 'Selalu' : 'Jam kerja 06–21']].map(function (r) { return '<dt>' + r[0] + '</dt><dd>' + esc(r[1] || '—') + '</dd>'; }).join('') + '</dl>', btn('settings-edit', 'Ubah pengaturan', '', 'primary') + btn('notify-test', 'Tes WhatsApp'));
     }
     if (tab === 'license') {
       var l = d.license;
@@ -1601,11 +1666,11 @@ function whForm(w) { w = w || {}; openForm({ title: w.id ? 'Ubah gudang' : 'Guda
 ACT['wh-new'] = function () { whForm(); }; ACT['wh-edit'] = function (el) { whForm(byId(S.d.warehouses)[el.dataset.id]); };
 ACT['settings-edit'] = function () {
   var s = S.d.settings;
-  openForm({ title: 'Ubah pengaturan', wide: true, values: s, fields: [{ name: 'companyName', label: 'Nama perusahaan', required: true }, { name: 'companyCode', label: 'Kode perusahaan (maks. 8)', required: true, help: 'Dipakai di nomor dokumen, mis. PO/KODE/2026/10-0001.' }, { name: 'companyAddress', label: 'Alamat', full: true }, { name: 'companyTaxId', label: 'NPWP' }, { name: 'companyPhone', label: 'Telepon' },
+  openForm({ title: 'Ubah pengaturan', wide: true, values: s, fields: [{ name: 'companyName', label: 'Nama perusahaan', required: true }, { name: 'companyCode', label: 'Kode perusahaan (maks. 8)', required: true, help: 'Dipakai di nomor dokumen, mis. PO/KODE/2026/10-0001.' }, { name: 'companyAddress', label: 'Alamat', full: true }, { name: 'companyTaxId', label: 'NPWP' }, { name: 'companyPhone', label: 'Telepon' }, { name: 'companyEmail', label: 'Email perusahaan', type: 'email' }, { name: 'privacyContact', label: 'Kontak pelindungan data (PDP)', help: 'Email/nama petugas yang menangani permintaan data pribadi. Tampil di Kebijakan Privasi.' },
     { name: 'ppnPercent', label: 'PPN default (%)', type: 'pct' }, { name: 'overtimeRatePct', label: 'Tarif lembur per jam (% upah harian)', type: 'pct' }, { name: 'qcPassScore', label: 'Ambang lulus QC (%)', type: 'pct' }, { name: 'bastMinProgress', label: 'Progres minimal BAST (%)', type: 'pct' }, { name: 'quotaNearLimitPct', label: 'Peringatan kuota mulai (%)', type: 'pct' },
     { name: 'quotaMode', label: 'Mode kuota material', type: 'select', placeholder: false, options: [{ v: 'STRICT', l: 'Ketat' }, { v: 'ALLOWANCE', l: 'Toleransi jumlah tetap' }] }, { name: 'quotaAllowanceQty', label: 'Toleransi untuk material di luar RAB', type: 'qty', show: function (v) { return v.quotaMode === 'ALLOWANCE'; } }, { name: 'defaultWarrantyMonths', label: 'Garansi default (bulan)', type: 'number' },
     { name: 'fonnteToken', label: 'Token Fonnte (WhatsApp)', help: 'Biarkan apa adanya bila tidak ingin mengubah.' }, { name: 'notifyPhones', label: 'Nomor tujuan notifikasi', help: 'Pisahkan dengan koma, mis. 08123…,08567…' }, { name: 'licenseServerUrl', label: 'URL server lisensi', help: 'Diisi oleh penyedia aplikasi.' },
-    { name: 'dailyBackup', label: 'Backup harian ke Drive', type: 'select', placeholder: false, options: [{ v: 'ON', l: 'Aktif' }, { v: 'OFF', l: 'Mati' }] }],
+    { name: 'dailyBackup', label: 'Backup harian ke Drive', type: 'select', placeholder: false, options: [{ v: 'ON', l: 'Aktif' }, { v: 'OFF', l: 'Mati' }] }, { name: 'keepWarm', label: 'Jaga server tetap siap (lebih cepat)', type: 'select', placeholder: false, options: [{ v: 'ON', l: 'Jam kerja 06–21' }, { v: 'ALWAYS', l: 'Selalu' }, { v: 'OFF', l: 'Mati' }], help: 'Memanaskan cache tiap 10 menit agar login & pindah proyek tidak lambat.' }],
     onSubmit: function (v) { return doMutate('settings.save', v, 'Pengaturan disimpan.'); } });
 };
 ACT['notify-test'] = function () { call('notify.test', {}).then(function () { toast('Pesan uji dikirim.', 'ok'); }).catch(function (e) { toast(errMsg(e), 'err'); }); };
@@ -2022,20 +2087,32 @@ var BR_CSS = '.brochure{font-family:"Segoe UI",system-ui,Roboto,Arial,sans-serif
   '@page brochure{size:A4;margin:0}';
 
 /* ---------- Tampilan modul ---------- */
+function createBtn(act, label, perm, roles) {
+  if (can(perm)) return btn(act, ico('plus') + ' ' + label, '', 'primary');
+  return '<button class="btn" disabled title="Hanya untuk: ' + roles + '">' + ico('plus') + ' ' + label + '</button>';
+}
 VIEWS.design = {
-  title: 'Denah & Brosur',
+  title: 'Denah & Brosur', needsProject: false,
   tabs: [['plans', 'Denah tipe rumah'], ['brochures', 'Brosur pemasaran']],
   headActions: function (tab) {
-    if (tab === 'plans' && can('DESIGN_MANAGE')) return btn('plan-new', ico('plus') + ' Denah baru', '', 'primary');
-    if (tab === 'brochures' && can('MARKETING_MANAGE')) return btn('br-new', ico('plus') + ' Brosur baru', '', 'primary');
+    if (tab === 'plans') return createBtn('plan-new', 'Denah baru', 'DESIGN_MANAGE', 'Admin, Project Manager, Quantity Surveyor, Site Engineer');
+    if (tab === 'brochures') return createBtn('br-new', 'Brosur baru', 'MARKETING_MANAGE', 'Admin, Project Manager, Staf Marketing');
     return '';
   },
   render: function (tab) {
     var d = S.d;
+    var steps = function (kind) {
+      var ok = can(kind === 'plan' ? 'DESIGN_MANAGE' : 'MARKETING_MANAGE');
+      return '<div class="howto"><b>' + (kind === 'plan' ? 'Cara membuat denah' : 'Cara membuat brosur') + '</b><ol>' + (kind === 'plan'
+        ? '<li>Klik <b>Denah baru</b> (kanan atas) lalu pilih template 36/72, 45/90, 54/108, 70/120, atau kosong.</li><li>Seret dan ubah ukuran ruang, tambah pintu/jendela, isi <b>Tipe unit</b> sama persis dengan tipe kavling.</li><li>Klik <b>Simpan denah</b>. Denah bisa dicetak, diunduh SVG, atau dipakai untuk usulan RAB.</li>'
+        : '<li>Buat denah tipe rumah lebih dulu di tab <b>Denah tipe rumah</b>.</li><li>Klik <b>Brosur baru</b>, pilih denah; harga & unit tersedia terisi otomatis dari data kavling.</li><li>Lengkapi fasilitas, spesifikasi, KPR, kontak, lalu <b>Simpan brosur</b> → pratinjau → cetak/PDF, HTML, atau WhatsApp.</li>') + '</ol>' +
+        (ok ? '' : '<p class="small" style="margin:6px 0 0;color:var(--bad)">Akun Anda (' + esc(d.roleLabels[d.actor.role] || d.actor.role) + ') tidak memiliki hak ' + (kind === 'plan' ? 'membuat denah. Hak dimiliki Admin, PM, QS, dan Site Engineer.' : 'membuat brosur. Hak dimiliki Admin, PM, dan Staf Marketing.') + ' Minta admin mengubah peran Anda.</p>') + '</div>';
+    };
     if (tab === 'brochures') {
+      if (!d.activeProjectId) return '<div class="panel">' + steps('brochure') + '<div class="empty"><b>Brosur dibuat per proyek</b>Buat proyek & kavling lebih dulu di menu Proyek & Kavling.</div></div>';
       var list = (d.brochures || []).slice().sort(function (a, b) { return String(b.updatedAt).localeCompare(String(a.updatedAt)); });
-      if (!list.length) return '<div class="panel"><div class="empty"><b>Belum ada brosur untuk proyek ini</b>' + (can('MARKETING_MANAGE') ? 'Buat brosur dari denah tipe rumah; harga dan unit tersedia diambil dari data kavling.' : '') + '</div></div>';
-      return '<div class="cards-grid">' + list.map(function (b) {
+      if (!list.length) return '<div class="panel">' + steps('brochure') + '<div class="empty"><b>Belum ada brosur untuk proyek ini</b>' + (can('MARKETING_MANAGE') ? '<br>' + btn('br-new', ico('plus') + ' Buat brosur pertama', '', 'primary') : '') + '</div></div>';
+      return '<div class="cards-grid">' + (can('MARKETING_MANAGE') ? '<button class="panel new-tile" data-act="br-new">' + ico('plus') + '<b>Brosur baru</b><span class="small muted">Dari denah & data kavling</span></button>' : '') + list.map(function (b) {
         var c = brochureCtx(b);
         return '<article class="panel br-card"><div class="br-thumb" style="background:' + c.th.c3 + '">' + (b.heroPhotoUrl ? '<img src="' + esc(b.heroPhotoUrl) + '" alt="">' : (c.meta ? facadeSvg(c.meta, c.th) : '')) + '</div><div class="row" style="justify-content:space-between;margin-top:10px"><h3>' + esc(b.title) + '</h3>' + chip(b.status === 'PUBLISHED' ? 'APPROVED' : 'SUBMITTED', b.status === 'PUBLISHED' ? 'Terbit' : 'Draf') + '</div>' +
           '<div class="small muted">' + esc(b.unitType || '—') + ', ' + (n(b.price) ? 'mulai ' + rpS(b.price) : 'tanpa harga') + '. ' + c.avail.length + ' unit tersedia. Diperbarui ' + dt(b.updatedAt) + '.</div>' +
@@ -2046,14 +2123,14 @@ VIEWS.design = {
     var plans = d.floorPlans || [];
     var types = {}; (d.houseUnits || []).forEach(function (u) { types[u.unitType] = (types[u.unitType] || 0) + 1; });
     var tinfo = Object.keys(types).map(function (t) { var p = plans.filter(function (x) { return x.unitType === t; })[0]; return '<div class="row small"><b>' + esc(t) + '</b><span class="muted">' + types[t] + ' kavling</span>' + (p ? chip('APPROVED', 'Denah ' + p.code) : chip('SUBMITTED', 'Belum ada denah')) + '</div>'; }).join('');
-    return (tinfo ? '<div class="panel" style="margin-bottom:14px"><div class="panel-h"><h2>Tipe rumah di proyek ini</h2></div><div class="stack" style="gap:6px">' + tinfo + '</div><p class="small muted" style="margin-bottom:0">Denah terhubung ke kavling lewat "Tipe unit" yang sama persis. Denah berlaku untuk semua proyek.</p></div>' : '') +
-      (plans.length ? '<div class="cards-grid">' + plans.map(function (p) {
+    return (tinfo ? '<div class="panel" style="margin-bottom:14px"><div class="panel-h"><h2>Tipe rumah di proyek ini</h2></div><div class="stack" style="gap:6px">' + tinfo + '</div><p class="small muted" style="margin-bottom:0">Denah terhubung ke kavling lewat "Tipe unit" yang sama persis. Denah berlaku untuk semua proyek.' + (can('DESIGN_MANAGE') ? '' : ' <b>Akun Anda hanya dapat melihat dan mencetak denah</b> — pembuatan denah oleh Admin, PM, QS, atau Site Engineer.') + '</p></div>' : '') +
+      (plans.length ? '<div class="cards-grid">' + (can('DESIGN_MANAGE') ? '<button class="panel new-tile" data-act="plan-new">' + ico('plus') + '<b>Denah baru</b><span class="small muted">Mulai dari template atau kosong</span></button>' : '') + plans.map(function (p) {
         var meta = fpMeta(p);
         return '<article class="panel"><div class="plan-thumb">' + planSvg(meta, 0, { compact: true }) + '</div><div class="row" style="justify-content:space-between;margin-top:10px"><h3>' + esc(p.name) + '</h3><span class="chip">' + esc(p.code) + '</span></div>' +
           '<div class="small muted">' + esc(p.unitType || 'Tanpa tipe unit') + '. Tanah ' + m2(p.landWidthM) + ' × ' + m2(p.landDepthM) + ' m, bangunan ' + m2(p.buildingAreaM2) + ' m², ' + p.bedrooms + ' KT, ' + p.bathrooms + ' KM, ' + p.floors + ' lantai.</div>' +
           '<div class="row" style="margin-top:10px">' + btn('plan-open', can('DESIGN_MANAGE') ? 'Buka editor' : 'Lihat', 'data-id="' + p.id + '"', 'sm primary') + btn('plan-print', ico('printer') + ' Cetak', 'data-id="' + p.id + '"') + btn('plan-svg', ico('download') + ' SVG', 'data-id="' + p.id + '"') +
           (can('DESIGN_MANAGE') ? btn('plan-copy', 'Salin', 'data-id="' + p.id + '"') + btn('master-del', 'Hapus', 'data-t="FloorPlans" data-id="' + p.id + '"', 'sm danger') : '') + '</div></article>';
-      }).join('') + '</div>' : '<div class="panel"><div class="empty"><b>Belum ada denah</b>' + (can('DESIGN_MANAGE') ? 'Mulai dari template 36/72, 45/90, 54/108, atau 70/120 lalu sesuaikan.' : '') + '</div></div>');
+      }).join('') + '</div>' : '<div class="panel">' + steps('plan') + '<div class="empty"><b>Belum ada denah</b>' + (can('DESIGN_MANAGE') ? '<br>' + btn('plan-new', ico('plus') + ' Buat denah pertama', '', 'primary') : '') + '</div></div>');
   }
 };
 ACT['plan-new'] = function () {
@@ -2128,6 +2205,109 @@ ACT['br-wa'] = function (el) {
   window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank', 'noopener');
   toast('Teks brosur disalin & WhatsApp dibuka. Lampirkan PDF/HTML brosur bila perlu.');
 };
+
+/* Versi aplikasi, riwayat perubahan, Syarat & Ketentuan, Pemberitahuan Privasi */
+var CHANGELOG = [
+  ['2.2.0', '2026-10-22', ['Aplikasi jauh lebih cepat: data tabel di-cache di server, login dan simpan cukup satu permintaan, data proyek tampil seketika saat dibuka atau pindah proyek lalu diperbarui di latar.', 'Tombol membuat denah dan brosur selalu terlihat beserta keterangan hak akses.', 'Informasi versi, Syarat & Ketentuan, dan Pemberitahuan Privasi; persetujuan dicatat per pengguna.', 'Peringatan bila versi server dan aplikasi berbeda.']],
+  ['2.1.0', '2026-10-22', ['Editor denah lantai per tipe rumah (template, pintu/jendela, estimasi volume ke RAB).', 'Brosur A4 dua halaman dengan simulasi KPR, cetak/PDF, HTML, dan WhatsApp.', 'Peran Staf Marketing.']],
+  ['2.0.0', '2026-10-22', ['Edisi Google Apps Script + Google Sheets + PWA offline.', 'Perbaikan 40 bug keamanan & perhitungan dari versi React.', 'Lisensi, backup harian, audit trail berantai.']]
+];
+function legalCtx(info) {
+  var s = (S.d && S.d.settings) || {}, i = info || S.legal || {};
+  var co = i.companyName || s.companyName || 'perusahaan pengelola aplikasi ini';
+  return { co: co, addr: i.companyAddress || s.companyAddress || '', contact: i.privacyContact || s.privacyContact || s.companyEmail || s.companyPhone || '', email: i.companyEmail || s.companyEmail || '', ver: i.legalVersion || (S.d && S.d.app && S.d.app.legalVersion) || '2026-10-22' };
+}
+function legalDoc(title, ver, sections) {
+  return '<article class="legal"><p class="small muted">Berlaku sejak ' + dt(ver) + '. Versi dokumen ' + esc(ver) + '.</p>' + sections.map(function (s) {
+    return '<h3>' + esc(s[0]) + '</h3>' + s[1].map(function (p) { return Array.isArray(p) ? '<ul>' + p.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul>' : '<p>' + p + '</p>'; }).join('');
+  }).join('') + '</article>';
+}
+function termsHtml(info) {
+  var c = legalCtx(info), CO = '<b>' + esc(c.co) + '</b>';
+  return legalDoc('Syarat & Ketentuan', c.ver, [
+    ['1. Para pihak & ruang lingkup', ['Syarat & Ketentuan ini mengatur penggunaan aplikasi Housing Contractor ERP ("Aplikasi") yang dikelola oleh ' + CO + (c.addr ? ', ' + esc(c.addr) : '') + ' ("Pengelola") untuk karyawan, mitra, dan pihak lain yang diberi akun ("Pengguna").', 'Aplikasi dipakai untuk administrasi proyek perumahan: anggaran, pengadaan, gudang, laporan lapangan, subkontraktor, keuangan, mutu, serah terima, denah, dan brosur. Dengan masuk dan menggunakan Aplikasi, Pengguna menyetujui ketentuan ini.']],
+    ['2. Akun & keamanan', [['Akun bersifat pribadi; dilarang meminjamkan email/kata sandi atau memakai akun orang lain.', 'Pengguna wajib mengganti kata sandi sementara, menjaga kerahasiaannya, dan segera melapor kepada admin bila curiga akun disalahgunakan.', 'Akun terkunci sementara setelah 5 kali gagal masuk. Admin dapat menonaktifkan akun atau mereset kata sandi.', 'Saat memakai perangkat bersama, keluar (logout) setelah selesai. Data proyek tersimpan di perangkat untuk mode offline sampai Pengguna keluar atau membersihkan data peramban.']]],
+    ['3. Penggunaan yang diizinkan', [['Gunakan Aplikasi hanya untuk pekerjaan yang berkaitan dengan Pengelola dan sesuai hak akses peran Anda.', 'Masukkan data yang benar dan dapat dipertanggungjawabkan, termasuk foto dan lokasi laporan lapangan.', 'Dilarang mengubah langsung isi spreadsheet database, mencoba melewati pembatasan hak akses, mengunggah konten yang melanggar hukum, atau memakai Aplikasi untuk merugikan pihak lain.']]],
+    ['4. Pencatatan & audit', ['Setiap transaksi dicatat dalam jejak audit berantai (siapa, kapan, apa, nilai sebelum dan sesudah). Transaksi yang sudah dibukukan tidak dapat dihapus; koreksi dilakukan melalui dokumen penyesuaian. Jejak audit dapat dipakai Pengelola untuk pemeriksaan internal maupun eksternal.']],
+    ['5. Perhitungan & laporan', ['RAB, kuota material, job costing, Earned Value, estimasi volume dari denah, dan simulasi KPR adalah alat bantu. Keputusan teknis, keuangan, perpajakan, dan hukum tetap menjadi tanggung jawab Pengelola dan pejabat yang berwenang. Simulasi KPR bukan penawaran kredit; besaran angsuran mengikuti ketentuan bank.']],
+    ['6. Denah & materi pemasaran', ['Denah dan brosur yang dibuat di Aplikasi adalah materi milik Pengelola. Pengguna yang menerbitkan brosur wajib memastikan harga, luas, spesifikasi, dan ketersediaan unit sesuai fakta dan peraturan perlindungan konsumen serta pemasaran perumahan yang berlaku, serta memiliki hak atas foto yang diunggah. Denah di Aplikasi bukan gambar kerja/izin bangunan resmi.']],
+    ['7. Data & kepemilikan', ['Seluruh data tersimpan di Google Spreadsheet dan Google Drive milik Pengelola dan tetap menjadi milik Pengelola. Pemrosesan data pribadi dijelaskan dalam Pemberitahuan Privasi.']],
+    ['8. Layanan pihak ketiga & ketersediaan', ['Aplikasi berjalan di atas Google Apps Script, Google Sheets, dan Google Drive; versi PWA disajikan dari GitHub Pages; notifikasi WhatsApp (opsional) memakai Fonnte. Ketersediaan Aplikasi bergantung pada layanan tersebut dan koneksi internet. Input saat offline disimpan sementara di perangkat dan baru tercatat resmi setelah tersinkron ke server.']],
+    ['9. Lisensi perangkat lunak', ['Pengelola menggunakan Aplikasi berdasarkan lisensi dari penyedia perangkat lunak. Bila lisensi berakhir, Aplikasi beralih ke mode baca-saja; data tetap dapat dilihat, dicetak, dan diekspor.']],
+    ['10. Batasan tanggung jawab', ['Sepanjang diizinkan hukum, Pengelola dan penyedia perangkat lunak tidak bertanggung jawab atas kerugian tidak langsung akibat gangguan layanan pihak ketiga, kesalahan input Pengguna, atau penggunaan di luar ketentuan ini.']],
+    ['11. Pelanggaran', ['Pelanggaran ketentuan ini dapat berakibat pembatasan atau penonaktifan akun serta tindakan sesuai peraturan perusahaan dan hukum yang berlaku.']],
+    ['12. Perubahan & hukum yang berlaku', ['Pengelola dapat memperbarui ketentuan ini; versi baru ditampilkan dan perlu disetujui kembali saat masuk. Ketentuan ini tunduk pada hukum Republik Indonesia.' + (c.contact ? ' Pertanyaan: ' + esc(c.contact) + '.' : '')]]
+  ]);
+}
+function privacyHtml(info) {
+  var c = legalCtx(info), CO = '<b>' + esc(c.co) + '</b>';
+  return legalDoc('Pemberitahuan Privasi', c.ver, [
+    ['1. Pengendali data', ['Pengendali data pribadi dalam Aplikasi adalah ' + CO + (c.addr ? ', ' + esc(c.addr) : '') + '. Pemberitahuan ini disusun dengan mengacu pada Undang-Undang Nomor 27 Tahun 2022 tentang Pelindungan Data Pribadi.' + (c.contact ? ' Kontak urusan data pribadi: <b>' + esc(c.contact) + '</b>.' : ' Hubungi admin perusahaan untuk urusan data pribadi.')]],
+    ['2. Data yang diproses', [[
+      '<b>Pengguna</b>: nama, email kerja, jabatan, peran, nomor telepon (opsional), riwayat masuk, dan catatan persetujuan ketentuan. Kata sandi disimpan dalam bentuk hash bersalt, tidak dapat dibaca siapa pun.',
+      '<b>Konsumen/pembeli</b>: nama, nomor telepon, kavling yang dibeli, tagihan, pembayaran, serah terima, dan klaim garansi.',
+      '<b>Pekerja lapangan</b>: nama, kode, keahlian, upah harian, kehadiran, lembur, dan nomor telepon (opsional).',
+      '<b>Mitra</b>: nama vendor/subkontraktor, kontak, NPWP, dan rekening/referensi pembayaran yang dicatat.',
+      '<b>Lapangan</b>: foto dokumentasi dan koordinat GPS yang diambil saat membuat laporan harian (hanya bila Pengguna menekan "Ambil lokasi GPS" dan mengizinkan akses lokasi di perangkat).',
+      '<b>Teknis</b>: token sesi, jenis peramban (user agent), dan jejak audit aktivitas.']]],
+    ['3. Tujuan & dasar pemrosesan', [[
+      'Menjalankan pekerjaan dan kontrak (pembangunan, jual beli rumah, borongan, pengupahan) — dasar: pelaksanaan perjanjian.',
+      'Pembukuan, perpajakan, dan dokumen serah terima — dasar: kewajiban hukum.',
+      'Keamanan akun, pencegahan kecurangan, dan audit internal — dasar: kepentingan yang sah.',
+      'Lokasi GPS & foto lapangan — dasar: kepentingan yang sah untuk verifikasi progres; akses lokasi perangkat selalu meminta izin Anda dan dapat ditolak.',
+      'Notifikasi WhatsApp (bila diaktifkan admin) — untuk pemberitahuan operasional, bukan promosi.']]],
+    ['4. Tempat penyimpanan', ['Data disimpan di Google Spreadsheet dan Google Drive milik Pengelola serta diproses oleh Google Apps Script; pusat data Google dapat berada di luar Indonesia, dengan standar pelindungan yang setara sesuai ketentuan Google Workspace. Untuk mode offline, salinan data proyek dan antrean input disimpan di peramban perangkat Anda (IndexedDB/localStorage) sampai Anda keluar atau membersihkan data peramban.']],
+    ['5. Pembagian data', [[
+      'Di dalam Pengelola: hanya Pengguna yang berhak sesuai peran dan keanggotaan proyek.',
+      'Google LLC sebagai penyedia infrastruktur; GitHub (Microsoft) hanya menyajikan berkas aplikasi tanpa data; Fonnte bila notifikasi WhatsApp diaktifkan (menerima nomor tujuan dan isi pesan).',
+      'Server lisensi penyedia perangkat lunak hanya menerima kunci lisensi, ID skrip, ID spreadsheet, dan nomor versi — tanpa data proyek atau data pribadi.',
+      'Bank/notaris/instansi hanya bila diperlukan untuk transaksi atau diwajibkan hukum.',
+      'Brosur yang diterbitkan tidak memuat data pribadi konsumen; hanya jumlah dan nomor unit yang tersedia.']]],
+    ['6. Masa simpan', [[
+      'Data transaksi, dokumen proyek, dan jejak audit disimpan selama diperlukan untuk kewajiban hukum dan pembukuan (umumnya minimal 10 tahun untuk dokumen keuangan) dan tidak dihapus secara fisik agar integritas audit terjaga; data master dinonaktifkan (soft delete).',
+      'Sesi masuk berlaku 14 hari; backup otomatis disimpan 30 versi terakhir.',
+      'Foto lapangan disimpan selama proyek dan masa garansi, kemudian dapat diarsipkan atau dihapus oleh Pengelola.']]],
+    ['7. Keamanan', ['Kata sandi di-hash dengan salt, akun dikunci setelah percobaan gagal berulang, hak akses berbasis peran dan proyek, teks berbahaya dinetralkan sebelum ditulis ke spreadsheet, jejak audit berantai SHA-256, dan backup harian berhash. Bila terjadi kegagalan pelindungan data pribadi, Pengelola memberi tahu subjek data dan lembaga yang berwenang secara tertulis paling lambat 3 × 24 jam sesuai UU PDP.']],
+    ['8. Hak Anda', [[
+      'Mendapat informasi tentang pemrosesan data Anda dan mengakses atau memperoleh salinannya.',
+      'Memperbaiki data yang tidak akurat; meminta pembatasan, penghapusan, atau pemusnahan sepanjang tidak bertentangan dengan kewajiban hukum penyimpanan.',
+      'Menarik persetujuan (mis. akses lokasi di perangkat) dan mengajukan keberatan atas pemrosesan.',
+      'Mengajukan pengaduan kepada lembaga pelindungan data pribadi yang berwenang.']]],
+    ['9. Anak', ['Aplikasi ditujukan untuk keperluan kerja dan tidak ditujukan bagi anak.']],
+    ['10. Perubahan', ['Pemberitahuan ini dapat diperbarui. Versi baru ditampilkan saat Anda masuk dan perlu disetujui kembali.' + (c.contact ? ' Permintaan terkait hak Anda dapat dikirim ke ' + esc(c.contact) + '.' : '')]]
+  ]);
+}
+function showLegal(kind, info) {
+  showInfo(kind === 'privacy' ? 'Pemberitahuan Privasi' : 'Syarat & Ketentuan', (kind === 'privacy' ? privacyHtml(info) : termsHtml(info)) + '<div class="row" style="margin-top:12px"><button class="btn sm" data-act="legal-print" data-k="' + kind + '">' + ico('printer') + ' Cetak</button></div>', true);
+}
+ACT['legal-terms'] = function () { showLegal('terms', S.legal); };
+ACT['legal-privacy'] = function () { showLegal('privacy', S.legal); };
+ACT['legal-print'] = function (el) { var k = el.dataset.k; closeModal(); printDoc(docHeader(k === 'privacy' ? 'PEMBERITAHUAN PRIVASI' : 'SYARAT & KETENTUAN PENGGUNAAN', 'Versi ' + legalCtx().ver) + (k === 'privacy' ? privacyHtml() : termsHtml())); };
+function needTerms() { return S.d && S.d.app && S.d.app.legalVersion && S.d.actor.termsVersion !== S.d.app.legalVersion; }
+function askTerms() {
+  if ($('#modal')) return;
+  openForm({ title: 'Syarat & Ketentuan dan Privasi', intro: S.d.actor.termsVersion ? 'Ketentuan telah diperbarui. Mohon baca dan setujui versi terbaru untuk melanjutkan.' : 'Sebelum mulai, mohon baca ketentuan penggunaan dan cara data Anda diproses.',
+    fields: [{ type: 'info', name: 'l', html: '<div class="legal-box">' + termsHtml() + '<hr>' + privacyHtml() + '</div>' },
+      { name: 'agree', label: 'Saya telah membaca dan menyetujui Syarat & Ketentuan serta memahami Pemberitahuan Privasi.', type: 'check', required: true }],
+    submitLabel: 'Setuju & lanjutkan', wide: true,
+    onSubmit: function (v) {
+      if (!v.agree) throw new Error('Centang persetujuan terlebih dahulu.');
+      return call('auth.acceptTerms', { version: S.d.app.legalVersion }).then(function (r) { S.d.actor.termsVersion = r.termsVersion; S.d.actor.termsAcceptedAt = r.termsAcceptedAt; Store.set('kv', 'boot:last', S.d); toast('Terima kasih. Persetujuan tercatat.', 'ok'); });
+    } });
+  $$('#modal [data-act="modal-close"]').forEach(function (b) { b.remove(); });
+  var out = document.createElement('button'); out.className = 'btn'; out.textContent = 'Keluar'; out.setAttribute('data-act', 'logout-now'); $('#modal .modal-f').prepend(out);
+}
+function aboutHtml() {
+  var d = S.d, sv = d.app.version, cv = CONFIG.APP_VERSION, a = d.actor;
+  return '<div class="grid g2"><section class="panel"><div class="panel-h"><h2>Tentang aplikasi</h2></div><dl class="kv">' +
+    '<dt>Nama</dt><dd>' + esc(d.app.name) + '</dd><dt>Versi aplikasi (tampilan)</dt><dd>' + esc(cv) + '</dd><dt>Versi server</dt><dd>' + esc(sv) + (sv !== cv ? ' ' + chip('REJECTED', 'berbeda') : ' ' + chip('APPROVED', 'cocok')) + '</dd>' +
+    '<dt>Tanggal rilis</dt><dd>' + dt(d.app.buildDate) + '</dd><dt>Mode</dt><dd>' + (IS_GAS ? 'Langsung dari Google Apps Script' : 'PWA (dapat dipasang & offline)') + '</dd>' +
+    '<dt>Pengelola data</dt><dd>' + esc(d.settings.companyName || '') + '</dd><dt>Lisensi</dt><dd>' + esc(d.license.tierLabel || '') + (d.license.expiresAt ? ' s/d ' + dt(d.license.expiresAt) : '') + '</dd>' +
+    '<dt>Versi ketentuan</dt><dd>' + esc(d.app.legalVersion || '') + '</dd><dt>Anda menyetujui</dt><dd>' + (a.termsAcceptedAt ? dtt(a.termsAcceptedAt) + ' (versi ' + esc(a.termsVersion) + ')' : 'Belum') + '</dd></dl>' +
+    (sv !== cv ? '<div class="alert danger" style="margin-top:10px">Versi tampilan dan server berbeda. Admin perlu mengganti <b>semua</b> file .gs dan Index.html, menjalankan setup, lalu membuat versi deployment baru' + (IS_GAS ? '' : ', dan mengunggah index.html + sw.js terbaru ke GitHub') + '.</div>' : '') +
+    '<div class="row" style="margin-top:12px">' + btn('legal-terms', 'Syarat & Ketentuan') + btn('legal-privacy', 'Pemberitahuan Privasi') + '</div></section>' +
+    '<section class="panel"><div class="panel-h"><h2>Riwayat perubahan</h2></div>' + CHANGELOG.map(function (c) { return '<h3 style="margin:10px 0 4px">Versi ' + c[0] + ' <span class="small muted">' + dt(c[1]) + '</span></h3><ul class="small" style="margin:0;padding-left:18px">' + c[2].map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>'; }).join('') + '</section></div>';
+}
 
 boot();
 </script>
