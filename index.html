@@ -803,7 +803,7 @@ function renderLogin(msg) {
     '<button class="btn primary" type="submit" id="lbtn" style="justify-content:center;padding:11px">Masuk</button>' +
     (IS_GAS ? '' : '<details class="small"><summary>Pengaturan koneksi server</summary><div class="field" style="margin-top:8px"><label for="lapi">URL Web App Google Apps Script</label><input id="lapi" placeholder="https://script.google.com/macros/s/…/exec" value="' + esc(apiUrl()) + '"><div class="help">Diberikan oleh admin saat instalasi. Disimpan di perangkat ini.</div></div><button type="button" class="btn sm" data-act="test-api">Uji koneksi</button></details>') +
     '<p class="small muted">Lupa kata sandi? Minta admin perusahaan melakukan reset dari menu Admin → Pengguna.</p><p class="small muted" style="margin:0">Dengan masuk, Anda menyetujui <a href="#" data-act="legal-terms">Syarat & Ketentuan</a> dan memahami <a href="#" data-act="legal-privacy">Pemberitahuan Privasi</a>.</p><p class="small" style="margin:0"><a href="#portal" data-act="portal-open">Pemilik rumah? Masuk ke Portal Pemilik Rumah →</a></p><p class="tiny muted" style="margin:0" id="loginVer">Versi aplikasi ' + esc(CONFIG.APP_VERSION) + '</p></form></section></div>';
-  if (!S.legal && (IS_GAS || apiUrl())) call('legal.info').then(function (i) { S.legal = i; var v = $('#loginVer'); if (v) v.textContent = 'Versi aplikasi ' + CONFIG.APP_VERSION + ', server ' + i.version + ', pengelola data: ' + (i.companyName || '-'); }).catch(function () { });
+  if (!S.legal && (IS_GAS || apiUrl())) call('legal.info').then(function (i) { S.legal = i; var v = $('#loginVer'); if (v) { v.textContent = 'Versi aplikasi ' + CONFIG.APP_VERSION + ', server ' + i.version + ', pengelola data: ' + (i.companyName || '-'); var vb = versionBanner(i.version, true); if (vb) { var el = document.createElement('div'); el.className = 'alert danger small'; el.innerHTML = vb; v.after(el); } } }).catch(function () { });
   $('#loginForm').onsubmit = function (e) {
     e.preventDefault();
     var api = $('#lapi'); if (api && api.value.trim()) lsSet('hc_api_url', api.value.trim());
@@ -876,6 +876,32 @@ function doMutate(action, payload, okMsg) {
   });
 }
 
+/* ---------------- Versi & pembaruan otomatis PWA ---------------- */
+function cmpVer(a, b) { a = String(a).split('.').map(Number); b = String(b).split('.').map(Number); for (var i = 0; i < 3; i++) { var x = (a[i] || 0) - (b[i] || 0); if (x) return x > 0 ? 1 : -1; } return 0; }
+/** Hapus cache & service worker lama lalu muat ulang tanpa cache browser (data antrean offline di IndexedDB tetap aman) */
+function hardUpdate() {
+  var p = [];
+  try { if ('serviceWorker' in navigator) p.push(navigator.serviceWorker.getRegistrations().then(function (rs) { return Promise.all(rs.map(function (r) { return r.unregister(); })); })); } catch (e) { }
+  try { if (window.caches) p.push(caches.keys().then(function (ks) { return Promise.all(ks.map(function (k) { return caches.delete(k); })); })); } catch (e) { }
+  Promise.all(p).catch(function () { }).then(function () { location.replace(location.pathname + '?v=' + Date.now() + location.hash); });
+}
+ACT['app-update'] = function () { toast('Memperbarui aplikasi…'); hardUpdate(); };
+/**
+ * Bandingkan versi tampilan (file di perangkat/GitHub) dengan versi server.
+ * PWA: bila server lebih baru, perangkat otomatis memuat ulang versi terbaru sekali per sesi; bila masih sama, tampilkan petunjuk.
+ */
+function versionBanner(sv, isAdmin) {
+  var cv = CONFIG.APP_VERSION;
+  if (!sv || sv === cv) return '';
+  var newer = cmpVer(sv, cv) > 0, key = 'hc_upd_' + sv, tried = false;
+  if (!IS_GAS && newer) {
+    try { tried = sessionStorage.getItem(key); if (!tried) sessionStorage.setItem(key, '1'); } catch (e) { tried = true; }
+    if (!tried) { setTimeout(hardUpdate, 50); return 'Memperbarui aplikasi ke versi ' + esc(sv) + '…'; }
+  }
+  if (newer) return 'Aplikasi di perangkat ini versi ' + esc(cv) + ', server sudah ' + esc(sv) + '. ' + (IS_GAS ? 'Admin perlu mengganti Index.html lalu membuat versi deployment baru.' : '<button class="btn sm" data-act="app-update">Perbarui sekarang</button> Bila tetap ' + esc(cv) + ', berkas <b>index.html</b> & <b>sw.js</b> di GitHub belum diganti dengan versi ' + esc(sv) + '.') + (isAdmin ? ' <a href="#/admin/about">Cara memperbarui</a>.' : '');
+  return isAdmin ? 'Server masih versi ' + esc(sv) + ', aplikasi sudah ' + esc(cv) + '. Ganti <b>semua</b> file .gs di Apps Script, jalankan setup, lalu buat versi deployment baru. <a href="#/admin/about">Cara memperbarui</a>.' : '';
+}
+
 /* ---------------- Shell ---------------- */
 function routeFromHash() { var h = (location.hash || '#/dashboard').slice(2).split('/'); S.route = VIEWS[h[0]] ? h[0] : 'dashboard'; if (h[1]) S.tab[S.route] = h[1]; }
 function renderShell() {
@@ -905,8 +931,8 @@ function renderShell() {
     }).join('') + '<a href="#" data-act="open-nav">' + ico('menu') + '<span>Menu</span></a></nav>';
   var mq = window.matchMedia('(max-width:860px)'); $('#navToggle').style.display = mq.matches ? 'inline-grid' : 'none';
   var sel = $('#projSel'); if (sel) sel.onchange = function () { S.projectId = sel.value; loadData(sel.value); };
-  var sv = d.app && d.app.version;
-  if (sv && sv !== CONFIG.APP_VERSION && a.role === 'COMPANY_ADMIN') { var ban = document.createElement('div'); ban.className = 'alert danger'; ban.style.margin = '12px 20px 0'; ban.innerHTML = 'Versi server (' + esc(sv) + ') berbeda dengan versi aplikasi (' + esc(CONFIG.APP_VERSION) + '). Fitur baru bisa tidak muncul atau gagal disimpan. <a href="#/admin/about">Lihat cara memperbarui</a>.'; $('#content').before(ban); }
+  var vb = versionBanner(d.app && d.app.version, a.role === 'COMPANY_ADMIN');
+  if (vb) { var ban = document.createElement('div'); ban.className = 'alert danger'; ban.style.margin = '12px 20px 0'; ban.innerHTML = vb; $('#content').before(ban); }
   updateNet(); renderView();
   if (d.actor.mustChangePassword) forcePassword();
   else if (needTerms() && !S.fromCache) askTerms();
@@ -2388,7 +2414,7 @@ function aboutHtml() {
     '<dt>Tanggal rilis</dt><dd>' + dt(d.app.buildDate) + '</dd><dt>Mode</dt><dd>' + (IS_GAS ? 'Langsung dari Google Apps Script' : 'PWA (dapat dipasang & offline)') + '</dd>' +
     '<dt>Pengelola data</dt><dd>' + esc(d.settings.companyName || '') + '</dd><dt>Lisensi</dt><dd>' + esc(d.license.tierLabel || '') + (d.license.expiresAt ? ' s/d ' + dt(d.license.expiresAt) : '') + '</dd>' +
     '<dt>Versi ketentuan</dt><dd>' + esc(d.app.legalVersion || '') + '</dd><dt>Anda menyetujui</dt><dd>' + (a.termsAcceptedAt ? dtt(a.termsAcceptedAt) + ' (versi ' + esc(a.termsVersion) + ')' : 'Belum') + '</dd></dl>' +
-    (sv !== cv ? '<div class="alert danger" style="margin-top:10px">Versi tampilan dan server berbeda. Admin perlu mengganti <b>semua</b> file .gs dan Index.html, menjalankan setup, lalu membuat versi deployment baru' + (IS_GAS ? '' : ', dan mengunggah index.html + sw.js terbaru ke GitHub') + '.</div>' : '') +
+    (sv !== cv ? '<div class="alert danger" style="margin-top:10px">Versi tampilan dan server berbeda. Admin perlu mengganti <b>semua</b> file .gs dan Index.html, menjalankan setup, lalu membuat versi deployment baru' + (IS_GAS ? '' : ', dan mengunggah index.html + sw.js terbaru ke GitHub') + '.' + (IS_GAS ? '' : ' <button class="btn sm" data-act="app-update">Perbarui aplikasi di perangkat ini</button>') + '</div>' : '') +
     '<div class="row" style="margin-top:12px">' + btn('legal-terms', 'Syarat & Ketentuan') + btn('legal-privacy', 'Pemberitahuan Privasi') + '</div></section>' +
     '<section class="panel"><div class="panel-h"><h2>Riwayat perubahan</h2></div>' + CHANGELOG.map(function (c) { return '<h3 style="margin:10px 0 4px">Versi ' + c[0] + ' <span class="small muted">' + dt(c[1]) + '</span></h3><ul class="small" style="margin:0;padding-left:18px">' + c[2].map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>'; }).join('') + '</section></div>';
 }
@@ -2451,6 +2477,7 @@ ACT['pt-legal'] = function (el) { showLegal(el.dataset.k, portalLegalInfo()); };
 /* ---------------- Data ---------------- */
 function portalApply(d) {
   P.d = d; P.fromCache = false;
+  var vb = versionBanner(d.app && d.app.version, false); if (vb && !IS_GAS) setTimeout(function () { toast(vb.replace(/<[^>]+>/g, ''), 'err'); }, 300);
   Store.set('kv', 'portal:last', d);
   if (P.unit >= d.units.length) P.unit = 0;
   renderPortal();

@@ -4,11 +4,11 @@
  * - Background Sync: antrean offline (IndexedDB 'hcerp' → outbox) dikirim walau aplikasi sudah ditutup, begitu sinyal kembali.
  * - Naikkan VERSION setiap kali index.html diperbarui agar pengguna mendapat versi baru.
  */
-var VERSION = 'hcerp-v2.3.0';
+var VERSION = 'hcerp-v2.3.0b';
 var SHELL = ['./', './index.html', './manifest.webmanifest', './icon.svg'];
 
 self.addEventListener('install', function (e) {
-  e.waitUntil(caches.open(VERSION).then(function (c) { return c.addAll(SHELL); }).then(function () { return self.skipWaiting(); }));
+  e.waitUntil(caches.open(VERSION).then(function (c) { return c.addAll(SHELL.map(function (u) { return new Request(u, { cache: 'reload' }); })); }).then(function () { return self.skipWaiting(); }));
 });
 
 self.addEventListener('activate', function (e) {
@@ -33,8 +33,9 @@ self.addEventListener('fetch', function (e) {
   }
   if (req.mode === 'navigate') {
     // network-first untuk halaman agar update cepat sampai; offline → cache
-    e.respondWith(fetch(req).then(function (res) {
-      var copy = res.clone(); caches.open(VERSION).then(function (c) { c.put('./index.html', copy); });
+    // cache:'no-store' → selalu ambil index.html terbaru dari GitHub (abaikan cache HTTP 10 menit GitHub Pages)
+    e.respondWith(fetch(req.url, { cache: 'no-store', credentials: 'same-origin' }).then(function (res) {
+      var copy = res.clone(); if (res.ok) caches.open(VERSION).then(function (c) { c.put('./index.html', copy); });
       return res;
     }).catch(function () { return caches.match('./index.html'); }));
     return;
