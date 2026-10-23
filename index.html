@@ -341,6 +341,17 @@ pre.msg{white-space:pre-wrap;font:inherit;font-size:.88rem;background:var(--surf
 .fm-ot{display:flex;flex-direction:column} .fm-ot input{width:100%;min-height:40px;border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:var(--surface);color:var(--text)}
 @media (max-width:560px){.fm-row{grid-template-columns:1fr 78px}.fm-row .seg{grid-column:1/-1;order:3;width:100%}.seg button{flex:1}}
 
+/* ---------- Avatar, logo & zoom (v2.4) ---------- */
+.avatar{border-radius:50%;object-fit:cover;flex:0 0 auto;display:inline-grid;place-items:center;color:#fff;font-weight:700;background:var(--surface-2);border:2px solid rgba(255,255,255,.6);cursor:zoom-in;vertical-align:middle}
+.avatar.ini{cursor:default;border-color:transparent}
+.brand-logo{border-radius:8px;object-fit:contain;flex:0 0 auto;background:#fff}
+.zoom-ov{position:fixed;inset:0;z-index:200;background:rgba(8,14,22,.94);display:flex;flex-direction:column;touch-action:none}
+.zoom-stage{flex:1;display:grid;place-items:center;overflow:hidden}
+.zoom-stage img{max-width:96vw;max-height:84vh;min-width:min(70vw,70vh);object-fit:contain;transition:transform .08s ease-out;touch-action:none;user-select:none;border-radius:6px;cursor:grab;transform-origin:center}
+.zoom-bar{display:flex;align-items:center;gap:8px;padding:10px 14px calc(10px + env(safe-area-inset-bottom));color:#fff;background:rgba(0,0,0,.35)}
+.zoom-bar .iconbtn{font-size:1.3rem;min-width:40px}
+#zoomPct{min-width:52px;text-align:center;font-variant-numeric:tabular-nums}
+
 /* ---------- Responsif ---------- */
 @media (max-width:1100px){.g4{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:860px){
@@ -386,7 +397,7 @@ pre.msg{white-space:pre-wrap;font:inherit;font-size:.88rem;background:var(--surf
 <script>
 /* Housing Contractor ERP — klien (vanilla JS). Inti: transport API, offline (IndexedDB + antrean), router, form, tabel, grafik. */
 'use strict';
-var CONFIG = { API_URL: 'https://script.google.com/macros/s/AKfycbxApoalXRMpIMBbsPSrhyQDYF-KrJjRSsZuxR4Jo4LqvTTDffYf6uwmIgALuzm_9uNS/exec', APP_VERSION: '2.3.0' };
+var CONFIG = { API_URL: 'https://script.google.com/macros/s/AKfycbxApoalXRMpIMBbsPSrhyQDYF-KrJjRSsZuxR4Jo4LqvTTDffYf6uwmIgALuzm_9uNS/exec', APP_VERSION: '2.4.0' };
 var IS_GAS = (typeof google !== 'undefined' && google.script && google.script.run) ? true : false;
 
 /* ============================ Util ============================ */
@@ -677,7 +688,17 @@ document.addEventListener('change', function (e) {
     readFields();
     var f = FORM.spec.fields.filter(function (x) { return x.name === t.name; })[0];
     if (f && f.onChange) f.onChange(FORM.vals, FORM);
-    if ((f && f.onChange) || FORM.spec.fields.some(function (x) { return x.show || typeof x.options === 'function' || x.type === 'info'; })) { renderFields(); var el = document.getElementById(t.id); if (el) el.focus(); }
+    if ((f && f.onChange) || FORM.spec.fields.some(function (x) { return x.show || typeof x.options === 'function' || x.type === 'info'; })) {
+      // tunda render sampai fokus pindah ke kolom berikutnya, lalu kembalikan fokus & posisi kursor ke kolom yang sedang diisi
+      setTimeout(function () {
+        if (!FORM) return;
+        var a = document.activeElement, id = a && a.closest && a.closest('#ffields') ? a.id : '', pos = null;
+        try { pos = a.selectionStart; } catch (er) { }
+        readFields(); renderFields();
+        var el = document.getElementById(id || t.id);
+        if (el && (id || !document.activeElement || document.activeElement === document.body)) { el.focus(); try { if (pos != null) el.setSelectionRange(pos, pos); } catch (er) { } }
+      }, 0);
+    }
   }
 });
 function handlePhoto(input) {
@@ -779,7 +800,7 @@ function printDoc(html) {
 }
 function docHeader(title, no) {
   var s = (S.d && S.d.settings) || {};
-  return '<div class="hdr"><h1>' + esc(s.companyName) + '</h1><div>' + esc(s.companyAddress || '') + (s.companyTaxId ? ' — NPWP ' + esc(s.companyTaxId) : '') + '</div></div><h2>' + esc(title) + '</h2><div style="text-align:center">Nomor: ' + esc(no) + '</div>';
+  return '<div class="hdr">' + (s.logoData ? '<img src="' + esc(s.logoData) + '" alt="" style="height:48px;float:left;margin-right:10px">' : '') + '<h1>' + esc(s.companyName) + '</h1><div>' + esc(s.companyAddress || '') + (s.companyTaxId ? ' — NPWP ' + esc(s.companyTaxId) : '') + '</div></div><h2>' + esc(title) + '</h2><div style="text-align:center">Nomor: ' + esc(no) + '</div>';
 }
 
 /* Kerangka aplikasi: login, shell, router, sinkronisasi data */
@@ -795,7 +816,7 @@ function applyTheme() { var t = lsGet('hc_theme'); if (t) document.documentEleme
 /* ---------------- Login ---------------- */
 function renderLogin(msg) {
   var app = $('#app');
-  app.innerHTML = '<div class="login"><section class="login-art"><div class="blueprint"></div><div style="position:relative"><div class="row" style="gap:12px"><div class="brand-mark">HC</div><b style="font-family:var(--font-head);font-size:1.1rem">Housing Contractor ERP</b></div></div>' +
+  app.innerHTML = '<div class="login"><section class="login-art"><div class="blueprint"></div><div style="position:relative"><div class="row" style="gap:12px" id="loginBrand">' + brandMark(40) + '<div><b style="font-family:var(--font-head);font-size:1.1rem">' + esc(brand().title) + '</b><div class="small" style="opacity:.8">' + esc(brand().subtitle) + '</div></div></div></div>' +
     '<div style="position:relative"><h1>Dari RAB sampai serah terima kunci.</h1><p>Anggaran, pengadaan, gudang, laporan lapangan, opname subkon, keuangan, dan QC per kavling dalam satu alur yang tercatat — tetap bisa dipakai di lokasi tanpa sinyal.</p></div><div style="position:relative" class="small">Versi ' + CONFIG.APP_VERSION + '</div></section>' +
     '<section class="login-form"><form id="loginForm" autocomplete="on"><h2>Masuk</h2>' + (msg ? '<div class="err-box">' + esc(msg) + '</div>' : '') +
     '<div class="field"><label for="lemail">Email</label><input id="lemail" type="email" autocomplete="username" required value="' + esc(lsGet('hc_last_email') || '') + '"></div>' +
@@ -803,7 +824,7 @@ function renderLogin(msg) {
     '<button class="btn primary" type="submit" id="lbtn" style="justify-content:center;padding:11px">Masuk</button>' +
     (IS_GAS ? '' : '<details class="small"><summary>Pengaturan koneksi server</summary><div class="field" style="margin-top:8px"><label for="lapi">URL Web App Google Apps Script</label><input id="lapi" placeholder="https://script.google.com/macros/s/…/exec" value="' + esc(apiUrl()) + '"><div class="help">Diberikan oleh admin saat instalasi. Disimpan di perangkat ini.</div></div><button type="button" class="btn sm" data-act="test-api">Uji koneksi</button></details>') +
     '<p class="small muted">Lupa kata sandi? Minta admin perusahaan melakukan reset dari menu Admin → Pengguna.</p><p class="small muted" style="margin:0">Dengan masuk, Anda menyetujui <a href="#" data-act="legal-terms">Syarat & Ketentuan</a> dan memahami <a href="#" data-act="legal-privacy">Pemberitahuan Privasi</a>.</p><p class="small" style="margin:0"><a href="#portal" data-act="portal-open">Pemilik rumah? Masuk ke Portal Pemilik Rumah →</a></p><p class="tiny muted" style="margin:0" id="loginVer">Versi aplikasi ' + esc(CONFIG.APP_VERSION) + '</p></form></section></div>';
-  if (!S.legal && (IS_GAS || apiUrl())) call('legal.info').then(function (i) { S.legal = i; var v = $('#loginVer'); if (v) { v.textContent = 'Versi aplikasi ' + CONFIG.APP_VERSION + ', server ' + i.version + ', pengelola data: ' + (i.companyName || '-'); var vb = versionBanner(i.version, true); if (vb) { var el = document.createElement('div'); el.className = 'alert danger small'; el.innerHTML = vb; v.after(el); } } }).catch(function () { });
+  if (!S.legal && (IS_GAS || apiUrl())) call('legal.info').then(function (i) { S.legal = i; rememberBrand(i); var lb = $('#loginBrand'); if (lb) lb.innerHTML = brandMark(40) + '<div><b style="font-family:var(--font-head);font-size:1.1rem">' + esc(brand().title) + '</b><div class="small" style="opacity:.8">' + esc(brand().subtitle) + '</div></div>'; var v = $('#loginVer'); if (v) { v.textContent = 'Versi aplikasi ' + CONFIG.APP_VERSION + ', server ' + i.version + ', pengelola data: ' + (i.companyName || '-'); var vb = versionBanner(i.version, true); if (vb) { var el = document.createElement('div'); el.className = 'alert danger small'; el.innerHTML = vb; v.after(el); } } }).catch(function () { });
   $('#loginForm').onsubmit = function (e) {
     e.preventDefault();
     var api = $('#lapi'); if (api && api.value.trim()) lsSet('hc_api_url', api.value.trim());
@@ -830,6 +851,7 @@ function sessionEnded(msg) {
 function applyBoot(d) {
   var y = window.scrollY, same = S.d && S.d.actor && d.actor && S.d.actor.id === d.actor.id && $('#content');
   S.d = d; S.fromCache = false; S.online = true; S.projectId = d.activeProjectId;
+  if (d.settings) rememberBrand(d.settings);
   lsSet('hc_project', d.activeProjectId || ''); lsSet('hc_uid', d.actor.id);
   Store.set('kv', 'boot:' + d.actor.id + ':' + (d.activeProjectId || ''), d); Store.set('kv', 'boot:last', d);
   renderShell();
@@ -915,8 +937,8 @@ function renderShell() {
     return '<a href="#/' + x[0] + '" class="' + (S.route === x[0] ? 'active' : '') + '" data-nav="' + x[0] + '">' + ico(x[2]) + '<span>' + x[1] + '</span>' + badge + '</a>';
   }).join('');
   var projOpts = (d.projects || []).map(function (p) { return '<option value="' + p.id + '"' + (p.id === d.activeProjectId ? ' selected' : '') + '>' + esc(p.code + ' — ' + p.name) + '</option>'; }).join('');
-  $('#app').innerHTML = '<div class="shell"><aside class="side" id="side"><div class="brand"><div class="brand-mark">HC</div><div><b>' + esc(d.settings.companyName || 'Housing Contractor ERP') + '</b><span>Housing Contractor ERP</span></div></div>' +
-    '<nav class="nav" aria-label="Menu utama">' + navHtml + '</nav><div class="side-foot"><div><b>' + esc(a.fullName) + '</b></div><div>' + esc(d.roleLabels[a.role] || a.role) + '</div><div style="margin-top:6px">Lisensi: ' + esc(lic.tierLabel || '-') + (lic.expiresAt ? ' s/d ' + dt(lic.expiresAt) : '') + '</div><div style="margin-top:6px"><a href="#/admin/about" class="side-link">Versi ' + esc(CONFIG.APP_VERSION) + '</a>, <a href="#" data-act="legal-terms" class="side-link">Ketentuan</a>, <a href="#" data-act="legal-privacy" class="side-link">Privasi</a></div></div></aside>' +
+  $('#app').innerHTML = '<div class="shell"><aside class="side" id="side"><div class="brand">' + brandMark() + '<div><b>' + esc(brand().title) + '</b><span>' + esc(brand().subtitle) + '</span></div></div>' +
+    '<nav class="nav" aria-label="Menu utama">' + navHtml + '</nav><div class="side-foot"><div class="row" style="gap:8px;flex-wrap:nowrap">' + avatarHtml(a, 34) + '<div style="min-width:0"><div><b>' + esc(a.fullName) + '</b></div><div>' + esc(d.roleLabels[a.role] || a.role) + '</div></div></div><div style="margin-top:6px">Lisensi: ' + esc(lic.tierLabel || '-') + (lic.expiresAt ? ' s/d ' + dt(lic.expiresAt) : '') + '</div><div style="margin-top:6px"><a href="#/admin/about" class="side-link">Versi ' + esc(CONFIG.APP_VERSION) + '</a>, <a href="#" data-act="legal-terms" class="side-link">Ketentuan</a>, <a href="#" data-act="legal-privacy" class="side-link">Privasi</a></div></div></aside>' +
     '<div class="main"><header class="topbar"><button class="iconbtn" id="navToggle" aria-label="Buka menu" style="display:none">' + ico('menu') + '</button>' +
     (projOpts ? '<label class="hide" for="projSel">Proyek aktif</label><select id="projSel" class="input" style="max-width:360px">' + projOpts + '</select>' : '<span class="muted small">Belum ada proyek</span>') +
     '<span class="grow"></span><span class="netpill" id="netpill" data-act="net-detail" role="button" tabindex="0"></span>' +
@@ -1021,7 +1043,7 @@ function start() {
   return loadOutbox().then(function () { return loadData(S.projectId); }).then(function () { if (S.online) syncOutbox(); });
 }
 function boot() {
-  applyTheme();
+  applyTheme(); applyBrandChrome();
   if (!IS_GAS && 'serviceWorker' in navigator && location.protocol === 'https:') {
     navigator.serviceWorker.register('sw.js').catch(function () { });
   }
@@ -1451,7 +1473,7 @@ VIEWS.field = {
     var reps = applyFilter((d.dailyReports || []).slice().sort(function (a, b) { return (b.reportDate + b.createdAt).localeCompare(a.reportDate + a.createdAt); }), 'dsr', function (r) { return r.reportNumber + r.workSummary + ((L().units[r.houseUnitId] || {}).unitNumber || ''); });
     var W = { CERAH: 'Cerah', BERAWAN: 'Berawan', HUJAN_RINGAN: 'Hujan ringan', HUJAN_LEBAT: 'Hujan lebat' };
     return panel('Laporan harian lapangan', '<div class="row" style="margin-bottom:6px">' + filterBox('dsr', 'Cari laporan / kavling') + '</div>' + (reps.length ? reps.slice(0, 60).map(function (r) {
-      return '<div class="dsr">' + (r.photoUrl ? '<a href="' + esc(r.photoUrl) + '" target="_blank" rel="noopener"><img src="' + esc(r.photoUrl) + '" alt="Foto ' + esc(r.reportNumber) + '" loading="lazy"></a>' : '<div class="ph">Tanpa foto</div>') +
+      return '<div class="dsr">' + (r.photoUrl ? '<img src="' + esc(r.photoUrl) + '" alt="Foto ' + esc(r.reportNumber) + '" loading="lazy" data-act="zoom-photo" data-src="' + esc(r.photoUrl) + '" data-cap="' + esc(r.reportNumber + ' — ' + dt(r.reportDate)) + '" style="cursor:zoom-in">' : '<div class="ph">Tanpa foto</div>') +
         '<div><div class="row"><b>' + esc(r.reportNumber) + '</b><span class="chip">' + unitLabel(r.houseUnitId) + '</span>' + (r.wbsCode ? '<span class="chip">' + esc(r.wbsCode) + '</span>' : '') + '<span class="small muted">' + dt(r.reportDate) + '</span></div>' +
         '<div style="margin:4px 0">' + esc(r.workSummary) + '</div>' + (r.issues ? '<div class="small" style="color:var(--bad)">Kendala: ' + esc(r.issues) + '</div>' : '') +
         '<div class="small muted">Progres +' + pct(r.progressAddedPct) + ', kumulatif ' + pct(r.cumulativeProgressPct) + '. ' + r.workforceCount + ' pekerja. Cuaca ' + esc(W[r.weatherMorning] || '') + ' / ' + esc(W[r.weatherAfternoon] || '') + '. ' + (r.lat ? '<a href="https://www.google.com/maps?q=' + esc(r.lat + ',' + r.lng) + '" target="_blank" rel="noopener">Lokasi GPS</a>. ' : '') + 'Oleh ' + userName(r.reportedByUserId) + '.</div></div></div>';
@@ -1708,7 +1730,7 @@ VIEWS.admin = {
         table([{ l: 'Waktu', f: function (x) { return dtt(x.createdAt); } }, { l: 'Transaksi', f: function (x) { return esc(x.label); } }, { l: 'Status', f: function (x) { return x.status === 'FAILED' ? chip('REJECTED', 'Gagal') : chip('SUBMITTED', 'Menunggu'); } }, { l: 'Keterangan', f: function (x) { return esc(x.error || ''); } }], S.outbox, { empty: 'Antrean kosong', actions: function (x) { return (x.status === 'FAILED' ? btn('ob-retry', 'Coba lagi', 'data-id="' + x.opId + '"') : '') + btn('ob-del', 'Hapus', 'data-id="' + x.opId + '"', 'sm danger'); } }), btn('sync-now', 'Kirim sekarang', '', 'primary'));
     }
     if (tab === 'users') {
-      return panel('Pengguna', table([{ l: 'Nama', f: function (u) { return '<b>' + esc(u.fullName) + '</b><br><span class="small muted">' + esc(u.title || '') + '</span>'; } }, { l: 'Email', k: 'email' }, { l: 'Peran', f: function (u) { return esc(d.roleLabels[u.role]); } }, { l: 'Telepon', k: 'phone' }, { l: 'Login terakhir', f: function (u) { return dtt(u.lastLoginAt); } }, { l: 'Status', f: function (u) { return u.isActive ? chip('ACTIVE') : chip('REJECTED', 'Nonaktif'); } }],
+      return panel('Pengguna', table([{ l: 'Nama', f: function (u) { return '<div class="row" style="gap:10px;flex-wrap:nowrap">' + avatarHtml(u, 36) + '<div><b>' + esc(u.fullName) + '</b><br><span class="small muted">' + esc(u.title || '') + '</span></div></div>'; } }, { l: 'Email', k: 'email' }, { l: 'Peran', f: function (u) { return esc(d.roleLabels[u.role]); } }, { l: 'Telepon', k: 'phone' }, { l: 'Login terakhir', f: function (u) { return dtt(u.lastLoginAt); } }, { l: 'Status', f: function (u) { return u.isActive ? chip('ACTIVE') : chip('REJECTED', 'Nonaktif'); } }],
         d.users, { actions: function (u) { return btn('user-edit', 'Ubah', 'data-id="' + u.id + '"') + btn('user-reset', 'Reset sandi', 'data-id="' + u.id + '"') + (u.id !== d.actor.id ? btn('master-del', 'Hapus', 'data-t="Users" data-id="' + u.id + '"', 'sm danger') : ''); } }), btn('user-new', ico('plus') + ' Pengguna baru', '', 'primary'));
     }
     if (tab === 'org') {
@@ -1718,7 +1740,7 @@ VIEWS.admin = {
     }
     if (tab === 'settings') {
       var s = d.settings;
-      return panel('Pengaturan perusahaan & aturan', '<dl class="kv">' + [['Nama perusahaan', s.companyName], ['Kode (prefiks nomor dokumen)', s.companyCode], ['Alamat', s.companyAddress], ['NPWP', s.companyTaxId], ['PPN default', pct(s.ppnPercent)], ['Tarif lembur per jam', pct(s.overtimeRatePct) + ' upah harian'], ['Ambang lulus QC', pct(s.qcPassScore)], ['Peringatan kuota', 'mulai ' + pct(s.quotaNearLimitPct)], ['Mode kuota material', s.quotaMode === 'STRICT' ? 'Ketat (material di luar RAB perlu alasan)' : 'Toleransi ' + s.quotaAllowanceQty], ['Garansi default', s.defaultWarrantyMonths + ' bulan'], ['Progres minimal BAST', pct(s.bastMinProgress)], ['Notifikasi WhatsApp (Fonnte)', s.fonnteToken ? 'Aktif ke ' + esc(s.notifyPhones) : 'Belum diatur'], ['Backup harian ke Drive', s.dailyBackup === 'OFF' ? 'Mati' : 'Aktif'], ['Email perusahaan', s.companyEmail], ['Kontak pelindungan data', s.privacyContact], ['Jaga server tetap siap', s.keepWarm === 'OFF' ? 'Mati' : s.keepWarm === 'ALWAYS' ? 'Selalu' : 'Jam kerja 06–21'], ['Alamat aplikasi / portal', s.appUrl ? s.appUrl + ' (#portal)' : 'Belum diisi'], ['Gateway WhatsApp', s.waProvider === 'OFF' ? 'Mati' : s.waProvider === 'WEBHOOK' ? 'Webhook' : 'Fonnte'], ['Email otomatis', s.emailNotify === 'OFF' ? 'Mati' : 'Aktif'], ['Pengingat konsumen', s.customerReminders === 'OFF' ? 'Mati' : 'H-' + s.reminderDaysBefore + ' / H+' + s.reminderDaysAfter + ', jam ' + s.reminderHour + '.00'], ['Rekening pembayaran', s.bankAccountNo ? s.bankName + ' ' + s.bankAccountNo + ' a.n. ' + s.bankAccountName : 'Belum diisi'], ['Peringatan ke direktur', s.approvalAlert === 'OFF' ? 'Mati' : 'Aktif' + (n(s.approvalAlertMinAmount) ? ' (MR ≥ ' + rp(s.approvalAlertMinAmount) + ')' : '')]].map(function (r) { return '<dt>' + r[0] + '</dt><dd>' + esc(r[1] || '—') + '</dd>'; }).join('') + '</dl>', btn('settings-edit', 'Ubah pengaturan', '', 'primary') + btn('notify-test', 'Tes WhatsApp'));
+      return panel('Pengaturan perusahaan & aturan', '<dl class="kv">' + [['Nama perusahaan', s.companyName], ['Kode (prefiks nomor dokumen)', s.companyCode], ['Alamat', s.companyAddress], ['NPWP', s.companyTaxId], ['PPN default', pct(s.ppnPercent)], ['Tarif lembur per jam', pct(s.overtimeRatePct) + ' upah harian'], ['Ambang lulus QC', pct(s.qcPassScore)], ['Peringatan kuota', 'mulai ' + pct(s.quotaNearLimitPct)], ['Mode kuota material', s.quotaMode === 'STRICT' ? 'Ketat (material di luar RAB perlu alasan)' : 'Toleransi ' + s.quotaAllowanceQty], ['Garansi default', s.defaultWarrantyMonths + ' bulan'], ['Progres minimal BAST', pct(s.bastMinProgress)], ['Notifikasi WhatsApp (Fonnte)', s.fonnteToken ? 'Aktif ke ' + esc(s.notifyPhones) : 'Belum diatur'], ['Backup harian ke Drive', s.dailyBackup === 'OFF' ? 'Mati' : 'Aktif'], ['Email perusahaan', s.companyEmail], ['Kontak pelindungan data', s.privacyContact], ['Jaga server tetap siap', s.keepWarm === 'OFF' ? 'Mati' : s.keepWarm === 'ALWAYS' ? 'Selalu' : 'Jam kerja 06–21'], ['Alamat aplikasi / portal', s.appUrl ? s.appUrl + ' (#portal)' : 'Belum diisi'], ['Gateway WhatsApp', s.waProvider === 'OFF' ? 'Mati' : s.waProvider === 'WEBHOOK' ? 'Webhook' : 'Fonnte'], ['Email otomatis', s.emailNotify === 'OFF' ? 'Mati' : 'Aktif'], ['Pengingat konsumen', s.customerReminders === 'OFF' ? 'Mati' : 'H-' + s.reminderDaysBefore + ' / H+' + s.reminderDaysAfter + ', jam ' + s.reminderHour + '.00'], ['Rekening pembayaran', s.bankAccountNo ? s.bankName + ' ' + s.bankAccountNo + ' a.n. ' + s.bankAccountName : 'Belum diisi'], ['Peringatan ke direktur', s.approvalAlert === 'OFF' ? 'Mati' : 'Aktif' + (n(s.approvalAlertMinAmount) ? ' (MR ≥ ' + rp(s.approvalAlertMinAmount) + ')' : '')]].map(function (r) { return '<dt>' + r[0] + '</dt><dd>' + esc(r[1] || '—') + '</dd>'; }).join('') + '</dl>', btn('settings-edit', 'Ubah pengaturan', '', 'primary') + btn('branding-edit', 'Judul header & logo') + btn('notify-test', 'Tes WhatsApp'));
     }
     if (tab === 'license') {
       var l = d.license;
@@ -1733,7 +1755,7 @@ VIEWS.admin = {
       return panel('Audit trail (berantai SHA-256)', '<div class="row" style="margin-bottom:10px">' + filterBox('aud', 'Cari aktivitas') + btn('audit-verify', 'Verifikasi rantai', '', 'primary') + '</div><p class="small muted">Setiap catatan menyimpan hash catatan sebelumnya. Perubahan diam-diam di spreadsheet akan memutus rantai dan terdeteksi saat verifikasi. Menampilkan 200 aktivitas terakhir.</p>' + table([{ l: '#', n: 1, k: 'seq' }, { l: 'Waktu', f: function (a) { return dtt(a.createdAt); } }, { l: 'Pengguna', f: function (a) { return esc(a.actorName) + '<br><span class="small muted">' + esc(d.roleLabels[a.actorRole] || a.actorRole) + '</span>'; } }, { l: 'Aktivitas', f: function (a) { return esc(a.summary); } }, { l: 'Rujukan', k: 'sourceReference' }, { l: 'Hash', f: function (a) { return '<span class="tiny muted" title="' + esc(a.integrityHash) + '">' + esc(String(a.integrityHash).slice(0, 12)) + '…</span>'; } }], logs, { empty: 'Belum ada aktivitas' }));
     }
     var a = d.actor;
-    return '<div class="grid g2" style="align-items:start">' + panel('Akun saya', '<dl class="kv"><dt>Nama</dt><dd>' + esc(a.fullName) + '</dd><dt>Email</dt><dd>' + esc(a.email) + '</dd><dt>Peran</dt><dd>' + esc(d.roleLabels[a.role]) + '</dd><dt>Login terakhir</dt><dd>' + dtt(a.lastLoginAt) + '</dd></dl>', btn('pw-change', 'Ganti kata sandi', '', 'primary')) +
+    return '<div class="grid g2" style="align-items:start">' + panel('Akun saya', photoPanel(a, true) + '<dl class="kv" style="margin-top:12px"><dt>Nama</dt><dd>' + esc(a.fullName) + '</dd><dt>Email</dt><dd>' + esc(a.email) + '</dd><dt>Peran</dt><dd>' + esc(d.roleLabels[a.role]) + '</dd><dt>Login terakhir</dt><dd>' + dtt(a.lastLoginAt) + '</dd></dl>', btn('pw-change', 'Ganti kata sandi', '', 'primary')) +
       panel('Aplikasi', '<dl class="kv"><dt>Versi</dt><dd>' + esc(d.app.version) + '</dd><dt>Mode</dt><dd>' + (IS_GAS ? 'Dibuka dari Google Apps Script' : 'PWA (GitHub Pages)') + '</dd><dt>Server</dt><dd class="small" style="word-break:break-all">' + esc(IS_GAS ? 'google.script.run' : apiUrl()) + '</dd><dt>Data per</dt><dd>' + dtt(d.serverTime) + '</dd></dl>' + (IS_GAS ? '' : '<div class="row" style="margin-top:10px">' + btn('api-change', 'Ubah URL server') + '</div>') + '<p class="small muted">Hak akses Anda: ' + esc(d.permissions.join(', ').toLowerCase().replace(/_/g, ' ')) + '.</p>') + '</div>';
   }
 };
@@ -1744,7 +1766,7 @@ ACT['pw-change'] = function () { openForm({ title: 'Ganti kata sandi', fields: [
 ACT['api-change'] = function () { openForm({ title: 'URL server', values: { url: apiUrl() }, fields: [{ name: 'url', label: 'URL Web App Google Apps Script', required: true }], onSubmit: function (v) { lsSet('hc_api_url', v.url.trim()); toast('URL disimpan.'); return refresh(); } }); };
 function userForm(u) {
   u = u || { isActive: true };
-  openForm({ title: u.id ? 'Ubah pengguna' : 'Pengguna baru', values: u, intro: u.id ? '' : 'Kata sandi sementara akan ditampilkan sekali setelah disimpan. Pengguna wajib menggantinya saat login pertama.', fields: [{ name: 'fullName', label: 'Nama lengkap', required: true }, { name: 'email', label: 'Email', type: 'email', required: true }, { name: 'role', label: 'Peran', type: 'select', required: true, options: Object.keys(S.d.roleLabels).map(function (k) { return { v: k, l: S.d.roleLabels[k] }; }) }, { name: 'title', label: 'Jabatan' }, { name: 'phone', label: 'Telepon', type: 'tel' }, { name: 'isActive', label: 'Aktif', type: 'check' }],
+  openForm({ title: u.id ? 'Ubah pengguna' : 'Pengguna baru', values: u, intro: u.id ? '' : 'Kata sandi sementara akan ditampilkan sekali setelah disimpan. Pengguna wajib menggantinya saat login pertama.', fields: (u.id ? [{ name: '_ph', type: 'info', html: photoPanel(u, u.id === S.d.actor.id) }] : []).concat([{ name: 'fullName', label: 'Nama lengkap', required: true }, { name: 'email', label: 'Email', type: 'email', required: true }, { name: 'role', label: 'Peran', type: 'select', required: true, options: Object.keys(S.d.roleLabels).map(function (k) { return { v: k, l: S.d.roleLabels[k] }; }) }, { name: 'title', label: 'Jabatan' }, { name: 'phone', label: 'Telepon', type: 'tel' }, { name: 'isActive', label: 'Aktif', type: 'check' }]),
     onSubmit: function (v) { return call('user.save', Object.assign({ id: u.id }, v)).then(function (r) { return refresh().then(function () { if (r.tempPassword) setTimeout(function () { showInfo('Pengguna dibuat', '<p>Berikan kredensial ini kepada ' + esc(r.fullName) + ':</p><dl class="kv"><dt>Email</dt><dd>' + esc(r.email) + '</dd><dt>Kata sandi sementara</dt><dd><b>' + esc(r.tempPassword) + '</b></dd></dl><p class="small muted">Jangan lupa menambahkan pengguna ini sebagai anggota proyek.</p>'); }, 50); else toast('Pengguna diperbarui.', 'ok'); }); }); } });
 }
 ACT['user-new'] = function () { userForm(); };
@@ -2312,6 +2334,7 @@ ACT['br-wa'] = function (el) {
 
 /* Versi aplikasi, riwayat perubahan, Syarat & Ketentuan, Pemberitahuan Privasi */
 var CHANGELOG = [
+  ['2.4.0', '2026-10-23', ['Foto profil untuk setiap pengguna & pemilik rumah, dapat diperbesar (zoom: roda mouse, cubit dua jari, ketuk ganda, geser).', 'Judul header, subjudul, dan logo dapat diubah admin (menu samping, halaman masuk, portal, tab browser, kop cetak).', 'Foto laporan harian & klaim garansi kini dapat di-zoom.', 'Perbaikan: kursor tidak lagi melompat kembali ke kolom sebelumnya saat mengisi form.', 'Penyedia: halaman Pembuat Lisensi (HTML) dengan sertifikat lisensi siap cetak.']],
   ['2.3.0', '2026-10-23', ['Portal Mandiri Pemilik Rumah: konsumen masuk dengan nomor HP untuk melihat progres & foto mingguan, riwayat termin/KPR, denah, dan mengajukan klaim garansi dengan foto dari ponsel.', 'Mode Lapangan untuk mandor/pengawas: presensi tukang & laporan harian offline-first, terkirim otomatis (juga di latar) saat sinyal kembali; upah dapat dihitung dari presensi.', 'Notifikasi otomatis WhatsApp (Fonnte/webhook) & email: pengingat jatuh tempo termin ke konsumen, peringatan persetujuan ke Direktur Proyek, tanda terima pembayaran, status klaim.', 'Impor mutasi rekening dengan pencocokan otomatis ke tagihan & rekonsiliasi.', 'Peran baru: Direktur Proyek dan Mandor / Pengawas Lapangan.']],
   ['2.2.0', '2026-10-22', ['Aplikasi jauh lebih cepat: data tabel di-cache di server, login dan simpan cukup satu permintaan, data proyek tampil seketika saat dibuka atau pindah proyek lalu diperbarui di latar.', 'Tombol membuat denah dan brosur selalu terlihat beserta keterangan hak akses.', 'Informasi versi, Syarat & Ketentuan, dan Pemberitahuan Privasi; persetujuan dicatat per pengguna.', 'Peringatan bila versi server dan aplikasi berbeda.']],
   ['2.1.0', '2026-10-22', ['Editor denah lantai per tipe rumah (template, pintu/jendela, estimasi volume ke RAB).', 'Brosur A4 dua halaman dengan simulasi KPR, cetak/PDF, HTML, dan WhatsApp.', 'Peran Staf Marketing.']],
@@ -2358,6 +2381,7 @@ function privacyHtml(info) {
       '<b>Pekerja lapangan</b>: nama, kode, keahlian, upah harian, kehadiran, lembur, dan nomor telepon (opsional).',
       '<b>Mitra</b>: nama vendor/subkontraktor, kontak, NPWP, dan rekening/referensi pembayaran yang dicatat.',
       '<b>Lapangan</b>: foto dokumentasi dan koordinat GPS yang diambil saat membuat laporan harian (hanya bila Pengguna menekan "Ambil lokasi GPS" dan mengizinkan akses lokasi di perangkat).',
+      '<b>Foto profil</b> (opsional) yang Anda unggah sendiri atau diunggah admin: versi kecil disimpan di spreadsheet, versi besar di Google Drive Pengelola; terlihat oleh pengguna lain di aplikasi dan dapat dihapus kapan saja dari menu Akun.',
       '<b>Teknis</b>: token sesi, jenis peramban (user agent), dan jejak audit aktivitas.']]],
     ['3. Tujuan & dasar pemrosesan', [[
       'Menjalankan pekerjaan dan kontrak (pembangunan, jual beli rumah, borongan, pengupahan) — dasar: pelaksanaan perjanjian.',
@@ -2448,7 +2472,7 @@ function portalLegalInfo() {
 /* ---------------- Masuk ---------------- */
 function renderPortalLogin(msg) {
   lsSet('hc_mode', 'portal');
-  $('#app').innerHTML = '<div class="pt-login"><div class="pt-login-card"><div class="row" style="gap:10px;margin-bottom:6px"><div class="brand-mark">HC</div><div><b>Portal Pemilik Rumah</b><div class="small muted" id="ptCo">' + esc((S.legal && S.legal.companyName) || 'Pantau rumah Anda dari ponsel') + '</div></div></div>' +
+  $('#app').innerHTML = '<div class="pt-login"><div class="pt-login-card"><div class="row" style="gap:10px;margin-bottom:6px">' + brandMark(40) + '<div><b>Portal Pemilik Rumah</b><div class="small muted" id="ptCo">' + esc((S.legal && S.legal.companyName) || 'Pantau rumah Anda dari ponsel') + '</div></div></div>' +
     '<p class="small muted" style="margin:6px 0 14px">Lihat progres & foto pembangunan setiap minggu, riwayat termin/KPR, dan ajukan klaim garansi.</p>' +
     (msg ? '<div class="err-box">' + esc(msg) + '</div>' : '') +
     '<form id="ptForm" autocomplete="on"><div class="field"><label for="ptId">Nomor HP (WhatsApp) atau email</label><input id="ptId" inputmode="email" autocomplete="username" required value="' + esc(lsGet('hc_ho_last') || '') + '" placeholder="0812xxxxxxxx"></div>' +
@@ -2476,7 +2500,7 @@ ACT['pt-legal'] = function (el) { showLegal(el.dataset.k, portalLegalInfo()); };
 
 /* ---------------- Data ---------------- */
 function portalApply(d) {
-  P.d = d; P.fromCache = false;
+  P.d = d; P.fromCache = false; if (d.branding) rememberBrand(d.branding);
   var vb = versionBanner(d.app && d.app.version, false); if (vb && !IS_GAS) setTimeout(function () { toast(vb.replace(/<[^>]+>/g, ''), 'err'); }, 300);
   Store.set('kv', 'portal:last', d);
   if (P.unit >= d.units.length) P.unit = 0;
@@ -2505,7 +2529,7 @@ function curUnit() { return P.d && P.d.units[P.unit]; }
 function renderPortal() {
   var d = P.d, u = curUnit();
   var sw = d.units.length > 1 ? '<select id="ptUnit" class="input" aria-label="Pilih rumah">' + d.units.map(function (x, i) { return '<option value="' + i + '"' + (i === P.unit ? ' selected' : '') + '>' + esc(x.unitNumber + ' — ' + x.project.name) + '</option>'; }).join('') + '</select>' : '';
-  $('#app').innerHTML = '<div class="pt-shell"><header class="pt-top"><div class="brand-mark">HC</div><div class="grow" style="min-width:0"><b class="ellip">' + esc(d.company.name || 'Portal Pemilik Rumah') + '</b><div class="small ellip" style="opacity:.8">Halo, ' + esc(d.homeowner.fullName) + '</div></div>' +
+  $('#app').innerHTML = '<div class="pt-shell"><header class="pt-top">' + brandMark() + '<div class="grow" style="min-width:0"><b class="ellip">' + esc((d.branding && d.branding.appTitle) || d.company.name || 'Portal Pemilik Rumah') + '</b><div class="small ellip" style="opacity:.8">Halo, ' + esc(d.homeowner.fullName) + '</div></div>' +
     '<button class="iconbtn light" data-act="pt-refresh" aria-label="Muat ulang">' + ico('refresh') + '</button></header>' +
     (P.fromCache ? '<div class="alert warn" style="margin:10px 14px 0">Offline — data per ' + dtt(d.serverTime) + '.</div>' : '') +
     (sw ? '<div style="padding:10px 14px 0">' + sw + '</div>' : '') +
@@ -2608,7 +2632,7 @@ ACT['pt-claim'] = function () {
 function ptAccount() {
   var h = P.d.homeowner, c = P.d.company;
   var wa = Notify_phone(c.phone);
-  return '<section class="panel"><div class="panel-h"><h3>Akun saya</h3></div><dl class="kv"><dt>Nama</dt><dd>' + esc(h.fullName) + '</dd><dt>Nomor HP</dt><dd>' + esc(h.phone) + '</dd><dt>Email</dt><dd>' + esc(h.email || '—') + '</dd><dt>Masuk terakhir</dt><dd>' + dtt(h.lastLoginAt) + '</dd></dl>' +
+  return '<section class="panel"><div class="panel-h"><h3>Akun saya</h3></div><div class="row" style="gap:14px;align-items:center;margin-bottom:12px">' + avatarHtml(h, 80) + '<div class="row">' + btn('pt-avatar', h.avatar ? 'Ganti foto' : 'Unggah foto', '', 'sm primary') + (h.avatar ? btn('pt-avatar-del', 'Hapus', '', 'sm danger') : '') + '</div></div><dl class="kv"><dt>Nama</dt><dd>' + esc(h.fullName) + '</dd><dt>Nomor HP</dt><dd>' + esc(h.phone) + '</dd><dt>Email</dt><dd>' + esc(h.email || '—') + '</dd><dt>Masuk terakhir</dt><dd>' + dtt(h.lastLoginAt) + '</dd></dl>' +
     '<div class="row" style="margin-top:10px">' + btn('pt-prefs', 'Notifikasi') + btn('pt-pw', 'Ganti kata sandi') + '</div></section>' +
     '<section class="panel"><div class="panel-h"><h3>Notifikasi</h3></div><p class="small" style="margin:0">WhatsApp: <b>' + (h.notifyWa ? 'aktif' : 'mati') + '</b> · Email: <b>' + (h.notifyEmail && h.email ? 'aktif' : 'mati') + '</b></p><p class="small muted" style="margin:6px 0 0">Anda menerima pengingat jatuh tempo termin, tanda terima pembayaran, dan kabar klaim garansi.</p></section>' +
     '<section class="panel"><div class="panel-h"><h3>Hubungi kami</h3></div><div class="small">' + esc(c.name || '') + '<br>' + esc(c.address || '') + '</div><div class="row" style="margin-top:8px">' + (wa ? '<a class="btn sm" href="https://wa.me/' + wa + '" target="_blank" rel="noopener">' + ico('wa') + ' WhatsApp</a>' : '') + (c.email ? '<a class="btn sm" href="mailto:' + esc(c.email) + '">Email</a>' : '') + '</div></section>' +
@@ -2648,6 +2672,9 @@ ACT['pt-logout'] = function () {
   portalEnded('Anda telah keluar.');
   rpc('portal.logout', {}, null, { token: tok }).catch(function () { });
 };
+
+ACT['pt-avatar'] = function () { pickFile('image/*').then(function (f) { if (!f) return; toast('Memproses foto…'); return profileImages(f).then(function (im) { return pcall('portal.photo', im); }).then(function (h) { P.d.homeowner = h; Store.set('kv', 'portal:last', P.d); renderPortal(); toast('Foto profil disimpan.', 'ok'); }); }).catch(function (e) { toast(errMsg(e), 'err'); }); };
+ACT['pt-avatar-del'] = function () { pcall('portal.photo', { remove: true }).then(function (h) { P.d.homeowner = h; renderPortal(); }).catch(function (e) { toast(errMsg(e), 'err'); }); };
 
 /* Mode Lapangan — layar mandor/pengawas: presensi tukang & laporan harian, offline-first dengan sinkron otomatis */
 var FM = { date: null, unit: '', rows: null, gps: true };
@@ -2930,6 +2957,151 @@ ACT['srv-diag'] = function () {
     showInfo('Diagnosa server', '<dl class="kv"><dt>URL server dipakai aplikasi ini</dt><dd style="word-break:break-all"><code>' + esc(api) + '</code></dd><dt>URL deployment menurut Google</dt><dd style="word-break:break-all"><code>' + esc(r.serviceUrl || '-') + '</code></dd><dt>Versi kode berjalan</dt><dd>' + esc(r.version) + ' (stempel ' + esc(r.codeStamp) + ')</dd><dt>Dijalankan sebagai</dt><dd>' + esc(r.runAs || '-') + '</dd><dt>Izin email</dt><dd>' + (mailOk ? chip('APPROVED', 'Aktif') : chip('REJECTED', 'Belum aktif') + '<br><span class="small">' + esc(r.mail) + '</span>') + '</dd><dt>Status otorisasi</dt><dd>' + esc(r.authStatus) + '</dd></dl>' +
       (mailOk ? '' : '<div class="alert danger" style="margin-top:10px"><b>Deployment yang dipanggil aplikasi ini belum membawa izin email.</b><ol class="small" style="margin:6px 0 0;padding-left:18px"><li>Di editor Apps Script jalankan fungsi <b>izinkanSemuaAkses</b> → <b>Tinjau izin</b> → pilih akun → <b>centang semua kotak akses</b> (termasuk <i>Kirim email atas nama Anda</i>) → Lanjutkan. Google tidak menanyakan ulang akses yang pernah tidak dicentang, jadi langkah ini wajib.</li><li>Terapkan → <b>Kelola deployment</b> → pilih deployment yang URL-nya <b>sama dengan baris pertama di atas</b> → ✎ → Versi: <b>Versi baru</b> → Terapkan. (Jangan “Deployment baru” — itu membuat URL lain yang tidak dipakai aplikasi.)</li><li>Bila “Dijalankan sebagai” bukan email pemilik skrip, ubah setelan deployment “Jalankan sebagai” menjadi <b>Saya</b>.</li></ol></div>'), true);
   }).catch(function (e) { toast(errMsg(e), 'err'); });
+};
+
+/* Foto profil (zoom), judul header & logo yang dapat diubah */
+
+/* ---------------- Penampil foto dengan zoom (roda mouse, cubit 2 jari, ketuk ganda, geser) ---------------- */
+function zoomImage(src, caption, fallback) {
+  closeZoom();
+  var ov = document.createElement('div'); ov.className = 'zoom-ov'; ov.id = 'zoomOv'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-label', 'Perbesar foto');
+  ov.innerHTML = '<div class="zoom-stage"><img id="zoomImg" alt="' + esc(caption || 'Foto') + '" draggable="false"></div>' +
+    '<div class="zoom-bar"><button class="iconbtn light" data-zoom="-" aria-label="Perkecil">−</button><span id="zoomPct">100%</span><button class="iconbtn light" data-zoom="+" aria-label="Perbesar">+</button><button class="iconbtn light" data-zoom="0" aria-label="Ukuran awal">⟲</button><span class="grow small ellip" style="color:#fff">' + esc(caption || '') + '</span><button class="iconbtn light" data-zoom="x" aria-label="Tutup">' + ico('x') + '</button></div>';
+  document.body.appendChild(ov);
+  var img = $('#zoomImg'), Z = { s: 1, x: 0, y: 0 }, ptrs = {}, start = null;
+  var apply = function () { Z.s = Math.max(1, Math.min(6, Z.s)); if (Z.s === 1) { Z.x = 0; Z.y = 0; } img.style.transform = 'translate(' + Z.x + 'px,' + Z.y + 'px) scale(' + Z.s + ')'; $('#zoomPct').textContent = Math.round(Z.s * 100) + '%'; };
+  img.onerror = function () { if (fallback && img.src !== fallback) img.src = fallback; };
+  if (fallback && fallback !== src) { img.src = fallback; var pre = new Image(); pre.onload = function () { img.src = src; }; pre.src = src; } else img.src = src;
+  ov.addEventListener('wheel', function (e) { e.preventDefault(); Z.s *= e.deltaY < 0 ? 1.15 : 1 / 1.15; apply(); }, { passive: false });
+  img.addEventListener('dblclick', function () { Z.s = Z.s > 1 ? 1 : 2.5; apply(); });
+  var lastTap = 0;
+  img.addEventListener('pointerdown', function (e) {
+    img.setPointerCapture(e.pointerId); ptrs[e.pointerId] = { x: e.clientX, y: e.clientY };
+    var ids = Object.keys(ptrs);
+    if (ids.length === 2) { var a = ptrs[ids[0]], b = ptrs[ids[1]]; start = { d: Math.hypot(a.x - b.x, a.y - b.y), s: Z.s }; }
+    else { start = { px: e.clientX, py: e.clientY, x: Z.x, y: Z.y }; if (e.pointerType === 'touch' && Date.now() - lastTap < 300) { Z.s = Z.s > 1 ? 1 : 2.5; apply(); } lastTap = Date.now(); }
+  });
+  img.addEventListener('pointermove', function (e) {
+    if (!ptrs[e.pointerId]) return; ptrs[e.pointerId] = { x: e.clientX, y: e.clientY };
+    var ids = Object.keys(ptrs);
+    if (ids.length === 2 && start && start.d) { var a = ptrs[ids[0]], b = ptrs[ids[1]]; Z.s = start.s * Math.hypot(a.x - b.x, a.y - b.y) / start.d; apply(); }
+    else if (ids.length === 1 && start && start.px !== undefined && Z.s > 1) { Z.x = start.x + e.clientX - start.px; Z.y = start.y + e.clientY - start.py; apply(); }
+  });
+  var up = function (e) { delete ptrs[e.pointerId]; start = null; };
+  img.addEventListener('pointerup', up); img.addEventListener('pointercancel', up);
+  ov.addEventListener('click', function (e) {
+    var z = e.target.closest('[data-zoom]');
+    if (z) { var k = z.dataset.zoom; if (k === 'x') return closeZoom(); if (k === '0') Z.s = 1; else Z.s *= k === '+' ? 1.4 : 1 / 1.4; apply(); return; }
+    if (e.target === ov || e.target.classList.contains('zoom-stage')) closeZoom();
+  });
+}
+function closeZoom() { var o = $('#zoomOv'); if (o) o.remove(); }
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && $('#zoomOv')) { e.stopPropagation(); closeZoom(); } }, true);
+ACT['zoom-photo'] = function (el) { zoomImage(el.dataset.src || el.src, el.dataset.cap || el.alt, el.dataset.fb); };
+ACT['pt-photo'] = function (el) { zoomImage(el.dataset.src, el.dataset.cap); };
+
+/* ---------------- Avatar ---------------- */
+function initials(name) { return String(name || '?').replace(/\(.*?\)/g, '').trim().split(/\s+/).filter(function (w) { return /^[A-Za-z]/.test(w) && !/^(bpk|ibu|dr|ir|hj?)\.?$/i.test(w); }).slice(0, 2).map(function (w) { return w[0].toUpperCase(); }).join('') || '?'; }
+function avatarHtml(u, size, noZoom) {
+  u = u || {}; size = size || 36;
+  var st = 'width:' + size + 'px;height:' + size + 'px;font-size:' + Math.round(size * 0.4) + 'px';
+  if (u.avatar) return '<img class="avatar" src="' + esc(u.avatar) + '" alt="Foto ' + esc(u.fullName) + '" style="' + st + '"' + (noZoom ? '' : ' data-act="zoom-photo" data-src="' + esc(u.photoUrl || u.avatar) + '" data-fb="' + esc(u.avatar) + '" data-cap="' + esc(u.fullName) + '" role="button" tabindex="0"') + '>';
+  var h = 0; String(u.fullName || u.id || '').split('').forEach(function (c) { h = (h * 31 + c.charCodeAt(0)) % 360; });
+  return '<span class="avatar ini" style="' + st + ';background:hsl(' + h + ',45%,42%)" aria-hidden="true">' + esc(initials(u.fullName)) + '</span>';
+}
+
+/* ---------------- Pengolahan gambar di perangkat ---------------- */
+function readImage(file) {
+  return new Promise(function (res, rej) {
+    if (!file || !/^image\//.test(file.type)) return rej(new Error('Pilih berkas gambar (JPG/PNG).'));
+    var url = URL.createObjectURL(file), img = new Image();
+    img.onload = function () { res(img); setTimeout(function () { URL.revokeObjectURL(url); }, 1000); };
+    img.onerror = function () { rej(new Error('Gambar tidak dapat dibaca.')); };
+    img.src = url;
+  });
+}
+function drawTo(img, max, square, mime, q) {
+  var w = img.naturalWidth || img.width, h = img.naturalHeight || img.height, sx = 0, sy = 0, sw = w, sh = h;
+  if (square) { var m = Math.min(w, h); sx = (w - m) / 2; sy = (h - m) / 2; sw = sh = m; }
+  var k = Math.min(1, max / Math.max(sw, sh)), c = document.createElement('canvas');
+  c.width = Math.round(sw * k); c.height = Math.round(sh * k);
+  var g = c.getContext('2d'); if (mime === 'image/jpeg') { g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); }
+  g.drawImage(img, sx, sy, sw, sh, 0, 0, c.width, c.height);
+  return c.toDataURL(mime, q);
+}
+/** Foto profil: avatar persegi 160 px (disimpan di sel) + foto besar 1280 px (Drive, untuk zoom) */
+function profileImages(file) { return readImage(file).then(function (img) { return { avatarBase64: drawTo(img, 160, true, 'image/jpeg', 0.82), photoBase64: drawTo(img, 1280, false, 'image/jpeg', 0.8) }; }); }
+/** Logo: PNG transparan bila muat, turunkan ukuran sampai ≤ 140 KB */
+function logoImage(file) {
+  return readImage(file).then(function (img) {
+    var sizes = [256, 192, 160, 128, 96];
+    for (var i = 0; i < sizes.length; i++) {
+      var png = drawTo(img, sizes[i], false, 'image/png'); if (png.length <= 140000) return png;
+      var webp = drawTo(img, sizes[i], false, 'image/webp', 0.9); if (/^data:image\/webp/.test(webp) && webp.length <= 140000) return webp;
+    }
+    return drawTo(img, 128, false, 'image/jpeg', 0.85);
+  });
+}
+function pickFile(accept) {
+  return new Promise(function (res) {
+    var i = document.createElement('input'); i.type = 'file'; i.accept = accept || 'image/*'; i.style.display = 'none';
+    document.body.appendChild(i);
+    i.onchange = function () { res(i.files && i.files[0]); setTimeout(function () { i.remove(); }, 0); }; i.click();
+  });
+}
+
+/* ---------------- Foto profil staf ---------------- */
+function photoPanel(u, self) {
+  return '<div class="row" style="gap:14px;align-items:center">' + avatarHtml(u, 88) + '<div class="stack" style="gap:6px"><div class="small muted">' + (u.avatar ? 'Ketuk foto untuk memperbesar.' : 'Belum ada foto profil.') + '</div><div class="row">' +
+    btn('photo-set', u.avatar ? 'Ganti foto' : 'Unggah foto', 'data-id="' + u.id + '"' + (self ? ' data-self="1"' : ''), 'sm primary') + (u.avatar ? btn('photo-del', 'Hapus', 'data-id="' + u.id + '"' + (self ? ' data-self="1"' : ''), 'sm danger') : '') + '</div></div></div>';
+}
+ACT['photo-set'] = function (el) {
+  pickFile('image/*').then(function (f) {
+    if (!f) return;
+    toast('Memproses foto…');
+    return profileImages(f).then(function (im) {
+      var p = Object.assign({ userId: el.dataset.self ? undefined : el.dataset.id }, im);
+      return call('user.photo', p, null, { refresh: S.projectId }).then(function () { toast('Foto profil disimpan.', 'ok'); closeModal(); if (S.lastBoot) { var b = S.lastBoot; S.lastBoot = null; applyBoot(b); } else refresh(); });
+    });
+  }).catch(function (e) { toast(errMsg(e), 'err'); });
+};
+ACT['photo-del'] = function (el) { confirmBox('Hapus foto profil', '<p>Foto profil akan dihapus.</p>', 'Hapus', function () { return call('user.photo', { userId: el.dataset.self ? undefined : el.dataset.id, remove: true }, null, { refresh: S.projectId }).then(function () { if (S.lastBoot) { var b = S.lastBoot; S.lastBoot = null; applyBoot(b); } else refresh(); }); }, true); };
+
+/* ---------------- Judul header & logo ---------------- */
+function brand() {
+  var s = (S.d && S.d.settings) || {}, c = {};
+  try { c = JSON.parse(lsGet('hc_brand') || '{}'); } catch (e) { }
+  var b = S.d ? { appTitle: s.appTitle || '', appSubtitle: s.appSubtitle || '', logoData: s.logoData || '', companyName: s.companyName || '' } : c;
+  return { title: b.appTitle || b.companyName || 'Housing Contractor ERP', subtitle: b.appSubtitle || 'Housing Contractor ERP', logo: b.logoData || '', raw: b };
+}
+function rememberBrand(b) {
+  try { lsSet('hc_brand', JSON.stringify({ appTitle: b.appTitle || '', appSubtitle: b.appSubtitle || '', logoData: b.logoData || '', companyName: b.companyName || '' })); } catch (e) { }
+  applyBrandChrome();
+}
+function brandMark(size) { var b = brand(); return b.logo ? '<img class="brand-logo" src="' + esc(b.logo) + '" alt="Logo" style="width:' + (size || 34) + 'px;height:' + (size || 34) + 'px">' : '<div class="brand-mark">HC</div>'; }
+function applyBrandChrome() {
+  var b = brand();
+  document.title = b.title;
+  var link = document.querySelector('link[rel="icon"]');
+  if (b.logo) { if (!link) { link = document.createElement('link'); link.rel = 'icon'; document.head.appendChild(link); } link.href = b.logo; }
+}
+var BRAND_LOGO_SET = null;
+document.addEventListener('change', function (e) { if (e.target.id === 'logoFile' && e.target.files && e.target.files[0] && BRAND_LOGO_SET) BRAND_LOGO_SET(e.target.files[0]); });
+ACT['branding-edit'] = function () {
+  var s = S.d.settings, logo = s.logoData || '', remove = false;
+  var prev = function () { return '<div class="field full"><label>Logo</label><div class="row" style="gap:12px">' + (logo && !remove ? '<img src="' + esc(logo) + '" alt="Logo" class="brand-logo" style="width:64px;height:64px;background:var(--surface-2)">' : '<div class="brand-mark" style="width:64px;height:64px;font-size:22px">HC</div>') +
+    '<div class="stack" style="gap:6px"><div class="row"><span class="btn sm photo-btn">Pilih gambar logo<input type="file" id="logoFile" accept="image/png,image/jpeg,image/webp" aria-label="Pilih gambar logo"></span>' + (logo && !remove ? '<button type="button" class="btn sm danger" data-act="logo-remove">Hapus logo</button>' : '') + '</div><div class="help">PNG transparan disarankan, persegi. Otomatis diperkecil ≤ 256 px.</div></div></div></div>'; };
+  openForm({ title: 'Judul header & logo', values: { appTitle: s.appTitle || '', appSubtitle: s.appSubtitle || '' }, fields: [
+    { name: 'appTitle', label: 'Judul header', placeholder: s.companyName || 'Nama aplikasi', max: 60, help: 'Tampil di menu samping, halaman masuk, portal pemilik rumah, dan judul tab. Kosongkan untuk memakai nama perusahaan.' },
+    { name: 'appSubtitle', label: 'Subjudul', placeholder: 'Housing Contractor ERP', max: 80 },
+    { name: 'logo', type: 'info', html: prev }
+  ], submitLabel: 'Simpan tampilan', onSubmit: function (v) {
+    var p = { appTitle: v.appTitle, appSubtitle: v.appSubtitle };
+    if (remove) p.removeLogo = true; else if (logo !== (s.logoData || '')) p.logoData = logo;
+    return call('settings.branding', p, null, { refresh: S.projectId }).then(function (b) { rememberBrand(b); toast('Tampilan diperbarui.', 'ok'); if (S.lastBoot) { var x = S.lastBoot; S.lastBoot = null; applyBoot(x); } else refresh(); });
+  } });
+  BRAND_LOGO_SET = function (f) { logoImage(f).then(function (d) { logo = d; remove = false; if (FORM) { readFields(); renderFields(); } }).catch(function (e) { toast(errMsg(e), 'err'); }); };
+  ACT['logo-remove'] = function () { remove = true; readFields(); renderFields(); };
 };
 
 boot();
