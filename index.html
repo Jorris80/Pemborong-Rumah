@@ -288,6 +288,59 @@ html.busy::before{content:"";position:fixed;left:0;top:0;height:3px;width:40%;ba
 .legal-box{max-height:46vh;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:4px 14px;background:var(--surface-2)}
 @media (prefers-reduced-motion:reduce){html.busy::before{animation:none;width:100%;opacity:.6}}
 
+/* ---------- Portal pemilik rumah ---------- */
+.pt-login{min-height:100vh;display:grid;place-items:center;padding:16px;background:linear-gradient(160deg,var(--ink) 0 38%,var(--bg) 38%)}
+.pt-login-card{width:100%;max-width:420px;background:var(--surface);border-radius:14px;padding:22px;box-shadow:0 12px 40px rgba(0,0,0,.18)}
+.pt-shell{max-width:760px;margin:0 auto;min-height:100vh;padding-bottom:84px}
+.pt-top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--ink);color:#fff}
+.iconbtn.light{color:#fff}
+.ellip{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pt-main{padding:12px 14px;display:flex;flex-direction:column;gap:12px}
+.pt-main h2,.pt-main h3{margin:0}
+.pt-ring{width:120px;height:120px;flex:0 0 120px}
+.pt-cover{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;cursor:zoom-in;background:var(--surface-2)}
+.pt-steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.pt-steps li{display:flex;align-items:center;gap:10px;padding:6px 0;color:var(--muted);position:relative}
+.pt-steps li i{width:14px;height:14px;border-radius:50%;border:2px solid var(--line);background:var(--surface);flex:0 0 14px}
+.pt-steps li.done{color:var(--text)} .pt-steps li.done i{background:var(--ok);border-color:var(--ok)}
+.pt-steps li.now{color:var(--text);font-weight:650} .pt-steps li.now i{background:var(--hivis);border-color:var(--hivis);box-shadow:0 0 0 4px var(--hivis-soft)}
+.pt-steps.mini{flex-direction:row;gap:12px;margin:4px 0} .pt-steps.mini li{padding:0;font-size:.8rem}
+.pt-line{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.pt-line:last-child{border-bottom:0}
+.pt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.pt-grid figure{margin:0;background:var(--surface-2);border-radius:10px;overflow:hidden}
+.pt-grid img,.pt-grid .ph{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;cursor:zoom-in}
+.pt-grid .ph{display:grid;place-items:center;color:var(--muted);font-size:.85rem}
+.pt-grid figcaption{padding:6px 8px;font-size:.8rem;line-height:1.35}
+.pt-inv{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)}
+.pt-inv:last-child{border-bottom:0} .pt-inv .progress{margin-top:6px}
+.pt-kpis{grid-template-columns:repeat(2,1fr)}
+.pt-bank{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface-2);border-radius:10px;padding:12px}
+.pt-claim{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)} .pt-claim:last-child{border-bottom:0}
+.pt-claim img{width:84px;height:84px;object-fit:cover;border-radius:8px;cursor:zoom-in;flex:0 0 84px}
+.pt-plan svg{width:100%;height:auto;max-height:70vh}
+.pt-nav{display:grid!important;grid-template-columns:repeat(5,1fr);position:fixed;bottom:0;left:0;right:0;max-width:760px;margin:0 auto;z-index:40;background:var(--surface);border-top:1px solid var(--line);padding:4px 4px calc(4px + env(safe-area-inset-bottom))}
+.pt-nav a{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.72rem;color:var(--muted);text-decoration:none;padding:6px 0;border-radius:8px}
+.pt-nav a svg{width:22px;height:22px}
+.pt-nav a.active{color:var(--text);background:var(--hivis-soft)}
+img.thumb{width:44px;height:44px;object-fit:cover;border-radius:6px;vertical-align:middle;cursor:zoom-in}
+pre.msg{white-space:pre-wrap;font:inherit;font-size:.88rem;background:var(--surface-2);padding:10px;border-radius:8px;margin:6px 0 0}
+
+/* ---------- Mode Lapangan ---------- */
+.fm-status{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 14px;border-radius:var(--radius);margin-bottom:12px;color:#fff;background:var(--ok)}
+.fm-status.off{background:#7A4B00}
+.fm-list{display:flex;flex-direction:column}
+.fm-row{display:grid;grid-template-columns:1fr auto 86px;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.fm-name{display:flex;flex-direction:column;min-width:0}
+.fm-name .q{color:#9A6400;font-weight:600} .fm-name .f{color:var(--bad);font-weight:600}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{min-width:42px;min-height:42px;border:0;border-right:1px solid var(--line);background:var(--surface);font-weight:700;cursor:pointer;color:var(--text)}
+.seg button:last-child{border-right:0}
+.seg button.on.s-HADIR{background:var(--ok);color:#fff} .seg button.on.s-SETENGAH{background:#3E7CB1;color:#fff}
+.seg button.on.s-IZIN,.seg button.on.s-SAKIT{background:var(--hivis);color:var(--hivis-ink)} .seg button.on.s-ALPA{background:var(--bad);color:#fff}
+.fm-ot{display:flex;flex-direction:column} .fm-ot input{width:100%;min-height:40px;border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:var(--surface);color:var(--text)}
+@media (max-width:560px){.fm-row{grid-template-columns:1fr 78px}.fm-row .seg{grid-column:1/-1;order:3;width:100%}.seg button{flex:1}}
+
 /* ---------- Responsif ---------- */
 @media (max-width:1100px){.g4{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:860px){
@@ -333,7 +386,7 @@ html.busy::before{content:"";position:fixed;left:0;top:0;height:3px;width:40%;ba
 <script>
 /* Housing Contractor ERP — klien (vanilla JS). Inti: transport API, offline (IndexedDB + antrean), router, form, tabel, grafik. */
 'use strict';
-var CONFIG = { API_URL: 'https://script.google.com/macros/s/AKfycbxApoalXRMpIMBbsPSrhyQDYF-KrJjRSsZuxR4Jo4LqvTTDffYf6uwmIgALuzm_9uNS/exec', APP_VERSION: '2.2.0' };
+var CONFIG = { API_URL: 'https://script.google.com/macros/s/AKfycbxApoalXRMpIMBbsPSrhyQDYF-KrJjRSsZuxR4Jo4LqvTTDffYf6uwmIgALuzm_9uNS/exec', APP_VERSION: '2.3.0' };
 var IS_GAS = (typeof google !== 'undefined' && google.script && google.script.run) ? true : false;
 
 /* ============================ Util ============================ */
@@ -482,13 +535,13 @@ function call(action, payload, opId, extra) {
   });
 }
 
-var NO_OFFLINE = /^(system\.|license\.|user\.|auth\.|settings\.|project\.members|notify\.)/;
+var NO_OFFLINE = /^(system\.|license\.|user\.|auth\.|settings\.|project\.members|notify\.|homeowner\.|bank\.|portal\.)/;
 /** Mutasi: online → langsung; offline/gagal jaringan → masuk antrean (bila diizinkan) */
 function mutate(action, payload, okMsg) {
   var opId = uuid();
   var queueIt = function () {
     var item = { opId: opId, action: action, payload: payload, createdAt: new Date().toISOString(), projectId: S.projectId, label: okMsg || action, status: 'PENDING', error: '' };
-    return Store.set('outbox', opId, item).then(function () { S.outbox.push(item); updateNet(); toast('Disimpan di antrean offline. Akan dikirim otomatis saat online.', 'ok'); return { queued: true }; });
+    return Store.set('outbox', opId, item).then(function () { S.outbox.push(item); updateNet(); if (typeof requestBgSync === 'function') requestBgSync(); toast('Disimpan di antrean offline. Akan dikirim otomatis saat online.', 'ok'); return { queued: true }; });
   };
   if (!S.online && !NO_OFFLINE.test(action)) return queueIt();
   S.lastBoot = null;
@@ -732,7 +785,7 @@ function docHeader(title, no) {
 /* Kerangka aplikasi: login, shell, router, sinkronisasi data */
 var VIEWS = {};   // diisi oleh app-views*.js : VIEWS[name] = { title, icon, tabs:[[key,label,permFn?]], render(tab) }
 var NAV = [
-  ['dashboard', 'Dasbor', 'dash'], ['units', 'Proyek & Kavling', 'home'], ['design', 'Denah & Brosur', 'plan'], ['rab', 'RAB, AHSP & Master', 'calc'], ['supply', 'Pengadaan & Gudang', 'truck'],
+  ['dashboard', 'Dasbor', 'dash'], ['fieldmode', 'Mode Lapangan', 'camera'], ['units', 'Proyek & Kavling', 'home'], ['design', 'Denah & Brosur', 'plan'], ['rab', 'RAB, AHSP & Master', 'calc'], ['supply', 'Pengadaan & Gudang', 'truck'],
   ['field', 'Lapangan & Subkon', 'helmet'], ['finance', 'Keuangan', 'wallet'], ['qc', 'QC & Serah Terima', 'check'], ['reports', 'Laporan & Cetak', 'chart'], ['admin', 'Admin & Sistem', 'gear']
 ];
 var ACT = {};     // handler aksi data-act
@@ -749,7 +802,7 @@ function renderLogin(msg) {
     '<div class="field"><label for="lpass">Kata sandi</label><input id="lpass" type="password" autocomplete="current-password" required></div>' +
     '<button class="btn primary" type="submit" id="lbtn" style="justify-content:center;padding:11px">Masuk</button>' +
     (IS_GAS ? '' : '<details class="small"><summary>Pengaturan koneksi server</summary><div class="field" style="margin-top:8px"><label for="lapi">URL Web App Google Apps Script</label><input id="lapi" placeholder="https://script.google.com/macros/s/…/exec" value="' + esc(apiUrl()) + '"><div class="help">Diberikan oleh admin saat instalasi. Disimpan di perangkat ini.</div></div><button type="button" class="btn sm" data-act="test-api">Uji koneksi</button></details>') +
-    '<p class="small muted">Lupa kata sandi? Minta admin perusahaan melakukan reset dari menu Admin → Pengguna.</p><p class="small muted" style="margin:0">Dengan masuk, Anda menyetujui <a href="#" data-act="legal-terms">Syarat & Ketentuan</a> dan memahami <a href="#" data-act="legal-privacy">Pemberitahuan Privasi</a>.</p><p class="tiny muted" style="margin:0" id="loginVer">Versi aplikasi ' + esc(CONFIG.APP_VERSION) + '</p></form></section></div>';
+    '<p class="small muted">Lupa kata sandi? Minta admin perusahaan melakukan reset dari menu Admin → Pengguna.</p><p class="small muted" style="margin:0">Dengan masuk, Anda menyetujui <a href="#" data-act="legal-terms">Syarat & Ketentuan</a> dan memahami <a href="#" data-act="legal-privacy">Pemberitahuan Privasi</a>.</p><p class="small" style="margin:0"><a href="#portal" data-act="portal-open">Pemilik rumah? Masuk ke Portal Pemilik Rumah →</a></p><p class="tiny muted" style="margin:0" id="loginVer">Versi aplikasi ' + esc(CONFIG.APP_VERSION) + '</p></form></section></div>';
   if (!S.legal && (IS_GAS || apiUrl())) call('legal.info').then(function (i) { S.legal = i; var v = $('#loginVer'); if (v) v.textContent = 'Versi aplikasi ' + CONFIG.APP_VERSION + ', server ' + i.version + ', pengelola data: ' + (i.companyName || '-'); }).catch(function () { });
   $('#loginForm').onsubmit = function (e) {
     e.preventDefault();
@@ -757,7 +810,8 @@ function renderLogin(msg) {
     var email = $('#lemail').value.trim(), pw = $('#lpass').value;
     var b = $('#lbtn'); b.disabled = true; b.textContent = 'Memeriksa…';
     call('auth.login', { email: email, password: pw, userAgent: navigator.userAgent, withBootstrap: true, projectId: lsGet('hc_project') || '' }).then(function (r) {
-      S.token = r.token; lsSet('hc_token', r.token); lsSet('hc_last_email', email); S.user = r.user;
+      S.token = r.token; lsSet('hc_token', r.token); lsSet('hc_last_email', email); S.user = r.user; saveSyncAuth();
+      if (!location.hash && r.user.role === 'FIELD_SUPERVISOR') history.replaceState(null, '', '#/fieldmode');
       if (!r.boot) return start();
       return loadOutbox().then(function () { applyBoot(r.boot); if (S.online) syncOutbox(); });
     }).catch(function (e) { renderLogin(e instanceof NetError ? 'Tidak dapat terhubung ke server. Periksa internet dan URL Web App.' : errMsg(e)); $('#lemail').value = email; });
@@ -769,7 +823,7 @@ ACT['test-api'] = function () {
   call('ping').then(function (r) { toast('Terhubung: ' + r.app + ' v' + r.version, 'ok'); }).catch(function (e) { toast('Gagal: ' + errMsg(e), 'err'); });
 };
 function sessionEnded(msg) {
-  S.token = null; S.d = null; lsSet('hc_token', null); closeModal();
+  S.token = null; S.d = null; lsSet('hc_token', null); closeModal(); try { Store.del('kv', 'auth'); } catch (e) { }
   renderLogin(msg || 'Sesi berakhir. Silakan masuk kembali.');
 }
 /** Pasang data baru tanpa membongkar halaman (posisi gulir dipertahankan) */
@@ -828,7 +882,8 @@ function renderShell() {
   routeFromHash();
   var d = S.d, a = d.actor;
   var lic = d.license || {};
-  var navHtml = NAV.map(function (x) {
+  var FIELD_ONLY = { dashboard: 1, fieldmode: 1, field: 1, units: 1, admin: 1 };
+  var navHtml = NAV.filter(function (x) { if (x[0] === 'fieldmode') return can('ATTENDANCE_RECORD') || can('DAILY_REPORT_SUBMIT'); return a.role !== 'FIELD_SUPERVISOR' || FIELD_ONLY[x[0]]; }).map(function (x) {
     var badge = '';
     if (x[0] === 'dashboard' && d.alerts && d.alerts.length) badge = '<span class="badge">' + d.alerts.length + '</span>';
     return '<a href="#/' + x[0] + '" class="' + (S.route === x[0] ? 'active' : '') + '" data-nav="' + x[0] + '">' + ico(x[2]) + '<span>' + x[1] + '</span>' + badge + '</a>';
@@ -845,7 +900,7 @@ function renderShell() {
     (lic.mode === 'READ_ONLY' ? '<div class="alert danger" style="margin:12px 20px 0">' + esc(lic.message) + '</div>' : (lic.mode === 'TRIAL' ? '' : '')) +
     (S.fromCache ? '<div class="alert warn" style="margin:12px 20px 0">Mode offline — data per ' + dtt(d.serverTime) + '. Input baru disimpan di antrean dan dikirim saat online.</div>' : '') +
     '<main class="content" id="content"></main></div></div>' +
-    '<nav class="bottomnav" aria-label="Menu cepat">' + [['dashboard', 'Dasbor', 'dash'], ['units', 'Kavling', 'home'], ['field', 'Lapangan', 'helmet'], ['supply', 'Gudang', 'truck']].map(function (x) {
+    '<nav class="bottomnav" aria-label="Menu cepat">' + [['dashboard', 'Dasbor', 'dash'], ['units', 'Kavling', 'home'], (can('ATTENDANCE_RECORD') || can('DAILY_REPORT_SUBMIT')) ? ['fieldmode', 'Lapangan', 'camera'] : ['field', 'Lapangan', 'helmet'], a.role === 'FIELD_SUPERVISOR' ? ['field', 'Laporan', 'helmet'] : ['supply', 'Gudang', 'truck']].map(function (x) {
       return '<a href="#/' + x[0] + '" class="' + (S.route === x[0] ? 'active' : '') + '">' + ico(x[2]) + '<span>' + x[1] + '</span></a>';
     }).join('') + '<a href="#" data-act="open-nav">' + ico('menu') + '<span>Menu</span></a></nav>';
   var mq = window.matchMedia('(max-width:860px)'); $('#navToggle').style.display = mq.matches ? 'inline-grid' : 'none';
@@ -905,7 +960,7 @@ document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape' && $('#modal') && $('#modal [data-act="modal-close"]')) closeModal();
   if ((e.key === 'Enter' || e.key === ' ') && e.target.getAttribute && e.target.getAttribute('role') === 'button' && e.target.dataset.act) { e.preventDefault(); e.target.click(); }
 });
-window.addEventListener('hashchange', function () { if (S.d) { routeFromHash(); renderView(); window.scrollTo(0, 0); } });
+window.addEventListener('hashchange', function () { if (/^#portal/.test(location.hash)) { if (!P.d && !S.d) renderPortalLogin(); return; } if (S.d) { routeFromHash(); renderView(); window.scrollTo(0, 0); } });
 window.addEventListener('online', function () { S.online = true; updateNet(); syncOutbox(); });
 window.addEventListener('offline', function () { S.online = false; updateNet(); });
 window.addEventListener('resize', function () { var t = $('#navToggle'); if (t) t.style.display = window.matchMedia('(max-width:860px)').matches ? 'inline-grid' : 'none'; });
@@ -944,9 +999,14 @@ function boot() {
   if (!IS_GAS && 'serviceWorker' in navigator && location.protocol === 'https:') {
     navigator.serviceWorker.register('sw.js').catch(function () { });
   }
+  if (isPortalMode()) { portalBoot(); return; }
+  if (IS_GAS && google.script.url && !lsGet('hc_mode_checked')) {
+    try { google.script.url.getLocation(function (l) { if (l && l.parameter && l.parameter.portal) { lsSet('hc_mode', 'portal'); portalBoot(); } }); } catch (e) { }
+  }
   if (!S.token) { loadOutbox(); renderLogin(); return; }
+  saveSyncAuth();
   start().catch(function (e) { if (!(e instanceof AppErr && /AUTH/.test(e.code))) renderLogin(errMsg(e)); });
-  setInterval(function () { if (S.online && S.outbox.some(function (x) { return x.status === 'PENDING'; })) syncOutbox(); }, 60000);
+  setInterval(function () { if ((S.online || navigator.onLine) && S.outbox.some(function (x) { return x.status === 'PENDING'; })) { S.online = true; syncOutbox(); } }, 30000);
 }
 
 /* Tampilan: Dasbor, Proyek & Kavling, RAB/AHSP/Master */
@@ -1085,7 +1145,7 @@ ACT['unit-detail'] = function (el) {
     '<h3 style="margin:16px 0 8px">Item RAB</h3>' + table([{ l: 'WBS', k: 'wbsCode' }, { l: 'Uraian', k: 'workDescription' }, { l: 'Volume', n: 1, f: function (i) { return qty(i.volume) + ' ' + esc(i.unit); } }, { l: 'Total', n: 1, f: function (i) { return rp(i.totalPrice); } }, { l: 'Dokumen', f: function (i) { var b = budgets[i.rabBudgetId]; return b ? esc(b.documentNumber) + ' ' + chip(b.status) : ''; } }], items, { empty: 'Belum ada RAB rinci' }) +
     '<h3 style="margin:16px 0 8px">Laporan harian terakhir</h3>' + table([{ l: 'Tanggal', f: function (r) { return dt(r.reportDate); } }, { l: 'Progres', n: 1, f: function (r) { return '+' + pct(r.progressAddedPct) + ' → ' + pct(r.cumulativeProgressPct); } }, { l: 'Ringkasan', k: 'workSummary' }], dsr, { empty: 'Belum ada laporan' }) +
     '<h3 style="margin:16px 0 8px">Inspeksi QC</h3>' + table([{ l: 'No.', k: 'inspectionNumber' }, { l: 'Tahap', k: 'stage' }, { l: 'Skor', n: 1, f: function (q) { return pct(q.checklistScorePct); } }, { l: 'Defect', f: function (q) { return chip(q.defectStatus); } }], qcs, { empty: 'Belum ada inspeksi' });
-  openForm({ title: 'Kavling ' + u.unitNumber, wide: true, fields: [{ type: 'info', name: 'i', html: html }], extraButtons: (function () { var fp = (S.d.floorPlans || []).filter(function (p) { return p.unitType === u.unitType; })[0]; return fp ? '<button class="btn" data-act="plan-view" data-id="' + fp.id + '">Denah</button>' : ''; })() + (can('UNIT_MANAGE') ? '<button class="btn" data-act="unit-edit" data-id="' + u.id + '">Ubah data</button>' : '') + '<button class="btn" data-act="print-unitcost" data-id="' + u.id + '">' + ico('printer') + ' Cetak laporan biaya</button>' });
+  openForm({ title: 'Kavling ' + u.unitNumber, wide: true, fields: [{ type: 'info', name: 'i', html: html }], extraButtons: (function () { var fp = (S.d.floorPlans || []).filter(function (p) { return p.unitType === u.unitType; })[0]; return fp ? '<button class="btn" data-act="plan-view" data-id="' + fp.id + '">Denah</button>' : ''; })() + (can('HOMEOWNER_MANAGE') ? '<button class="btn" data-act="ho-for-unit" data-id="' + u.id + '">Akses portal pembeli</button>' : '') + (can('UNIT_MANAGE') ? '<button class="btn" data-act="unit-edit" data-id="' + u.id + '">Ubah data</button>' : '') + '<button class="btn" data-act="print-unitcost" data-id="' + u.id + '">' + ico('printer') + ' Cetak laporan biaya</button>' });
 };
 
 /* ============================ RAB, AHSP & MASTER ============================ */
@@ -1413,6 +1473,7 @@ ACT['payroll-new'] = function () {
   openForm({ title: 'Catat upah periode', fields: [{ name: 'workerId', label: 'Pekerja', type: 'select', required: true, options: (S.d.workers || []).filter(function (w) { return w.isActive; }).map(function (w) { return { v: w.id, l: w.workerCode + ' — ' + w.fullName + ' (' + rp(w.dailyRate) + '/hari)' }; }) },
     { name: 'periodStart', label: 'Awal periode', type: 'date', required: true }, { name: 'periodEnd', label: 'Akhir periode', type: 'date', required: true }, { name: 'daysPresent', label: 'Hari hadir', type: 'qty', required: true, help: 'Boleh 0 atau setengah hari (0,5).' }, { name: 'overtimeHours', label: 'Jam lembur', type: 'qty' },
     { name: 'houseUnitId', label: 'Dibebankan ke kavling', type: 'select', options: unitOpts(), placeholder: 'Overhead proyek' }, { name: 'wbsCode', label: 'Pekerjaan (WBS)', type: 'select', options: wbsOpts() },
+    { name: 'att', type: 'info', html: function (v) { if (!v.workerId || !v.periodStart || !v.periodEnd) return ''; var a = (S.d.attendance || []).filter(function (x) { return x.workerId === v.workerId && x.workDate >= v.periodStart && x.workDate <= v.periodEnd; }); if (!a.length) return '<div class="small muted">Belum ada presensi Mode Lapangan untuk periode ini.</div>'; var dd = sum(a, 'dayValue'), oo = sum(a, 'overtimeHours'); return '<div class="alert">Presensi tercatat: <b>' + NF2.format(dd) + ' hari</b>, lembur ' + NF2.format(oo) + ' jam (' + a.length + ' catatan). <button type="button" class="btn sm" data-act="payroll-useatt" data-d="' + dd + '" data-o="' + oo + '">Pakai angka presensi</button></div>'; } },
     { name: 'calc', type: 'info', html: function (v) { var w = ws[v.workerId]; if (!w) return ''; var r = n(w.dailyRate); return '<div class="alert">' + NF2.format(n(v.daysPresent)) + ' hari × ' + rp(r) + ' + ' + NF2.format(n(v.overtimeHours)) + ' jam × ' + rp(r * n(S.d.settings.overtimeRatePct) / 100) + ' = <b>' + rp(n(v.daysPresent) * r + n(v.overtimeHours) * r * n(S.d.settings.overtimeRatePct) / 100) + '</b></div>'; } }],
     submitLabel: 'Simpan upah', onSubmit: function (v) { return doMutate('payroll.create', Object.assign({ projectId: S.d.activeProjectId }, v), 'Upah dicatat.'); } });
 };
@@ -1442,9 +1503,9 @@ VIEWS.finance = {
     var inv = applyFilter((d.invoices || []).slice().sort(function (a, b) { return b.createdAt.localeCompare(a.createdAt); }), 'inv', function (i) { return i.invoiceNumber + i.counterpartyName + i.sourceDocNumber; });
     var it = S.filters.invType || ''; if (it) inv = inv.filter(function (i) { return i.invoiceType === it; });
     return head + panel('Faktur proyek', '<div class="row" style="margin-bottom:10px">' + filterBox('inv', 'Cari faktur / pihak') + '<select class="input" style="max-width:200px" data-act-change="invType" aria-label="Filter jenis"><option value="">Semua jenis</option>' + ['AP_VENDOR', 'AP_SUBCON', 'AP_OTHER', 'AP_RETENTION', 'AR_PROGRESS_BILLING'].map(function (x) { return '<option value="' + x + '"' + (x === it ? ' selected' : '') + '>' + STATUS_LABEL[x] + '</option>'; }).join('') + '</select>' + btn('csv-inv', ico('download') + ' CSV') + '</div>' + table([
-      { l: 'No. faktur', f: function (i) { return '<b>' + esc(i.invoiceNumber) + '</b><br><span class="small muted">' + esc(i.sourceDocNumber || '') + '</span>'; } }, { l: 'Jenis', f: function (i) { return esc(STATUS_LABEL[i.invoiceType] || i.invoiceType); } }, { l: 'Pihak', k: 'counterpartyName' }, { l: 'Kavling', f: function (i) { return unitLabel(i.houseUnitId); } },
+      { l: 'No. faktur', f: function (i) { return '<b>' + esc(i.invoiceNumber) + '</b><br><span class="small muted">' + esc(i.sourceDocNumber || '') + '</span>'; } }, { l: 'Jenis', f: function (i) { return esc(STATUS_LABEL[i.invoiceType] || i.invoiceType); } }, { l: 'Pihak', f: function (i) { return esc(i.counterpartyName) + (i.invoiceType === 'AR_PROGRESS_BILLING' ? '<br><span class="small muted">' + (i.billTo === 'BANK' ? 'Bank KPR' : 'Konsumen') + (n(i.reminderCount) ? ' · ' + i.reminderCount + '× diingatkan' : '') + '</span>' : ''); } }, { l: 'Kavling', f: function (i) { return unitLabel(i.houseUnitId); } },
       { l: 'Netto', n: 1, f: function (i) { return rp(i.netAmount) + (n(i.retentionAmount) ? '<br><span class="small muted">retensi ' + rp(i.retentionAmount) + '</span>' : ''); } }, { l: 'Dibayar', n: 1, f: function (i) { return rp(i.paidAmount); } }, { l: 'Jatuh tempo', f: function (i) { return dt(i.dueDate); } }, { l: 'Status', f: function (i) { return chip(i.status); } }
-    ], inv, { empty: 'Belum ada faktur', actions: function (i) { var open = n(i.netAmount) - n(i.paidAmount) > 0.004 && i.status !== 'VOID'; return (open && can('FINANCE_PAYMENT_POST') ? btn('inv-pay', i.invoiceType === 'AR_PROGRESS_BILLING' ? 'Terima' : 'Bayar', 'data-id="' + i.id + '"', 'sm primary') : '') + (n(i.paidAmount) === 0 && i.status !== 'VOID' && ['AP_VENDOR', 'AP_OTHER', 'AR_PROGRESS_BILLING'].indexOf(i.invoiceType) >= 0 && can('FINANCE_INVOICE_CREATE') ? btn('inv-void', 'Batalkan', 'data-id="' + i.id + '"', 'sm danger') : '') + btn('print-inv', ico('printer'), 'data-id="' + i.id + '" aria-label="Cetak faktur"'); } }));
+    ], inv, { empty: 'Belum ada faktur', actions: function (i) { var open = n(i.netAmount) - n(i.paidAmount) > 0.004 && i.status !== 'VOID'; return (open && can('FINANCE_PAYMENT_POST') ? btn('inv-pay', i.invoiceType === 'AR_PROGRESS_BILLING' ? 'Terima' : 'Bayar', 'data-id="' + i.id + '"', 'sm primary') : '') + (n(i.paidAmount) === 0 && i.status !== 'VOID' && ['AP_VENDOR', 'AP_OTHER', 'AR_PROGRESS_BILLING'].indexOf(i.invoiceType) >= 0 && can('FINANCE_INVOICE_CREATE') ? btn('inv-void', 'Batalkan', 'data-id="' + i.id + '"', 'sm danger') : '') + (open && i.invoiceType === 'AR_PROGRESS_BILLING' && i.billTo !== 'BANK' && can('NOTIFY_SEND') ? btn('inv-remind', 'Ingatkan', 'data-id="' + i.id + '" title="Kirim pengingat WhatsApp/email ke konsumen sekarang"') : '') + btn('print-inv', ico('printer'), 'data-id="' + i.id + '" aria-label="Cetak faktur"'); } }));
   }
 };
 ACT['inv-new'] = function () {
@@ -1454,8 +1515,10 @@ ACT['inv-new'] = function () {
     { name: 'invoiceType', label: 'Jenis faktur', type: 'select', placeholder: false, required: true, options: [{ v: 'AP_VENDOR', l: 'Hutang vendor (dari PO)' }, { v: 'AP_OTHER', l: 'Biaya langsung lain (sewa alat, dll)' }, { v: 'AR_PROGRESS_BILLING', l: 'Tagihan ke konsumen / bank KPR' }] },
     { name: 'purchaseOrderId', label: 'Purchase order', type: 'select', required: true, options: pos, show: function (v) { return v.invoiceType === 'AP_VENDOR'; }, help: 'Tagihan dicocokkan dengan nilai barang yang sudah diterima (3-way match).' },
     { name: 'houseUnitId', label: 'Kavling', type: 'select', options: unitOpts(), placeholder: 'Overhead proyek', required: false, show: function (v) { return v.invoiceType !== 'AP_VENDOR'; } },
+    { name: 'billTo', label: 'Ditagihkan kepada', type: 'select', placeholder: false, options: [{ v: 'BUYER', l: 'Konsumen (uang muka / angsuran / pelunasan)' }, { v: 'BANK', l: 'Bank KPR (pencairan bertahap)' }], show: function (v) { return v.invoiceType === 'AR_PROGRESS_BILLING'; }, help: 'Pengingat jatuh tempo otomatis hanya dikirim untuk tagihan ke konsumen.' },
     { name: 'counterpartyName', label: 'Nama pihak', show: function (v) { return v.invoiceType !== 'AP_VENDOR'; }, help: 'Untuk tagihan konsumen, kosongkan agar memakai nama pembeli kavling.' },
-    { name: 'sourceDocNumber', label: 'No. faktur pihak / referensi' }, { name: 'grossAmount', label: 'Nilai bruto / DPP (Rp)', type: 'money', required: true },
+    { name: 'notifyCustomer', label: 'Kirim tagihan ke WhatsApp/email konsumen', type: 'check', value: true, show: function (v) { return v.invoiceType === 'AR_PROGRESS_BILLING' && v.billTo !== 'BANK'; } },
+    { name: 'sourceDocNumber', label: 'No. faktur pihak / referensi', help: 'Untuk tagihan konsumen isi nama termin, mis. "Termin 2 — angsuran uang muka". Nama ini tampil di portal & pesan pengingat.' }, { name: 'grossAmount', label: 'Nilai bruto / DPP (Rp)', type: 'money', required: true },
     { name: 'taxPercent', label: 'Pajak (%)', type: 'pct', help: 'Kosongkan: PPN default untuk faktur vendor, 0% untuk lainnya.' }, { name: 'retentionPercent', label: 'Potongan retensi (%)', type: 'pct' },
     { name: 'invoiceDate', label: 'Tanggal faktur', type: 'date' }, { name: 'dueDate', label: 'Jatuh tempo', type: 'date', help: 'Kosongkan: otomatis dari termin vendor (atau 14 hari untuk konsumen).' },
     { name: 'notes', label: 'Catatan', type: 'textarea', max: 500 },
@@ -1490,7 +1553,7 @@ VIEWS.qc = {
       ], d.houseUnits, { actions: function (u) { var bq = (d.qcInspections || []).filter(function (q) { return q.houseUnitId === u.id && q.bastNumber; })[0]; return (u.status !== 'HANDED_OVER' && can('HANDOVER_ISSUE') ? btn('bast-new', 'Terbitkan BAST', 'data-id="' + u.id + '"', 'sm primary') : '') + (bq ? btn('print-bast', ico('printer') + ' BAST', 'data-id="' + bq.id + '"') : ''); } }));
     }
     if (tab === 'warranty') {
-      return panel('Klaim garansi konsumen', table([{ l: 'No. klaim', f: function (c) { return '<b>' + esc(c.claimNumber) + '</b>'; } }, { l: 'Kavling', k: 'unitNumber' }, { l: 'Tanggal', f: function (c) { return dt(c.claimDate); } }, { l: 'Kerusakan', k: 'defectDescription' }, { l: 'Garansi', f: function (c) { return chip(c.warrantyStatus); } }, { l: 'Perbaikan', f: function (c) { return chip(c.repairStatus) + (c.repairNotes ? '<br><span class="small muted">' + esc(c.repairNotes) + '</span>' : ''); } }],
+      return panel('Klaim garansi konsumen', table([{ l: 'No. klaim', f: function (c) { return '<b>' + esc(c.claimNumber) + '</b>'; } }, { l: 'Kavling', k: 'unitNumber' }, { l: 'Tanggal', f: function (c) { return dt(c.claimDate); } }, { l: 'Kerusakan', f: function (c) { return (c.photoUrl ? '<img src="' + esc(c.photoUrl) + '" alt="Foto klaim" class="thumb" data-act="pt-photo" data-src="' + esc(c.photoUrl) + '" data-cap="' + esc(c.claimNumber) + '"> ' : '') + esc(c.defectDescription) + (c.category || c.location ? '<br><span class="small muted">' + esc((CLAIM_CAT[c.category] || '') + (c.location ? ' · ' + c.location : '')) + '</span>' : ''); } }, { l: 'Sumber', f: function (c) { return c.source === 'PORTAL' ? chip('SUBMITTED', 'Portal konsumen') : '<span class="small muted">Staf</span>'; } }, { l: 'Garansi', f: function (c) { return chip(c.warrantyStatus); } }, { l: 'Perbaikan', f: function (c) { return chip(c.repairStatus) + (c.repairNotes ? '<br><span class="small muted">' + esc(c.repairNotes) + '</span>' : ''); } }],
         (d.warrantyClaims || []).slice().sort(function (a, b) { return b.createdAt.localeCompare(a.createdAt); }), { empty: 'Belum ada klaim garansi', actions: function (c) { return c.repairStatus !== 'RESOLVED' && can('QC_INSPECT') ? btn('claim-update', 'Perbarui', 'data-id="' + c.id + '"') : ''; } }));
     }
     var qcs = (d.qcInspections || []).slice().sort(function (a, b) { return b.createdAt.localeCompare(a.createdAt); });
@@ -1515,8 +1578,9 @@ ACT['bast-new'] = function (el) {
     { name: 'billingAmount', label: 'Nilai tagihan akhir (Rp)', type: 'money', required: true, show: function (v) { return v.generateFinalBilling; } }
   ], submitLabel: 'Terbitkan BAST', onSubmit: function (v) { return doMutate('bast.issue', Object.assign({ projectId: S.d.activeProjectId, houseUnitId: u.id }, v), 'BAST diterbitkan.'); } });
 };
-ACT['claim-new'] = function () { openForm({ title: 'Klaim garansi', fields: [{ name: 'houseUnitId', label: 'Kavling (sudah serah terima)', type: 'select', required: true, options: (S.d.houseUnits || []).filter(function (u) { return u.status === 'HANDED_OVER'; }).map(function (u) { return { v: u.id, l: u.unitNumber + ' — garansi s/d ' + dt(u.warrantyEndDate) }; }) }, { name: 'claimDate', label: 'Tanggal laporan', type: 'date', value: todayIso() }, { name: 'defectDescription', label: 'Uraian kerusakan', type: 'textarea', required: true }], submitLabel: 'Catat klaim', onSubmit: function (v) { return doMutate('warranty.create', Object.assign({ projectId: S.d.activeProjectId }, v), 'Klaim garansi dicatat.'); } }); };
-ACT['claim-update'] = function (el) { openForm({ title: 'Perbarui klaim', values: { repairStatus: 'RESOLVED' }, fields: [{ name: 'repairStatus', label: 'Status', type: 'select', placeholder: false, options: [{ v: 'IN_REPAIR', l: 'Dalam perbaikan' }, { v: 'RESOLVED', l: 'Selesai' }] }, { name: 'repairNotes', label: 'Catatan perbaikan', type: 'textarea', required: true }], onSubmit: function (v) { return doMutate('warranty.update', Object.assign({ id: el.dataset.id }, v), 'Klaim diperbarui.'); } }); };
+ACT['claim-new'] = function () { openForm({ title: 'Klaim garansi', fields: [{ name: 'houseUnitId', label: 'Kavling (sudah serah terima)', type: 'select', required: true, options: (S.d.houseUnits || []).filter(function (u) { return u.status === 'HANDED_OVER'; }).map(function (u) { return { v: u.id, l: u.unitNumber + ' — garansi s/d ' + dt(u.warrantyEndDate) }; }) }, { name: 'claimDate', label: 'Tanggal laporan', type: 'date', value: todayIso() }, { name: 'category', label: 'Jenis kerusakan', type: 'select', options: Object.keys(CLAIM_CAT).map(function (k) { return { v: k, l: CLAIM_CAT[k] }; }) }, { name: 'location', label: 'Lokasi di rumah' }, { name: 'defectDescription', label: 'Uraian kerusakan', type: 'textarea', required: true }], submitLabel: 'Catat klaim', onSubmit: function (v) { return doMutate('warranty.create', Object.assign({ projectId: S.d.activeProjectId }, v), 'Klaim garansi dicatat.'); } }); };
+ACT['claim-update'] = function (el) { openForm({ title: 'Perbarui klaim', values: { repairStatus: 'RESOLVED' }, fields: [{ name: 'repairStatus', label: 'Status', type: 'select', placeholder: false, options: [{ v: 'IN_REPAIR', l: 'Dalam perbaikan' }, { v: 'RESOLVED', l: 'Selesai' }] }, { name: 'repairNotes', label: 'Catatan perbaikan', type: 'textarea', required: true, help: 'Catatan ini juga dikirim ke pemilik rumah.' }, { name: 'notifyOwner', label: 'Kabari pemilik rumah via WhatsApp/email', type: 'check', value: true }], onSubmit: function (v) { return doMutate('warranty.update', Object.assign({ id: el.dataset.id }, v), 'Klaim diperbarui.'); } }); };
+ACT['payroll-useatt'] = function (el) { readFields(); FORM.vals.daysPresent = el.dataset.d; FORM.vals.overtimeHours = el.dataset.o; renderFields(); };
 
 /* Tampilan: Laporan & Cetak, Admin & Sistem */
 
@@ -1628,7 +1692,7 @@ VIEWS.admin = {
     }
     if (tab === 'settings') {
       var s = d.settings;
-      return panel('Pengaturan perusahaan & aturan', '<dl class="kv">' + [['Nama perusahaan', s.companyName], ['Kode (prefiks nomor dokumen)', s.companyCode], ['Alamat', s.companyAddress], ['NPWP', s.companyTaxId], ['PPN default', pct(s.ppnPercent)], ['Tarif lembur per jam', pct(s.overtimeRatePct) + ' upah harian'], ['Ambang lulus QC', pct(s.qcPassScore)], ['Peringatan kuota', 'mulai ' + pct(s.quotaNearLimitPct)], ['Mode kuota material', s.quotaMode === 'STRICT' ? 'Ketat (material di luar RAB perlu alasan)' : 'Toleransi ' + s.quotaAllowanceQty], ['Garansi default', s.defaultWarrantyMonths + ' bulan'], ['Progres minimal BAST', pct(s.bastMinProgress)], ['Notifikasi WhatsApp (Fonnte)', s.fonnteToken ? 'Aktif ke ' + esc(s.notifyPhones) : 'Belum diatur'], ['Backup harian ke Drive', s.dailyBackup === 'OFF' ? 'Mati' : 'Aktif'], ['Email perusahaan', s.companyEmail], ['Kontak pelindungan data', s.privacyContact], ['Jaga server tetap siap', s.keepWarm === 'OFF' ? 'Mati' : s.keepWarm === 'ALWAYS' ? 'Selalu' : 'Jam kerja 06–21']].map(function (r) { return '<dt>' + r[0] + '</dt><dd>' + esc(r[1] || '—') + '</dd>'; }).join('') + '</dl>', btn('settings-edit', 'Ubah pengaturan', '', 'primary') + btn('notify-test', 'Tes WhatsApp'));
+      return panel('Pengaturan perusahaan & aturan', '<dl class="kv">' + [['Nama perusahaan', s.companyName], ['Kode (prefiks nomor dokumen)', s.companyCode], ['Alamat', s.companyAddress], ['NPWP', s.companyTaxId], ['PPN default', pct(s.ppnPercent)], ['Tarif lembur per jam', pct(s.overtimeRatePct) + ' upah harian'], ['Ambang lulus QC', pct(s.qcPassScore)], ['Peringatan kuota', 'mulai ' + pct(s.quotaNearLimitPct)], ['Mode kuota material', s.quotaMode === 'STRICT' ? 'Ketat (material di luar RAB perlu alasan)' : 'Toleransi ' + s.quotaAllowanceQty], ['Garansi default', s.defaultWarrantyMonths + ' bulan'], ['Progres minimal BAST', pct(s.bastMinProgress)], ['Notifikasi WhatsApp (Fonnte)', s.fonnteToken ? 'Aktif ke ' + esc(s.notifyPhones) : 'Belum diatur'], ['Backup harian ke Drive', s.dailyBackup === 'OFF' ? 'Mati' : 'Aktif'], ['Email perusahaan', s.companyEmail], ['Kontak pelindungan data', s.privacyContact], ['Jaga server tetap siap', s.keepWarm === 'OFF' ? 'Mati' : s.keepWarm === 'ALWAYS' ? 'Selalu' : 'Jam kerja 06–21'], ['Alamat aplikasi / portal', s.appUrl ? s.appUrl + ' (#portal)' : 'Belum diisi'], ['Gateway WhatsApp', s.waProvider === 'OFF' ? 'Mati' : s.waProvider === 'WEBHOOK' ? 'Webhook' : 'Fonnte'], ['Email otomatis', s.emailNotify === 'OFF' ? 'Mati' : 'Aktif'], ['Pengingat konsumen', s.customerReminders === 'OFF' ? 'Mati' : 'H-' + s.reminderDaysBefore + ' / H+' + s.reminderDaysAfter + ', jam ' + s.reminderHour + '.00'], ['Rekening pembayaran', s.bankAccountNo ? s.bankName + ' ' + s.bankAccountNo + ' a.n. ' + s.bankAccountName : 'Belum diisi'], ['Peringatan ke direktur', s.approvalAlert === 'OFF' ? 'Mati' : 'Aktif' + (n(s.approvalAlertMinAmount) ? ' (MR ≥ ' + rp(s.approvalAlertMinAmount) + ')' : '')]].map(function (r) { return '<dt>' + r[0] + '</dt><dd>' + esc(r[1] || '—') + '</dd>'; }).join('') + '</dl>', btn('settings-edit', 'Ubah pengaturan', '', 'primary') + btn('notify-test', 'Tes WhatsApp'));
     }
     if (tab === 'license') {
       var l = d.license;
@@ -1670,10 +1734,24 @@ ACT['settings-edit'] = function () {
     { name: 'ppnPercent', label: 'PPN default (%)', type: 'pct' }, { name: 'overtimeRatePct', label: 'Tarif lembur per jam (% upah harian)', type: 'pct' }, { name: 'qcPassScore', label: 'Ambang lulus QC (%)', type: 'pct' }, { name: 'bastMinProgress', label: 'Progres minimal BAST (%)', type: 'pct' }, { name: 'quotaNearLimitPct', label: 'Peringatan kuota mulai (%)', type: 'pct' },
     { name: 'quotaMode', label: 'Mode kuota material', type: 'select', placeholder: false, options: [{ v: 'STRICT', l: 'Ketat' }, { v: 'ALLOWANCE', l: 'Toleransi jumlah tetap' }] }, { name: 'quotaAllowanceQty', label: 'Toleransi untuk material di luar RAB', type: 'qty', show: function (v) { return v.quotaMode === 'ALLOWANCE'; } }, { name: 'defaultWarrantyMonths', label: 'Garansi default (bulan)', type: 'number' },
     { name: 'fonnteToken', label: 'Token Fonnte (WhatsApp)', help: 'Biarkan apa adanya bila tidak ingin mengubah.' }, { name: 'notifyPhones', label: 'Nomor tujuan notifikasi', help: 'Pisahkan dengan koma, mis. 08123…,08567…' }, { name: 'licenseServerUrl', label: 'URL server lisensi', help: 'Diisi oleh penyedia aplikasi.' },
-    { name: 'dailyBackup', label: 'Backup harian ke Drive', type: 'select', placeholder: false, options: [{ v: 'ON', l: 'Aktif' }, { v: 'OFF', l: 'Mati' }] }, { name: 'keepWarm', label: 'Jaga server tetap siap (lebih cepat)', type: 'select', placeholder: false, options: [{ v: 'ON', l: 'Jam kerja 06–21' }, { v: 'ALWAYS', l: 'Selalu' }, { v: 'OFF', l: 'Mati' }], help: 'Memanaskan cache tiap 10 menit agar login & pindah proyek tidak lambat.' }],
+    { name: 'dailyBackup', label: 'Backup harian ke Drive', type: 'select', placeholder: false, options: [{ v: 'ON', l: 'Aktif' }, { v: 'OFF', l: 'Mati' }] }, { name: 'keepWarm', label: 'Jaga server tetap siap (lebih cepat)', type: 'select', placeholder: false, options: [{ v: 'ON', l: 'Jam kerja 06–21' }, { v: 'ALWAYS', l: 'Selalu' }, { v: 'OFF', l: 'Mati' }], help: 'Memanaskan cache tiap 10 menit agar login & pindah proyek tidak lambat.' },
+    { name: '_h1', type: 'info', html: '<h3 style="margin:12px 0 0">Portal pemilik rumah, WhatsApp & email</h3>' },
+    { name: 'appUrl', label: 'Alamat aplikasi (untuk tautan di pesan)', placeholder: 'https://akun.github.io/hc-erp/', help: 'Konsumen menerima tautan alamat ini + #portal.' },
+    { name: 'waProvider', label: 'Gateway WhatsApp', type: 'select', placeholder: false, options: [{ v: 'FONNTE', l: 'Fonnte (token di atas)' }, { v: 'WEBHOOK', l: 'Webhook gateway lain (WA Cloud API, Wablas, dll.)' }, { v: 'OFF', l: 'Mati' }] },
+    { name: 'waWebhookUrl', label: 'URL webhook WhatsApp', show: function (v) { return v.waProvider === 'WEBHOOK'; }, help: 'Menerima POST JSON {phone, message, sender}. Gunakan proxy/middleware Anda untuk API resmi WhatsApp Business.' },
+    { name: 'emailNotify', label: 'Email otomatis (akun Google)', type: 'select', placeholder: false, options: [{ v: 'ON', l: 'Aktif' }, { v: 'OFF', l: 'Mati' }], help: 'Batas Google: ±100 email/hari (akun gratis), 1.500 (Workspace).' },
+    { name: 'customerReminders', label: 'Pengingat jatuh tempo ke konsumen', type: 'select', placeholder: false, options: [{ v: 'ON', l: 'Aktif' }, { v: 'OFF', l: 'Mati' }] },
+    { name: 'reminderDaysBefore', label: 'Kirim H- (hari sebelum jatuh tempo)', placeholder: '7,3,1,0' }, { name: 'reminderDaysAfter', label: 'Kirim H+ (hari setelah terlambat)', placeholder: '1,7,14,30' },
+    { name: 'reminderHour', label: 'Jam pengiriman (0–23)', type: 'number' },
+    { name: 'reminderTemplate', label: 'Templat pesan pengingat', type: 'textarea', max: 1500, full: true, help: 'Kosongkan untuk templat bawaan. Penanda: {nama} {termin} {kavling} {proyek} {noTagihan} {nominal} {jatuhTempo} {keterangan} {rekening} {portal} {perusahaan}' },
+    { name: 'bankName', label: 'Bank penerima' }, { name: 'bankAccountNo', label: 'Nomor rekening' }, { name: 'bankAccountName', label: 'Atas nama rekening' },
+    { name: 'approvalAlert', label: 'Peringatan persetujuan ke Direktur Proyek', type: 'select', placeholder: false, options: [{ v: 'ON', l: 'Aktif' }, { v: 'OFF', l: 'Mati' }], help: 'Dikirim saat ada MR, revisi RAB, atau opname yang perlu disetujui.' },
+    { name: 'approvalAlertMinAmount', label: 'Hanya MR dengan estimasi ≥ (Rp)', type: 'money' },
+    { name: 'directorPhones', label: 'Nomor WA direktur tambahan', help: 'Selain pengguna berperan Direktur Proyek (memakai nomor telepon di akunnya). Pisahkan dengan koma.' }, { name: 'directorEmails', label: 'Email direktur tambahan' }],
     onSubmit: function (v) { return doMutate('settings.save', v, 'Pengaturan disimpan.'); } });
 };
-ACT['notify-test'] = function () { call('notify.test', {}).then(function () { toast('Pesan uji dikirim.', 'ok'); }).catch(function (e) { toast(errMsg(e), 'err'); }); };
+ACT['notify-test'] = function () { openForm({ title: 'Tes notifikasi', intro: 'Kosongkan keduanya untuk mengirim ke grup staf (nomor notifikasi).', fields: [{ name: 'phone', label: 'Nomor WhatsApp tujuan', type: 'tel' }, { name: 'email', label: 'Email tujuan', type: 'email' }], submitLabel: 'Kirim tes', onSubmit: function (v) { return call('notify.test', v).then(function () { toast('Pesan uji dikirim.', 'ok'); }); } }); };
+ACT['notify-test-old'] = function () { call('notify.test', {}).then(function () { toast('Pesan uji dikirim.', 'ok'); }).catch(function (e) { toast(errMsg(e), 'err'); }); };
 ACT['license-activate'] = function () { openForm({ title: 'Aktivasi lisensi', fields: [{ name: 'licenseKey', label: 'Kunci lisensi', required: true, placeholder: 'HCERP-XXXX-XXXX-XXXX' }], submitLabel: 'Verifikasi & aktifkan', onSubmit: function (v) { return call('license.activate', v).then(function () { toast('Lisensi aktif.', 'ok'); return refresh(); }); } }); };
 ACT['backup-now'] = function (el) { el.disabled = true; call('system.backup', {}).then(function (r) { toast('Backup tersimpan: ' + r.fileName + ' (' + r.sizeKb + ' KB).', 'ok'); }).catch(function (e) { toast(errMsg(e), 'err'); }).then(function () { el.disabled = false; }); };
 ACT['backup-download'] = function (el) { el.disabled = true; call('system.backup', { download: true }).then(function (r) { download(r.fileName, r.content, 'application/json'); }).catch(function (e) { toast(errMsg(e), 'err'); }).then(function () { el.disabled = false; }); };
@@ -2208,6 +2286,7 @@ ACT['br-wa'] = function (el) {
 
 /* Versi aplikasi, riwayat perubahan, Syarat & Ketentuan, Pemberitahuan Privasi */
 var CHANGELOG = [
+  ['2.3.0', '2026-10-23', ['Portal Mandiri Pemilik Rumah: konsumen masuk dengan nomor HP untuk melihat progres & foto mingguan, riwayat termin/KPR, denah, dan mengajukan klaim garansi dengan foto dari ponsel.', 'Mode Lapangan untuk mandor/pengawas: presensi tukang & laporan harian offline-first, terkirim otomatis (juga di latar) saat sinyal kembali; upah dapat dihitung dari presensi.', 'Notifikasi otomatis WhatsApp (Fonnte/webhook) & email: pengingat jatuh tempo termin ke konsumen, peringatan persetujuan ke Direktur Proyek, tanda terima pembayaran, status klaim.', 'Impor mutasi rekening dengan pencocokan otomatis ke tagihan & rekonsiliasi.', 'Peran baru: Direktur Proyek dan Mandor / Pengawas Lapangan.']],
   ['2.2.0', '2026-10-22', ['Aplikasi jauh lebih cepat: data tabel di-cache di server, login dan simpan cukup satu permintaan, data proyek tampil seketika saat dibuka atau pindah proyek lalu diperbarui di latar.', 'Tombol membuat denah dan brosur selalu terlihat beserta keterangan hak akses.', 'Informasi versi, Syarat & Ketentuan, dan Pemberitahuan Privasi; persetujuan dicatat per pengguna.', 'Peringatan bila versi server dan aplikasi berbeda.']],
   ['2.1.0', '2026-10-22', ['Editor denah lantai per tipe rumah (template, pintu/jendela, estimasi volume ke RAB).', 'Brosur A4 dua halaman dengan simulasi KPR, cetak/PDF, HTML, dan WhatsApp.', 'Peran Staf Marketing.']],
   ['2.0.0', '2026-10-22', ['Edisi Google Apps Script + Google Sheets + PWA offline.', 'Perbaikan 40 bug keamanan & perhitungan dari versi React.', 'Lisensi, backup harian, audit trail berantai.']]
@@ -2236,7 +2315,9 @@ function termsHtml(info) {
     ['9. Lisensi perangkat lunak', ['Pengelola menggunakan Aplikasi berdasarkan lisensi dari penyedia perangkat lunak. Bila lisensi berakhir, Aplikasi beralih ke mode baca-saja; data tetap dapat dilihat, dicetak, dan diekspor.']],
     ['10. Batasan tanggung jawab', ['Sepanjang diizinkan hukum, Pengelola dan penyedia perangkat lunak tidak bertanggung jawab atas kerugian tidak langsung akibat gangguan layanan pihak ketiga, kesalahan input Pengguna, atau penggunaan di luar ketentuan ini.']],
     ['11. Pelanggaran', ['Pelanggaran ketentuan ini dapat berakibat pembatasan atau penonaktifan akun serta tindakan sesuai peraturan perusahaan dan hukum yang berlaku.']],
-    ['12. Perubahan & hukum yang berlaku', ['Pengelola dapat memperbarui ketentuan ini; versi baru ditampilkan dan perlu disetujui kembali saat masuk. Ketentuan ini tunduk pada hukum Republik Indonesia.' + (c.contact ? ' Pertanyaan: ' + esc(c.contact) + '.' : '')]]
+    ['12. Portal Pemilik Rumah', [['Akun portal dibuat oleh Pengelola untuk pembeli yang terdaftar dan hanya menampilkan kavling milik pemegang akun. Pemegang akun wajib menjaga kerahasiaan kata sandi.', 'Progres, foto, dan tahapan di portal adalah informasi pemantauan dari laporan lapangan; jadwal, spesifikasi, harga, dan kewajiban pembayaran yang mengikat tetap mengacu pada PPJB/perjanjian jual beli dan perjanjian KPR.', 'Status tagihan dapat tertunda sampai pembayaran dibukukan bagian keuangan. Pembayaran hanya ke rekening resmi Pengelola yang tercantum di portal.', 'Klaim garansi diproses sesuai ketentuan garansi dalam perjanjian/BAST; pengajuan tidak berarti klaim pasti disetujui. Foto yang diunggah dipakai untuk menilai dan menjadwalkan perbaikan.']]],
+    ['13. Notifikasi & Mode Lapangan', ['Pengguna yang nomornya terdaftar dapat menerima pesan WhatsApp/email otomatis terkait pekerjaan dan transaksi. Data yang diisi saat offline tersimpan sementara di perangkat dan dikirim otomatis saat tersambung; pengguna tidak boleh menghapus data peramban sebelum antrean terkirim.']],
+    ['14. Perubahan & hukum yang berlaku', ['Pengelola dapat memperbarui ketentuan ini; versi baru ditampilkan dan perlu disetujui kembali saat masuk. Ketentuan ini tunduk pada hukum Republik Indonesia.' + (c.contact ? ' Pertanyaan: ' + esc(c.contact) + '.' : '')]]
   ]);
 }
 function privacyHtml(info) {
@@ -2245,7 +2326,9 @@ function privacyHtml(info) {
     ['1. Pengendali data', ['Pengendali data pribadi dalam Aplikasi adalah ' + CO + (c.addr ? ', ' + esc(c.addr) : '') + '. Pemberitahuan ini disusun dengan mengacu pada Undang-Undang Nomor 27 Tahun 2022 tentang Pelindungan Data Pribadi.' + (c.contact ? ' Kontak urusan data pribadi: <b>' + esc(c.contact) + '</b>.' : ' Hubungi admin perusahaan untuk urusan data pribadi.')]],
     ['2. Data yang diproses', [[
       '<b>Pengguna</b>: nama, email kerja, jabatan, peran, nomor telepon (opsional), riwayat masuk, dan catatan persetujuan ketentuan. Kata sandi disimpan dalam bentuk hash bersalt, tidak dapat dibaca siapa pun.',
-      '<b>Konsumen/pembeli</b>: nama, nomor telepon, kavling yang dibeli, tagihan, pembayaran, serah terima, dan klaim garansi.',
+      '<b>Konsumen/pembeli</b>: nama, nomor telepon/WhatsApp, email (opsional), kavling yang dibeli, tagihan, pembayaran, serah terima, dan klaim garansi beserta foto kerusakan yang Anda unggah.',
+      '<b>Pemilik rumah pengguna Portal</b>: data akun (nomor HP, email, kata sandi dalam bentuk hash), riwayat masuk, preferensi notifikasi, dan persetujuan ketentuan. Portal hanya menampilkan data kavling milik Anda — tanpa biaya internal, data pekerja, atau lokasi GPS.',
+      '<b>Mutasi rekening</b> yang diimpor bagian keuangan (tanggal, berita transfer, nominal, referensi) untuk mencocokkan pembayaran.',
       '<b>Pekerja lapangan</b>: nama, kode, keahlian, upah harian, kehadiran, lembur, dan nomor telepon (opsional).',
       '<b>Mitra</b>: nama vendor/subkontraktor, kontak, NPWP, dan rekening/referensi pembayaran yang dicatat.',
       '<b>Lapangan</b>: foto dokumentasi dan koordinat GPS yang diambil saat membuat laporan harian (hanya bila Pengguna menekan "Ambil lokasi GPS" dan mengizinkan akses lokasi di perangkat).',
@@ -2255,17 +2338,18 @@ function privacyHtml(info) {
       'Pembukuan, perpajakan, dan dokumen serah terima — dasar: kewajiban hukum.',
       'Keamanan akun, pencegahan kecurangan, dan audit internal — dasar: kepentingan yang sah.',
       'Lokasi GPS & foto lapangan — dasar: kepentingan yang sah untuk verifikasi progres; akses lokasi perangkat selalu meminta izin Anda dan dapat ditolak.',
-      'Notifikasi WhatsApp (bila diaktifkan admin) — untuk pemberitahuan operasional, bukan promosi.']]],
+      'Notifikasi WhatsApp/email (bila diaktifkan) — pengingat jatuh tempo, tanda terima pembayaran, status klaim, dan permintaan persetujuan internal; untuk pemberitahuan pelaksanaan perjanjian, bukan promosi. Pemilik rumah dapat mematikan notifikasi di menu Akun portal.',
+      'Presensi tukang (Mode Lapangan) — dasar: pelaksanaan perjanjian kerja dan perhitungan upah.']]],
     ['4. Tempat penyimpanan', ['Data disimpan di Google Spreadsheet dan Google Drive milik Pengelola serta diproses oleh Google Apps Script; pusat data Google dapat berada di luar Indonesia, dengan standar pelindungan yang setara sesuai ketentuan Google Workspace. Untuk mode offline, salinan data proyek dan antrean input disimpan di peramban perangkat Anda (IndexedDB/localStorage) sampai Anda keluar atau membersihkan data peramban.']],
     ['5. Pembagian data', [[
       'Di dalam Pengelola: hanya Pengguna yang berhak sesuai peran dan keanggotaan proyek.',
-      'Google LLC sebagai penyedia infrastruktur; GitHub (Microsoft) hanya menyajikan berkas aplikasi tanpa data; Fonnte bila notifikasi WhatsApp diaktifkan (menerima nomor tujuan dan isi pesan).',
+      'Google LLC sebagai penyedia infrastruktur; GitHub (Microsoft) hanya menyajikan berkas aplikasi tanpa data; Fonnte atau gateway WhatsApp lain yang dipilih Pengelola, dan Google (Gmail) untuk email, bila notifikasi diaktifkan (menerima nomor/email tujuan dan isi pesan).',
       'Server lisensi penyedia perangkat lunak hanya menerima kunci lisensi, ID skrip, ID spreadsheet, dan nomor versi — tanpa data proyek atau data pribadi.',
       'Bank/notaris/instansi hanya bila diperlukan untuk transaksi atau diwajibkan hukum.',
       'Brosur yang diterbitkan tidak memuat data pribadi konsumen; hanya jumlah dan nomor unit yang tersedia.']]],
     ['6. Masa simpan', [[
       'Data transaksi, dokumen proyek, dan jejak audit disimpan selama diperlukan untuk kewajiban hukum dan pembukuan (umumnya minimal 10 tahun untuk dokumen keuangan) dan tidak dihapus secara fisik agar integritas audit terjaga; data master dinonaktifkan (soft delete).',
-      'Sesi masuk berlaku 14 hari; backup otomatis disimpan 30 versi terakhir.',
+      'Sesi masuk berlaku 14 hari (staf) dan 30 hari (Portal Pemilik Rumah); backup otomatis disimpan 30 versi terakhir. Log notifikasi disimpan untuk jejak pengiriman dan mencegah pesan ganda.',
       'Foto lapangan disimpan selama proyek dan masa garansi, kemudian dapat diarsipkan atau dihapus oleh Pengelola.']]],
     ['7. Keamanan', ['Kata sandi di-hash dengan salt, akun dikunci setelah percobaan gagal berulang, hak akses berbasis peran dan proyek, teks berbahaya dinetralkan sebelum ditulis ke spreadsheet, jejak audit berantai SHA-256, dan backup harian berhash. Bila terjadi kegagalan pelindungan data pribadi, Pengelola memberi tahu subjek data dan lembaga yang berwenang secara tertulis paling lambat 3 × 24 jam sesuai UU PDP.']],
     ['8. Hak Anda', [[
@@ -2308,6 +2392,493 @@ function aboutHtml() {
     '<div class="row" style="margin-top:12px">' + btn('legal-terms', 'Syarat & Ketentuan') + btn('legal-privacy', 'Pemberitahuan Privasi') + '</div></section>' +
     '<section class="panel"><div class="panel-h"><h2>Riwayat perubahan</h2></div>' + CHANGELOG.map(function (c) { return '<h3 style="margin:10px 0 4px">Versi ' + c[0] + ' <span class="small muted">' + dt(c[1]) + '</span></h3><ul class="small" style="margin:0;padding-left:18px">' + c[2].map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>'; }).join('') + '</section></div>';
 }
+
+/* Portal Mandiri Pemilik Rumah — tampilan khusus konsumen (mobile-first), sesi terpisah dari staf */
+var P = { token: lsGet('hc_ho_token'), d: null, tab: 'home', unit: 0, fromCache: false };
+var PORTAL_TABS = [['home', 'Progres', 'home'], ['photos', 'Foto', 'camera'], ['billing', 'Termin', 'wallet'], ['warranty', 'Garansi', 'check'], ['account', 'Akun', 'user']];
+ICONS.camera = '<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>';
+ICONS.user = '<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.2-6.5 8-6.5s7 2 8 6.5"/>';
+ICONS.wa = '<path d="M4 20l1.3-4A8 8 0 1 1 8 18.7z"/><path d="M9 9c0 3 2.5 5.5 5.5 5.5l1.2-1.4-1.9-.9-.9.9A4.2 4.2 0 0 1 10.5 10l.9-.9-.9-1.9z"/>';
+
+function isPortalMode() {
+  return /^#portal/.test(location.hash) || lsGet('hc_mode') === 'portal';
+}
+function pcall(action, payload) {
+  return rpc(action, payload, null, { token: P.token }).then(function (r) {
+    if (!r || !r.ok) {
+      var e = new AppErr((r && r.error) || { code: 'UNKNOWN', message: 'Respons tidak dikenal.' });
+      if (/^AUTH_(REQUIRED|EXPIRED|INACTIVE_USER)$/.test(e.code) && action !== 'portal.login') portalEnded(e.message);
+      throw e;
+    }
+    return r.data;
+  });
+}
+function portalEnded(msg) { P.token = null; P.d = null; lsSet('hc_ho_token', null); closeModal(); renderPortalLogin(msg); }
+function portalLegalInfo() {
+  var c = (P.d && P.d.company) || {};
+  return { companyName: c.name || (S.legal && S.legal.companyName), companyAddress: c.address || (S.legal && S.legal.companyAddress), companyEmail: c.email, privacyContact: c.privacyContact || (S.legal && S.legal.privacyContact), legalVersion: (P.d && P.d.app.legalVersion) || (S.legal && S.legal.legalVersion) };
+}
+
+/* ---------------- Masuk ---------------- */
+function renderPortalLogin(msg) {
+  lsSet('hc_mode', 'portal');
+  $('#app').innerHTML = '<div class="pt-login"><div class="pt-login-card"><div class="row" style="gap:10px;margin-bottom:6px"><div class="brand-mark">HC</div><div><b>Portal Pemilik Rumah</b><div class="small muted" id="ptCo">' + esc((S.legal && S.legal.companyName) || 'Pantau rumah Anda dari ponsel') + '</div></div></div>' +
+    '<p class="small muted" style="margin:6px 0 14px">Lihat progres & foto pembangunan setiap minggu, riwayat termin/KPR, dan ajukan klaim garansi.</p>' +
+    (msg ? '<div class="err-box">' + esc(msg) + '</div>' : '') +
+    '<form id="ptForm" autocomplete="on"><div class="field"><label for="ptId">Nomor HP (WhatsApp) atau email</label><input id="ptId" inputmode="email" autocomplete="username" required value="' + esc(lsGet('hc_ho_last') || '') + '" placeholder="0812xxxxxxxx"></div>' +
+    '<div class="field"><label for="ptPw">Kata sandi</label><input id="ptPw" type="password" autocomplete="current-password" required></div>' +
+    '<button class="btn primary" id="ptBtn" type="submit" style="justify-content:center;width:100%;padding:12px">Masuk</button></form>' +
+    (IS_GAS ? '' : '<details class="small" style="margin-top:10px"><summary>Pengaturan koneksi server</summary><div class="field" style="margin-top:8px"><label for="lapi">URL server</label><input id="lapi" value="' + esc(apiUrl()) + '" placeholder="https://script.google.com/macros/s/…/exec"><div class="help">Diberikan oleh pengembang perumahan.</div></div></details>') +
+    '<p class="small muted">Belum punya akun atau lupa sandi? Hubungi marketing/customer service pengembang — akun dibuat dan direset oleh mereka.</p>' +
+    '<p class="small muted" style="margin:0">Dengan masuk, Anda menyetujui <a href="#" data-act="pt-legal" data-k="terms">Syarat & Ketentuan</a> dan memahami <a href="#" data-act="pt-legal" data-k="privacy">Pemberitahuan Privasi</a>.</p>' +
+    '<p class="small" style="margin:12px 0 0"><a href="#" data-act="staff-mode">Masuk sebagai staf perusahaan →</a></p><p class="tiny muted" style="margin:6px 0 0">Versi ' + esc(CONFIG.APP_VERSION) + '</p></div></div>';
+  if (!S.legal && (IS_GAS || apiUrl())) call('legal.info').then(function (i) { S.legal = i; var c = $('#ptCo'); if (c && i.companyName) c.textContent = i.companyName; }).catch(function () { });
+  $('#ptForm').onsubmit = function (e) {
+    e.preventDefault();
+    var api = $('#lapi'); if (api && api.value.trim()) lsSet('hc_api_url', api.value.trim());
+    var idf = $('#ptId').value.trim(), pw = $('#ptPw').value, b = $('#ptBtn');
+    b.disabled = true; b.textContent = 'Memeriksa…';
+    pcall('portal.login', { identifier: idf, password: pw, userAgent: navigator.userAgent }).then(function (r) {
+      P.token = r.token; lsSet('hc_ho_token', r.token); lsSet('hc_ho_last', idf);
+      portalApply(r.data);
+    }).catch(function (er) { renderPortalLogin(er instanceof NetError ? 'Tidak dapat terhubung ke server. Periksa internet Anda.' : errMsg(er)); $('#ptId').value = idf; });
+  };
+}
+ACT['staff-mode'] = function () { lsSet('hc_mode', null); if (/^#portal/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search); renderLogin(); };
+ACT['portal-open'] = function () { renderPortalLogin(); };
+ACT['pt-legal'] = function (el) { showLegal(el.dataset.k, portalLegalInfo()); };
+
+/* ---------------- Data ---------------- */
+function portalApply(d) {
+  P.d = d; P.fromCache = false;
+  Store.set('kv', 'portal:last', d);
+  if (P.unit >= d.units.length) P.unit = 0;
+  renderPortal();
+  if (d.homeowner.mustChangePassword) portalForcePassword();
+  else if (d.homeowner.termsVersion !== d.app.legalVersion) portalTerms();
+}
+function portalLoad() {
+  return Store.get('kv', 'portal:last').then(function (c) {
+    if (c && c.homeowner) { P.d = c; renderPortal(); }
+    return pcall('portal.data', {}).then(portalApply).catch(function (e) {
+      if (!(e instanceof NetError)) throw e;
+      if (P.d) { P.fromCache = true; renderPortal(); toast('Offline: menampilkan data tersimpan ' + dtt(P.d.serverTime) + '.'); }
+      else $('#app').innerHTML = '<div class="loading-full"><div class="empty"><b>Tidak ada koneksi</b>Buka portal sekali saat online agar data rumah Anda tersimpan di ponsel.<br><br><button class="btn" onclick="location.reload()">Coba lagi</button></div></div>';
+    });
+  });
+}
+function portalBoot() {
+  lsSet('hc_mode', 'portal');
+  if (!P.token) return renderPortalLogin();
+  portalLoad().catch(function (e) { renderPortalLogin(errMsg(e)); });
+}
+
+/* ---------------- Kerangka ---------------- */
+function curUnit() { return P.d && P.d.units[P.unit]; }
+function renderPortal() {
+  var d = P.d, u = curUnit();
+  var sw = d.units.length > 1 ? '<select id="ptUnit" class="input" aria-label="Pilih rumah">' + d.units.map(function (x, i) { return '<option value="' + i + '"' + (i === P.unit ? ' selected' : '') + '>' + esc(x.unitNumber + ' — ' + x.project.name) + '</option>'; }).join('') + '</select>' : '';
+  $('#app').innerHTML = '<div class="pt-shell"><header class="pt-top"><div class="brand-mark">HC</div><div class="grow" style="min-width:0"><b class="ellip">' + esc(d.company.name || 'Portal Pemilik Rumah') + '</b><div class="small ellip" style="opacity:.8">Halo, ' + esc(d.homeowner.fullName) + '</div></div>' +
+    '<button class="iconbtn light" data-act="pt-refresh" aria-label="Muat ulang">' + ico('refresh') + '</button></header>' +
+    (P.fromCache ? '<div class="alert warn" style="margin:10px 14px 0">Offline — data per ' + dtt(d.serverTime) + '.</div>' : '') +
+    (sw ? '<div style="padding:10px 14px 0">' + sw + '</div>' : '') +
+    '<main class="pt-main" id="ptMain">' + (u ? portalTabHtml(u) : '<div class="empty"><b>Belum ada rumah terhubung</b>Hubungi pengembang untuk menautkan kavling Anda.</div>') + '</main>' +
+    '<nav class="bottomnav pt-nav" aria-label="Menu portal">' + PORTAL_TABS.map(function (t) { return '<a href="#portal/' + t[0] + '" data-act="pt-tab" data-tab="' + t[0] + '" class="' + (P.tab === t[0] ? 'active' : '') + '">' + ico(t[2]) + '<span>' + t[1] + '</span></a>'; }).join('') + '</nav></div>';
+  var s = $('#ptUnit'); if (s) s.onchange = function () { P.unit = Number(s.value); renderPortal(); };
+}
+ACT['pt-tab'] = function (el) { P.tab = el.dataset.tab; history.replaceState(null, '', '#portal/' + P.tab); renderPortal(); window.scrollTo(0, 0); };
+ACT['pt-refresh'] = function () { pcall('portal.data', {}).then(function (d) { portalApply(d); toast('Data diperbarui.'); }).catch(function (e) { toast(errMsg(e), 'err'); }); };
+function portalTabHtml(u) {
+  try { return ({ home: ptHome, photos: ptPhotos, billing: ptBilling, warranty: ptWarranty, account: ptAccount }[P.tab] || ptHome)(u); }
+  catch (e) { console.error(e); return '<div class="empty"><b>Halaman gagal ditampilkan</b>' + esc(errMsg(e)) + '</div>'; }
+}
+
+/* ---------------- Progres ---------------- */
+var PT_STAGES = [['PLANNED', 'Persiapan'], ['FOUNDATION', 'Pondasi'], ['STRUCTURE', 'Struktur & dinding'], ['FINISHING', 'Finishing'], ['QC_INSPECTION', 'Pemeriksaan mutu'], ['HANDOVER_READY', 'Siap serah terima'], ['HANDED_OVER', 'Serah terima kunci']];
+function ring(p) {
+  var v = Math.max(0, Math.min(100, n(p))), r = 52, c = 2 * Math.PI * r;
+  return '<svg viewBox="0 0 130 130" class="pt-ring" role="img" aria-label="Progres ' + NF2.format(v) + '%"><circle cx="65" cy="65" r="' + r + '" fill="none" stroke="var(--surface-2)" stroke-width="12"/><circle cx="65" cy="65" r="' + r + '" fill="none" stroke="var(--hivis)" stroke-width="12" stroke-linecap="round" stroke-dasharray="' + (c * v / 100).toFixed(1) + ' ' + c.toFixed(1) + '" transform="rotate(-90 65 65)"/><text x="65" y="64" text-anchor="middle" font-size="24" font-weight="700" fill="currentColor">' + NF0.format(Math.round(v)) + '%</text><text x="65" y="84" text-anchor="middle" font-size="10" fill="var(--muted)">progres fisik</text></svg>';
+}
+function ptHome(u) {
+  var idx = Math.max(0, u.stageIndex), last = u.feed[0];
+  var steps = PT_STAGES.map(function (s, i) { return '<li class="' + (i < idx ? 'done' : i === idx ? 'now' : '') + '"><i></i><span>' + s[1] + '</span></li>'; }).join('');
+  var wk = weekGroups(u.feed)[0];
+  return '<section class="panel pt-hero"><div class="row" style="gap:16px;align-items:center;flex-wrap:nowrap">' + ring(u.progressPercent) + '<div style="min-width:0"><div class="small muted">' + esc(u.project.name) + '</div><h2 style="margin:2px 0">Rumah ' + esc(u.unitNumber) + '</h2><div class="small">' + esc(u.unitType) + ' · LT ' + m2(u.landAreaM2) + ' m² · LB ' + m2(u.buildingAreaM2) + ' m²</div>' +
+    '<div style="margin-top:6px">' + chip(u.status === 'HANDED_OVER' ? 'APPROVED' : 'SUBMITTED', u.stageLabel) + '</div>' + (u.status !== 'HANDED_OVER' && u.project.targetEndDate ? '<div class="small muted" style="margin-top:4px">Target proyek selesai: ' + dt(u.project.targetEndDate) + '</div>' : '') + (u.handoverDate ? '<div class="small muted" style="margin-top:4px">Serah terima ' + dt(u.handoverDate) + '</div>' : '') + '</div></div></section>' +
+    (wk ? '<section class="panel"><div class="panel-h"><h3>Minggu ini</h3><a href="#portal/photos" data-act="pt-tab" data-tab="photos" class="small">Semua foto →</a></div><div class="small muted" style="margin-bottom:8px">' + esc(wk.label) + ' · progres +' + NF2.format(wk.added) + '%</div>' + (wk.items[0].photoUrl ? '<img class="pt-cover" src="' + esc(wk.items[0].photoUrl) + '" alt="Foto terbaru rumah ' + esc(u.unitNumber) + '" data-act="pt-photo" data-src="' + esc(wk.items[0].photoUrl) + '" data-cap="' + esc(dt(wk.items[0].date) + ' — ' + wk.items[0].summary) + '">' : '') + '<p style="margin:8px 0 0">' + esc(last.summary) + '</p></section>' : '') +
+    '<section class="panel"><div class="panel-h"><h3>Tahapan pembangunan</h3></div><ol class="pt-steps">' + steps + '</ol></section>' +
+    (u.milestones.length ? '<section class="panel"><div class="panel-h"><h3>Pemeriksaan mutu</h3></div>' + u.milestones.map(function (m) { return '<div class="pt-line"><span>' + esc(m.label) + (m.bastNumber ? ' · BAST ' + esc(m.bastNumber) : '') + '</span><span class="small muted">' + dt(m.date) + '</span>' + (m.passed ? chip('APPROVED', 'Lulus') : chip('SUBMITTED', 'Perbaikan')) + '</div>'; }).join('') + '</section>' : '') +
+    (u.floorPlan ? '<section class="panel"><div class="panel-h"><h3>Denah rumah</h3><button class="btn sm" data-act="pt-plan">Lihat denah</button></div><div class="small muted">' + esc(u.floorPlan.name) + ' · ' + u.floorPlan.bedrooms + ' KT · ' + u.floorPlan.bathrooms + ' KM · ' + u.floorPlan.floors + ' lantai</div></section>' : '');
+}
+ACT['pt-plan'] = function () {
+  var f = curUnit().floorPlan; if (!f || typeof planSvg !== 'function') return;
+  var meta = { plan: f.plan, landWidthM: f.landWidthM, landDepthM: f.landDepthM };
+  showInfo('Denah ' + f.name, (f.plan.floors || []).map(function (fl, i) { return '<h3 style="margin:8px 0">' + esc(fl.name || 'Lantai ' + (i + 1)) + '</h3><div class="pt-plan">' + planSvg(meta, i, { compact: true }) + '</div>'; }).join('') + '<p class="small muted">Denah ilustrasi tipe rumah; ukuran akhir mengikuti gambar kerja dan PPJB.</p>', true);
+};
+
+/* ---------------- Foto mingguan ---------------- */
+function mondayOf(iso) { var d = new Date(iso + 'T00:00:00Z'), w = (d.getUTCDay() + 6) % 7; d.setUTCDate(d.getUTCDate() - w); return d.toISOString().slice(0, 10); }
+function weekGroups(feed) {
+  var g = {}, order = [];
+  (feed || []).forEach(function (f) { var k = mondayOf(f.date); if (!g[k]) { g[k] = { start: k, items: [], added: 0 }; order.push(k); } g[k].items.push(f); g[k].added += n(f.added); });
+  return order.map(function (k) { var x = g[k], e = new Date(k + 'T00:00:00Z'); e.setUTCDate(e.getUTCDate() + 6); x.label = dt(k) + ' – ' + dt(e.toISOString().slice(0, 10)); x.cum = x.items[0].cumulative; return x; });
+}
+function ptPhotos(u) {
+  var gs = weekGroups(u.feed);
+  if (!gs.length) return '<div class="panel"><div class="empty"><b>Belum ada laporan</b>Foto progres akan muncul di sini setiap kali tim lapangan melaporkan pekerjaan rumah Anda.</div></div>';
+  return '<p class="small muted" style="margin:0 0 10px">Foto langsung dari laporan harian tim lapangan, dikelompokkan per minggu.</p>' + gs.map(function (g) {
+    return '<section class="panel pt-week"><div class="panel-h"><h3>' + esc(g.label) + '</h3><span class="chip info">+' + NF2.format(g.added) + '% → ' + NF0.format(n(g.cum)) + '%</span></div><div class="pt-grid">' + g.items.map(function (f) {
+      return '<figure>' + (f.photoUrl ? '<img src="' + esc(f.photoUrl) + '" loading="lazy" alt="Foto ' + esc(dt(f.date)) + '" data-act="pt-photo" data-src="' + esc(f.photoUrl) + '" data-cap="' + esc(dt(f.date) + ' — ' + f.summary) + '">' : '<div class="ph">Tanpa foto</div>') + '<figcaption><b>' + dt(f.date) + '</b> · +' + NF2.format(n(f.added)) + '%<br>' + esc(f.summary) + '</figcaption></figure>';
+    }).join('') + '</div></section>';
+  }).join('');
+}
+ACT['pt-photo'] = function (el) { showInfo('Foto progres', '<img src="' + esc(el.dataset.src) + '" alt="" style="width:100%;border-radius:8px"><p class="small">' + esc(el.dataset.cap || '') + '</p>', true); };
+
+/* ---------------- Termin & KPR ---------------- */
+function ptBilling(u) {
+  var c = P.d.company, t = u.totals, today = todayIso();
+  var next = u.invoices.filter(function (i) { return n(i.netAmount) - n(i.paidAmount) > 0.5 && i.billTo !== 'BANK'; }).sort(function (a, b) { return String(a.dueDate).localeCompare(String(b.dueDate)); })[0];
+  var bank = c.bankAccountNo ? '<section class="panel"><div class="panel-h"><h3>Rekening pembayaran</h3></div><div class="pt-bank"><div><div class="small muted">' + esc(c.bankName || 'Bank') + '</div><b class="num" style="font-size:1.15rem">' + esc(c.bankAccountNo) + '</b><div class="small">a.n. ' + esc(c.bankAccountName || c.name) + '</div></div><button class="btn sm" data-act="pt-copy" data-v="' + esc(String(c.bankAccountNo).replace(/\D/g, '')) + '">Salin</button></div><p class="small muted" style="margin:8px 0 0">Cantumkan nomor tagihan pada berita transfer agar pembayaran tercatat otomatis. Kami tidak pernah meminta transfer ke rekening pribadi.</p></section>' : '';
+  return '<div class="kpis pt-kpis">' + kpi('Harga rumah', rpS(t.salePrice)) + kpi('Sudah ditagih', rpS(t.billed)) + kpi('Sudah dibayar', rpS(t.paid), '', 'ok') + kpi('Sisa tagihan', rpS(t.outstanding), '', n(t.outstanding) > 0 ? 'bad' : 'ok') + '</div>' +
+    (next ? '<div class="alert ' + (next.dueDate < today ? 'danger' : 'warn') + '"><span><b>' + esc(next.label) + '</b>: ' + rp(n(next.netAmount) - n(next.paidAmount)) + ' jatuh tempo ' + dt(next.dueDate) + (next.dueDate < today ? ' (terlambat)' : '') + '. No. ' + esc(next.invoiceNumber) + '</span></div>' : '') +
+    '<section class="panel"><div class="panel-h"><h3>Riwayat termin</h3></div>' + (u.invoices.length ? u.invoices.map(function (i) {
+      var open = n(i.netAmount) - n(i.paidAmount), paid = open <= 0.5;
+      return '<div class="pt-inv"><div class="grow" style="min-width:0"><b>' + esc(i.label) + '</b>' + (i.billTo === 'BANK' ? ' <span class="chip info">dibayar bank KPR</span>' : '') + '<div class="small muted">' + esc(i.invoiceNumber) + ' · jatuh tempo ' + dt(i.dueDate) + '</div>' + progressBar(n(i.netAmount) ? n(i.paidAmount) / n(i.netAmount) * 100 : 0, paid ? 'ok' : '') + '</div><div style="text-align:right"><b class="num">' + rp(i.netAmount) + '</b><div>' + (paid ? chip('PAID') : n(i.paidAmount) > 0 ? chip('PARTIAL', 'Sisa ' + rpS(open)) : (i.dueDate < today ? chip('REJECTED', 'Terlambat') : chip('SUBMITTED', 'Belum dibayar'))) + '</div></div></div>';
+    }).join('') : '<div class="empty"><b>Belum ada tagihan</b></div>') + '</section>' + bank +
+    '<section class="panel"><div class="panel-h"><h3>Pembayaran diterima</h3></div>' + (u.payments.length ? u.payments.map(function (p) { return '<div class="pt-line"><span>' + dt(p.paidAt) + ' · ' + esc(STATUS_LABEL[p.method] || p.method) + '<br><span class="small muted">' + esc(p.paymentNumber) + ' untuk ' + esc(p.invoiceNumber) + '</span></span><b class="num">' + rp(p.amount) + '</b></div>'; }).join('') : '<div class="small muted">Belum ada pembayaran tercatat.</div>') + '</section>';
+}
+ACT['pt-copy'] = function (el) { var v = el.dataset.v; (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(function () { toast('Nomor rekening disalin.', 'ok'); }).catch(function () { toast(v); }); };
+
+/* ---------------- Garansi ---------------- */
+var CLAIM_CAT = { ATAP_BOCOR: 'Atap bocor / rembes', DINDING_RETAK: 'Dinding retak', PLAFON: 'Plafon', LANTAI_KERAMIK: 'Lantai / keramik', PINTU_JENDELA: 'Pintu / jendela / kunci', LISTRIK: 'Listrik', AIR_SANITASI: 'Air bersih / saluran / sanitair', LAINNYA: 'Lainnya' };
+function ptWarranty(u) {
+  var handed = u.status === 'HANDED_OVER', today = todayIso();
+  var left = u.warrantyEndDate ? Math.round((new Date(u.warrantyEndDate) - new Date(today)) / 86400000) : null;
+  var head = handed ? '<section class="panel"><div class="row" style="justify-content:space-between"><div><div class="small muted">Masa garansi</div><b>' + (left >= 0 ? 'Aktif s/d ' + dt(u.warrantyEndDate) : 'Berakhir ' + dt(u.warrantyEndDate)) + '</b>' + (left >= 0 ? '<div class="small muted">' + left + ' hari lagi</div>' : '') + '</div><button class="btn primary" data-act="pt-claim">' + ico('plus') + ' Ajukan klaim</button></div></section>'
+    : '<div class="alert">Klaim garansi dapat diajukan setelah serah terima kunci. Selama pembangunan, sampaikan masukan kepada marketing kami.</div>';
+  var steps = function (c) { var k = { REPORTED: 0, IN_REPAIR: 1, RESOLVED: 2 }[c.repairStatus] || 0; return '<ol class="pt-steps mini">' + ['Dilaporkan', 'Diperbaiki', 'Selesai'].map(function (s, i) { return '<li class="' + (i < k ? 'done' : i === k ? 'now' : '') + '"><i></i><span>' + s + '</span></li>'; }).join('') + '</ol>'; };
+  return head + '<section class="panel"><div class="panel-h"><h3>Klaim saya</h3></div>' + (u.claims.length ? u.claims.map(function (c) {
+    return '<div class="pt-claim">' + (c.photoUrl ? '<img src="' + esc(c.photoUrl) + '" alt="Foto klaim" loading="lazy" data-act="pt-photo" data-src="' + esc(c.photoUrl) + '" data-cap="' + esc(c.claimNumber) + '">' : '') + '<div class="grow" style="min-width:0"><div class="row" style="gap:6px"><b>' + esc(c.claimNumber) + '</b>' + chip(c.repairStatus) + (c.warrantyStatus === 'EXPIRED' ? chip('EXPIRED') : '') + '</div><div class="small muted">' + dt(c.claimDate) + (c.category ? ' · ' + esc(CLAIM_CAT[c.category] || c.category) : '') + (c.location ? ' · ' + esc(c.location) : '') + '</div><p style="margin:4px 0">' + esc(c.description) + '</p>' + steps(c) + (c.repairNotes ? '<div class="small"><b>Tim kami:</b> ' + esc(c.repairNotes) + '</div>' : '') + '</div></div>';
+  }).join('') : '<div class="small muted">Belum ada klaim.</div>') + '</section>';
+}
+ACT['pt-claim'] = function () {
+  var u = curUnit();
+  openForm({ title: 'Ajukan klaim garansi', intro: 'Rumah ' + esc(u.unitNumber) + '. Foto yang jelas mempercepat penjadwalan perbaikan.', fields: [
+    { name: 'category', label: 'Jenis kerusakan', type: 'select', required: true, options: Object.keys(CLAIM_CAT).map(function (k) { return { v: k, l: CLAIM_CAT[k] }; }) },
+    { name: 'location', label: 'Lokasi di rumah', placeholder: 'mis. kamar mandi belakang', max: 120 },
+    { name: 'description', label: 'Uraian kerusakan', type: 'textarea', required: true, max: 1500, help: 'Apa yang terjadi, sejak kapan, seberapa parah.' },
+    { name: 'photoBase64', label: 'Foto kerusakan', type: 'photo' }
+  ], submitLabel: 'Kirim klaim', onSubmit: function (v) {
+    if (!P.token) throw new Error('Sesi berakhir.');
+    return pcall('portal.claim', Object.assign({ houseUnitId: u.id }, v)).then(function (r) {
+      toast('Klaim ' + r.claimNumber + ' terkirim. Tim kami akan menghubungi Anda.', 'ok');
+      return pcall('portal.data', {}).then(portalApply);
+    }).catch(function (e) { if (e instanceof NetError) throw new Error('Tidak ada koneksi. Klaim belum terkirim — coba lagi saat ada sinyal.'); throw e; });
+  } });
+};
+
+/* ---------------- Akun ---------------- */
+function ptAccount() {
+  var h = P.d.homeowner, c = P.d.company;
+  var wa = Notify_phone(c.phone);
+  return '<section class="panel"><div class="panel-h"><h3>Akun saya</h3></div><dl class="kv"><dt>Nama</dt><dd>' + esc(h.fullName) + '</dd><dt>Nomor HP</dt><dd>' + esc(h.phone) + '</dd><dt>Email</dt><dd>' + esc(h.email || '—') + '</dd><dt>Masuk terakhir</dt><dd>' + dtt(h.lastLoginAt) + '</dd></dl>' +
+    '<div class="row" style="margin-top:10px">' + btn('pt-prefs', 'Notifikasi') + btn('pt-pw', 'Ganti kata sandi') + '</div></section>' +
+    '<section class="panel"><div class="panel-h"><h3>Notifikasi</h3></div><p class="small" style="margin:0">WhatsApp: <b>' + (h.notifyWa ? 'aktif' : 'mati') + '</b> · Email: <b>' + (h.notifyEmail && h.email ? 'aktif' : 'mati') + '</b></p><p class="small muted" style="margin:6px 0 0">Anda menerima pengingat jatuh tempo termin, tanda terima pembayaran, dan kabar klaim garansi.</p></section>' +
+    '<section class="panel"><div class="panel-h"><h3>Hubungi kami</h3></div><div class="small">' + esc(c.name || '') + '<br>' + esc(c.address || '') + '</div><div class="row" style="margin-top:8px">' + (wa ? '<a class="btn sm" href="https://wa.me/' + wa + '" target="_blank" rel="noopener">' + ico('wa') + ' WhatsApp</a>' : '') + (c.email ? '<a class="btn sm" href="mailto:' + esc(c.email) + '">Email</a>' : '') + '</div></section>' +
+    '<section class="panel"><div class="row">' + '<button class="btn sm" data-act="pt-legal" data-k="terms">Syarat & Ketentuan</button><button class="btn sm" data-act="pt-legal" data-k="privacy">Privasi</button><button class="btn sm danger" data-act="pt-logout">Keluar</button></div><p class="tiny muted" style="margin:10px 0 0">Versi aplikasi ' + esc(CONFIG.APP_VERSION) + ' · ketentuan ' + esc(h.termsVersion || '-') + '</p></section>';
+}
+function Notify_phone(p) { var s = String(p || '').replace(/\D/g, ''); if (!s) return ''; if (s[0] === '0') s = '62' + s.slice(1); return s.length >= 9 ? s : ''; }
+ACT['pt-prefs'] = function () {
+  var h = P.d.homeowner;
+  openForm({ title: 'Pengaturan notifikasi', values: { notifyWa: h.notifyWa, notifyEmail: h.notifyEmail, email: h.email }, fields: [
+    { name: 'notifyWa', label: 'Terima pesan WhatsApp', type: 'check' }, { name: 'notifyEmail', label: 'Terima email', type: 'check' }, { name: 'email', label: 'Alamat email', type: 'email' }
+  ], onSubmit: function (v) { return pcall('portal.prefs', v).then(function (r) { P.d.homeowner = r; Store.set('kv', 'portal:last', P.d); renderPortal(); toast('Tersimpan.', 'ok'); }); } });
+};
+ACT['pt-pw'] = function () { portalPassword(false); };
+function portalPassword(forced) {
+  openForm({ title: forced ? 'Buat kata sandi baru' : 'Ganti kata sandi', intro: forced ? 'Anda masuk dengan kata sandi sementara. Buat kata sandi pribadi (minimal 8 karakter, huruf dan angka).' : '', fields: (forced ? [] : [{ name: 'oldPassword', label: 'Kata sandi lama', type: 'password', required: true }]).concat([{ name: 'newPassword', label: 'Kata sandi baru', type: 'password', required: true }, { name: 'confirm', label: 'Ulangi kata sandi baru', type: 'password', required: true }]),
+    submitLabel: 'Simpan', onSubmit: function (v) {
+      if (v.newPassword !== v.confirm) throw new Error('Konfirmasi kata sandi tidak sama.');
+      return pcall('portal.changePassword', { oldPassword: v.oldPassword, newPassword: v.newPassword }).then(function () { P.d.homeowner.mustChangePassword = false; toast('Kata sandi diperbarui.', 'ok'); if (P.d.homeowner.termsVersion !== P.d.app.legalVersion) setTimeout(portalTerms, 80); });
+    } });
+  if (forced) $$('#modal [data-act="modal-close"]').forEach(function (b) { b.remove(); });
+}
+function portalForcePassword() { portalPassword(true); }
+function portalTerms() {
+  if ($('#modal')) return;
+  var info = portalLegalInfo();
+  openForm({ title: 'Syarat & Ketentuan dan Privasi', wide: true, intro: 'Mohon baca ketentuan portal dan cara data Anda diproses.', fields: [{ type: 'info', name: 'l', html: '<div class="legal-box">' + termsHtml(info) + '<hr>' + privacyHtml(info) + '</div>' }, { name: 'agree', label: 'Saya telah membaca dan menyetujui Syarat & Ketentuan serta memahami Pemberitahuan Privasi.', type: 'check', required: true }],
+    submitLabel: 'Setuju & lanjutkan', onSubmit: function (v) {
+      if (!v.agree) throw new Error('Centang persetujuan terlebih dahulu.');
+      return pcall('portal.acceptTerms', { version: P.d.app.legalVersion }).then(function (r) { P.d.homeowner.termsVersion = r.termsVersion; Store.set('kv', 'portal:last', P.d); toast('Terima kasih.', 'ok'); });
+    } });
+  $$('#modal [data-act="modal-close"]').forEach(function (b) { b.remove(); });
+  var out = document.createElement('button'); out.className = 'btn'; out.textContent = 'Keluar'; out.setAttribute('data-act', 'pt-logout'); $('#modal .modal-f').prepend(out);
+}
+ACT['pt-logout'] = function () {
+  var tok = P.token; closeModal();
+  Store.del('kv', 'portal:last');
+  portalEnded('Anda telah keluar.');
+  rpc('portal.logout', {}, null, { token: tok }).catch(function () { });
+};
+
+/* Mode Lapangan — layar mandor/pengawas: presensi tukang & laporan harian, offline-first dengan sinkron otomatis */
+var FM = { date: null, unit: '', rows: null, gps: true };
+var ATT_OPTS = [['HADIR', 'H', 'Hadir'], ['SETENGAH', '½', 'Setengah hari'], ['IZIN', 'I', 'Izin'], ['SAKIT', 'S', 'Sakit'], ['ALPA', 'A', 'Alpa']];
+
+/** Presensi yang sudah tercatat untuk tanggal tsb: data server + antrean offline terbaru */
+function attFor(date) {
+  var m = {};
+  (S.d.attendance || []).filter(function (a) { return a.workDate === date; }).forEach(function (a) { m[a.workerId] = { status: a.status, ot: n(a.overtimeHours) ? String(n(a.overtimeHours)).replace('.', ',') : '', src: 'server', unit: a.houseUnitId }; });
+  S.outbox.filter(function (o) { return o.action === 'attendance.save' && o.payload.workDate === date && o.projectId === S.projectId; }).forEach(function (o) {
+    o.payload.entries.forEach(function (e) { m[e.workerId] = { status: e.status, ot: e.overtimeHours && n(e.overtimeHours) ? String(e.overtimeHours).replace('.', ',') : '', src: o.status === 'FAILED' ? 'failed' : 'queue', unit: o.payload.houseUnitId }; });
+  });
+  return m;
+}
+function fmInit(force) {
+  if (FM.rows && !force && FM.pid === S.projectId) {
+    // data baru dari server/antrean: perbarui label sumber; isian yang belum disimpan tetap dipertahankan
+    var sv = attFor(FM.date);
+    Object.keys(FM.rows).forEach(function (k) { var r = FM.rows[k], x = sv[k]; if (!FM.dirty && x) { r.status = x.status; r.ot = x.ot; } r.src = x ? x.src : ''; });
+    return;
+  }
+  FM.dirty = false;
+  FM.pid = S.projectId; FM.date = FM.date || todayIso();
+  var saved = attFor(FM.date), rows = {};
+  (S.d.workers || []).filter(function (w) { return w.isActive; }).forEach(function (w) { var s = saved[w.id]; rows[w.id] = { status: s ? s.status : '', ot: s ? s.ot : '', src: s ? s.src : '' }; });
+  FM.rows = rows;
+  var any = Object.keys(saved).map(function (k) { return saved[k].unit; }).filter(Boolean)[0];
+  if (any) FM.unit = any;
+}
+VIEWS.fieldmode = {
+  title: 'Mode Lapangan',
+  render: function () {
+    fmInit();
+    var d = S.d, pend = S.outbox.filter(function (x) { return x.status === 'PENDING'; }), fail = S.outbox.filter(function (x) { return x.status === 'FAILED'; });
+    var workers = (d.workers || []).filter(function (w) { return w.isActive; });
+    var units = (d.houseUnits || []).filter(function (u) { return u.status !== 'HANDED_OVER'; });
+    var saved = attFor(FM.date), nSaved = Object.keys(saved).length;
+    var status = '<section class="fm-status ' + (S.online ? 'on' : 'off') + '"><div class="grow"><b>' + (S.online ? 'Online' : 'Offline — data disimpan di HP') + '</b><div class="small">' + (pend.length ? pend.length + ' data menunggu dikirim' : 'Semua data sudah terkirim') + (fail.length ? ' · <b>' + fail.length + ' gagal</b>' : '') + ' · data per ' + dtt(d.serverTime) + '</div></div>' +
+      (pend.length && S.online ? btn('sync-now', 'Kirim sekarang', '', 'sm primary') : '') + (FM_INSTALL ? btn('fm-install', 'Pasang aplikasi', '', 'sm') : '') + '</section>';
+    var att = '';
+    if (can('ATTENDANCE_RECORD')) {
+      att = '<section class="panel"><div class="panel-h"><h2>Presensi tukang</h2><span class="small muted">' + (nSaved ? nSaved + ' dari ' + workers.length + ' tercatat' : 'belum dicatat') + '</span></div>' +
+        '<div class="row" style="margin-bottom:10px"><label class="hide" for="fmDate">Tanggal</label><input type="date" id="fmDate" class="input" style="max-width:170px" value="' + FM.date + '" max="' + todayIso() + '">' +
+        '<label class="hide" for="fmUnit">Kavling</label><select id="fmUnit" class="input" style="max-width:220px"><option value="">Lokasi kerja: seluruh proyek</option>' + units.map(function (u) { return '<option value="' + u.id + '"' + (u.id === FM.unit ? ' selected' : '') + '>Kavling ' + esc(u.unitNumber) + '</option>'; }).join('') + '</select>' +
+        btn('fm-allpresent', 'Semua hadir', '', 'sm') + '</div>' +
+        (workers.length ? '<div class="fm-list">' + workers.map(function (w) {
+          var r = FM.rows[w.id] || {};
+          return '<div class="fm-row"><div class="fm-name"><b>' + esc(w.fullName) + '</b><span class="small muted">' + esc(w.workerCode) + ' · ' + esc(String(w.skillRole).replace('_', ' ').toLowerCase()) + (r.src === 'queue' ? ' · <span class="q">antre</span>' : r.src === 'failed' ? ' · <span class="f">gagal</span>' : r.src === 'server' ? ' · tersimpan' : '') + '</span></div>' +
+            '<div class="seg" role="radiogroup" aria-label="Presensi ' + esc(w.fullName) + '">' + ATT_OPTS.map(function (o) { return '<button type="button" role="radio" aria-checked="' + (r.status === o[0]) + '" title="' + o[2] + '" class="' + (r.status === o[0] ? 'on s-' + o[0] : '') + '" data-act="fm-set" data-w="' + w.id + '" data-s="' + o[0] + '">' + o[1] + '</button>'; }).join('') + '</div>' +
+            '<label class="fm-ot"><span class="tiny muted">Lembur (jam)</span><input inputmode="decimal" data-ot="' + w.id + '" value="' + esc(r.ot || '') + '" placeholder="0"' + (r.status === 'HADIR' || r.status === 'SETENGAH' ? '' : ' disabled') + '></label></div>';
+        }).join('') + '</div>' : '<div class="empty"><b>Belum ada daftar pekerja</b>Site Engineer menambahkan pekerja di Lapangan & Subkon → Tenaga kerja.</div>') +
+        '<div class="row" style="margin-top:12px"><label class="row small" style="gap:6px"><input type="checkbox" id="fmGps"' + (FM.gps ? ' checked' : '') + '> Sertakan lokasi GPS</label><span class="grow"></span>' + (workers.length ? btn('fm-save', 'Simpan presensi', '', 'primary') : '') + '</div>' +
+        '<p class="tiny muted" style="margin:8px 0 0">H = hadir, ½ = setengah hari, I = izin, S = sakit, A = alpa. Presensi bisa disimpan tanpa sinyal dan dikirim otomatis saat online. Rekap upah dapat dihitung dari presensi.</p></section>';
+    }
+    var today = todayIso();
+    var reps = (d.dailyReports || []).filter(function (r) { return r.reportDate === today; });
+    var qd = S.outbox.filter(function (o) { return o.action === 'dsr.create' && o.projectId === S.projectId; });
+    var dsr = '<section class="panel"><div class="panel-h"><h2>Laporan harian</h2>' + (can('DAILY_REPORT_SUBMIT') ? btn('dsr-new', ico('camera') + ' Buat laporan + foto', '', 'primary') : '') + '</div>' +
+      (reps.length || qd.length ? qd.map(function (o) { return '<div class="pt-line"><span><b>' + esc((L().units[o.payload.houseUnitId] || {}).unitNumber || '') + '</b> ' + esc(String(o.payload.workSummary || '').slice(0, 80)) + (o.payload.photoBase64 ? ' 📷' : '') + '</span>' + chip(o.status === 'FAILED' ? 'REJECTED' : 'SUBMITTED', o.status === 'FAILED' ? 'Gagal' : 'Menunggu sinyal') + '</div>'; }).join('') +
+        reps.map(function (r) { return '<div class="pt-line"><span><b>' + unitLabel(r.houseUnitId) + '</b> ' + esc(r.workSummary.slice(0, 80)) + '</span>' + chip('APPROVED', 'Terkirim +' + NF2.format(n(r.progressAddedPct)) + '%') + '</div>'; }).join('')
+        : '<div class="small muted">Belum ada laporan hari ini.</div>') + '</section>';
+    var tips = '<section class="panel"><div class="panel-h"><h3>Tips di lokasi minim sinyal</h3></div><ul class="small" style="margin:0;padding-left:18px"><li>Buka aplikasi sekali saat ada sinyal setiap pagi agar daftar pekerja & kavling terbaru tersimpan di HP.</li><li>Isi presensi & laporan seperti biasa — data masuk antrean dan terkirim otomatis begitu ada sinyal, walau aplikasi sudah ditutup (Android/Chrome).</li><li>Foto otomatis diperkecil agar hemat kuota. Jangan hapus data browser sebelum antrean terkirim.</li></ul></section>';
+    return status + '<div class="grid g2" style="align-items:start"><div class="stack">' + att + '</div><div class="stack">' + dsr + tips + '</div></div>';
+  },
+  after: function () {
+    var dEl = $('#fmDate'); if (dEl) dEl.onchange = function () { FM.date = dEl.value || todayIso(); fmInit(true); rerenderBody(); };
+    var uEl = $('#fmUnit'); if (uEl) uEl.onchange = function () { FM.unit = uEl.value; };
+    var g = $('#fmGps'); if (g) g.onchange = function () { FM.gps = g.checked; };
+    $$('[data-ot]').forEach(function (i) { i.oninput = function () { FM.dirty = true; FM.rows[i.dataset.ot].ot = i.value; }; });
+  }
+};
+ACT['fm-set'] = function (el) { FM.dirty = true; var r = FM.rows[el.dataset.w]; r.status = el.dataset.s; if (r.status !== 'HADIR' && r.status !== 'SETENGAH') r.ot = ''; rerenderBody(); };
+ACT['fm-allpresent'] = function () { FM.dirty = true; Object.keys(FM.rows).forEach(function (k) { if (!FM.rows[k].status) FM.rows[k].status = 'HADIR'; }); rerenderBody(); };
+ACT['fm-save'] = function (el) {
+  var entries = Object.keys(FM.rows).filter(function (k) { return FM.rows[k].status; }).map(function (k) { var r = FM.rows[k]; return { workerId: k, status: r.status, overtimeHours: String(r.ot || '0').replace(',', '.') }; });
+  if (!entries.length) return toast('Tandai presensi minimal satu pekerja.', 'err');
+  el.disabled = true;
+  var send = function (pos) {
+    var payload = { projectId: S.d.activeProjectId, workDate: FM.date, houseUnitId: FM.unit, entries: entries };
+    if (pos) { payload.lat = pos.coords.latitude.toFixed(6); payload.lng = pos.coords.longitude.toFixed(6); }
+    return doMutate('attendance.save', payload, 'Presensi ' + dt(FM.date) + ' tersimpan (' + entries.length + ' pekerja).').then(function () { fmInit(true); rerenderBody(); }).catch(function (e) { toast(errMsg(e), 'err'); el.disabled = false; });
+  };
+  if (FM.gps && navigator.geolocation) navigator.geolocation.getCurrentPosition(send, function () { send(null); }, { enableHighAccuracy: true, timeout: 8000, maximumAge: 120000 });
+  else send(null);
+};
+var FM_INSTALL = null;
+window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); FM_INSTALL = e; });
+ACT['fm-install'] = function () { if (!FM_INSTALL) return; FM_INSTALL.prompt(); FM_INSTALL.userChoice.then(function () { FM_INSTALL = null; rerenderBody(); }); };
+
+/* ---------------- Sinkron latar (Background Sync) ---------------- */
+/** Simpan kredensial ringkas untuk service worker agar antrean bisa dikirim walau aplikasi tertutup */
+function saveSyncAuth() { if (S.token) Store.set('kv', 'auth', { token: S.token, api: apiUrl() }); else Store.del('kv', 'auth'); }
+function requestBgSync() {
+  try { if ('serviceWorker' in navigator && 'SyncManager' in window) navigator.serviceWorker.ready.then(function (r) { saveSyncAuth(); return r.sync.register('hc-outbox'); }).catch(function () { }); } catch (e) { }
+}
+if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', function (e) {
+  if (e.data && e.data.type === 'outbox-synced') { loadOutbox().then(function () { if (S.d && e.data.sent) { toast(e.data.sent + ' data antrean terkirim di latar.', 'ok'); refresh(); } }); }
+});
+document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible' && S.token && navigator.onLine && S.outbox.some(function (x) { return x.status === 'PENDING'; })) { S.online = true; syncOutbox(); } });
+
+/* v2.3 — sisi staf: akun Portal Pemilik Rumah, notifikasi & pengingat, impor mutasi bank */
+
+/* ============================ Portal pemilik (tab di Proyek & Kavling) ============================ */
+VIEWS.units.tabs.push(['owners', 'Portal pemilik', function () { return can('HOMEOWNER_MANAGE'); }]);
+(function () {
+  var r0 = VIEWS.units.render, h0 = VIEWS.units.headActions;
+  VIEWS.units.render = function (tab) { return tab === 'owners' ? ownersHtml() : r0(tab); };
+  VIEWS.units.headActions = function (tab) { return tab === 'owners' ? btn('ho-new', ico('plus') + ' Akun pemilik', '', 'primary') : h0(tab); };
+})();
+function ownersHtml() {
+  var d = S.d, U = L().units, hs = d.homeowners || [];
+  var linked = {}; hs.forEach(function (h) { h.houseUnitIds.forEach(function (id) { linked[id] = h; }); });
+  var noAcc = (d.houseUnits || []).filter(function (u) { return u.buyerName && !linked[u.id]; });
+  var link = d.settings.appUrl ? String(d.settings.appUrl).replace(/#.*$/, '') + '#portal' : '';
+  return '<div class="alert">Konsumen masuk ke <b>Portal Pemilik Rumah</b> dengan nomor HP & kata sandi untuk melihat progres dan foto mingguan, riwayat termin/KPR, dan mengajukan klaim garansi. ' + (link ? 'Tautan portal: <b>' + esc(link) + '</b>' : 'Isi <b>Alamat aplikasi</b> di Admin → Pengaturan agar tautan portal ikut terkirim di WhatsApp.') + '</div>' +
+    panel('Akun pemilik rumah', table([
+      { l: 'Nama', f: function (h) { return '<b>' + esc(h.fullName) + '</b><br><span class="small muted">' + esc(h.phone) + (h.email ? ' · ' + esc(h.email) : '') + '</span>'; } },
+      { l: 'Kavling', f: function (h) { return h.houseUnitIds.map(function (id) { return U[id] ? '<span class="chip">' + esc(U[id].unitNumber) + '</span>' : ''; }).join(' '); } },
+      { l: 'Masuk terakhir', f: function (h) { return h.lastLoginAt ? dtt(h.lastLoginAt) : '<span class="muted">Belum pernah</span>'; } },
+      { l: 'Notifikasi', f: function (h) { return (h.notifyWa ? 'WA' : '') + (h.notifyWa && h.notifyEmail ? ' + ' : '') + (h.notifyEmail ? 'Email' : '') || '—'; } },
+      { l: 'Status', f: function (h) { return h.isActive ? (h.mustChangePassword ? chip('SUBMITTED', 'Sandi sementara') : chip('ACTIVE')) : chip('VOID', 'Nonaktif'); } }
+    ], hs, { empty: 'Belum ada akun pemilik rumah', actions: function (h) { return btn('ho-edit', 'Ubah', 'data-id="' + h.id + '"') + btn('ho-reset', 'Reset sandi', 'data-id="' + h.id + '"'); } })) +
+    (noAcc.length ? '<div style="height:12px"></div>' + panel('Pembeli belum punya akses portal', table([{ l: 'Kavling', f: function (u) { return '<b>' + esc(u.unitNumber) + '</b>'; } }, { l: 'Pembeli', k: 'buyerName' }, { l: 'Telepon', k: 'buyerPhone' }, { l: 'Status', f: function (u) { return chip(u.status); } }], noAcc, { actions: function (u) { return btn('ho-for-unit', 'Buat akses', 'data-id="' + u.id + '"', 'sm primary'); } })) : '');
+}
+var HO_SEL = [];
+document.addEventListener('change', function (e) { var t = e.target; if (!t.classList || !t.classList.contains('hoUnit')) return; HO_SEL = HO_SEL.filter(function (x) { return x !== t.value; }); if (t.checked) HO_SEL.push(t.value); if (FORM) renderFields(); });
+function hoForm(h, unitId) {
+  h = h || {};
+  var u = unitId ? L().units[unitId] : null;
+  var vals = h.id ? { fullName: h.fullName, phone: h.phone, email: h.email, isActive: h.isActive, notifyWa: h.notifyWa } : { fullName: u ? u.buyerName : '', phone: u ? u.buyerPhone : '', isActive: true, notifyWa: true, sendCredentials: true };
+  var sel = HO_SEL = (h.houseUnitIds || (unitId ? [unitId] : [])).slice();
+  openForm({ title: h.id ? 'Ubah akun pemilik' : 'Akun Portal Pemilik Rumah', values: vals, fields: [
+    { name: 'fullName', label: 'Nama konsumen', required: true }, { name: 'phone', label: 'Nomor HP / WhatsApp', type: 'tel', required: true, help: 'Dipakai untuk masuk portal & menerima pengingat.' }, { name: 'email', label: 'Email (opsional)', type: 'email' },
+    { name: 'units', type: 'info', html: '<div class="field full"><label>Kavling milik konsumen</label><div class="row">' + (S.d.houseUnits || []).map(function (x) { return '<label class="row small" style="gap:4px;border:1px solid var(--line);border-radius:8px;padding:4px 8px"><input type="checkbox" class="hoUnit" value="' + x.id + '"' + (HO_SEL.indexOf(x.id) >= 0 ? ' checked' : '') + '>' + esc(x.unitNumber) + '</label>'; }).join('') + '</div></div>' },
+    { name: 'notifyWa', label: 'Kirim notifikasi WhatsApp', type: 'check' },
+    { name: 'isActive', label: 'Akses aktif', type: 'check', show: function () { return !!h.id; } },
+    { name: 'sendCredentials', label: 'Kirim tautan portal & kata sandi sementara via WhatsApp', type: 'check', show: function () { return !h.id; } }
+  ], submitLabel: h.id ? 'Simpan' : 'Buat akun', onSubmit: function (v) {
+    var ids = HO_SEL.slice();
+    if (!ids.length) throw new Error('Pilih minimal satu kavling.');
+    return call('homeowner.save', Object.assign({ id: h.id, houseUnitIds: ids }, v), null, { refresh: S.projectId }).then(function (r) {
+      if (S.lastBoot) { var b = S.lastBoot; S.lastBoot = null; applyBoot(b); }
+      if (r.tempPassword) setTimeout(function () { hoCredInfo(r); }, 60); else toast('Akun diperbarui.', 'ok');
+    });
+  } });
+}
+function hoCredInfo(r) {
+  var s = S.d.settings, link = s.appUrl ? String(s.appUrl).replace(/#.*$/, '') + '#portal' : '(alamat aplikasi)#portal';
+  showInfo('Akses portal dibuat', '<p>Berikan kepada <b>' + esc(r.homeowner.fullName) + '</b>:</p><dl class="kv"><dt>Alamat</dt><dd>' + esc(link) + '</dd><dt>Nomor HP</dt><dd>' + esc(r.homeowner.phone) + '</dd><dt>Sandi sementara</dt><dd><b class="num">' + esc(r.tempPassword) + '</b></dd></dl><p class="small muted">Sandi hanya ditampilkan sekali dan wajib diganti saat masuk pertama. Bila opsi WhatsApp dicentang, pesan sudah dikirim — cek tab Keuangan → Notifikasi untuk status kirim.</p>');
+}
+ACT['ho-new'] = function () { hoForm(); };
+ACT['ho-edit'] = function (el) { hoForm(byId(S.d.homeowners)[el.dataset.id]); };
+ACT['ho-for-unit'] = function (el) { var h = (S.d.homeowners || []).filter(function (x) { return x.houseUnitIds.indexOf(el.dataset.id) >= 0; })[0]; closeModal(); setTimeout(function () { hoForm(h, el.dataset.id); }, 30); };
+ACT['ho-reset'] = function (el) {
+  var h = byId(S.d.homeowners)[el.dataset.id];
+  openForm({ title: 'Reset sandi portal', fields: [{ type: 'info', name: 'i', html: '<p>Buat kata sandi sementara baru untuk ' + esc(h.fullName) + '? Sesi portal yang aktif akan dikeluarkan.</p>' }, { name: 'sendCredentials', label: 'Kirim via WhatsApp', type: 'check', value: true }], submitLabel: 'Reset', onSubmit: function (v) {
+    return call('homeowner.resetPassword', { id: h.id, sendCredentials: v.sendCredentials }).then(function (r) { setTimeout(function () { hoCredInfo(r); }, 60); });
+  } });
+};
+
+/* ============================ Keuangan: notifikasi & mutasi bank ============================ */
+VIEWS.finance.tabs.push(['notif', 'Notifikasi & pengingat', function () { return can('NOTIFY_SEND'); }], ['bank', 'Impor mutasi bank', function () { return can('FINANCE_PAYMENT_POST'); }]);
+(function () {
+  var r0 = VIEWS.finance.render, h0 = VIEWS.finance.headActions;
+  VIEWS.finance.render = function (tab) { return tab === 'notif' ? notifHtml() : tab === 'bank' ? bankHtml() : r0(tab); };
+  VIEWS.finance.headActions = function (tab) {
+    if (tab === 'notif') return btn('rem-preview', 'Pratinjau pengingat hari ini') + btn('rem-run', 'Kirim pengingat sekarang', '', 'primary');
+    return h0(tab);
+  };
+})();
+var NK = { DUE_REMINDER: 'Pengingat jatuh tempo', APPROVAL_ALERT: 'Persetujuan direktur', PAYMENT_RECEIPT: 'Tanda terima bayar', INVOICE_ISSUED: 'Tagihan terbit', CLAIM_RECEIVED: 'Klaim diterima', CLAIM_UPDATE: 'Status klaim', PORTAL_INVITE: 'Undangan portal', STAFF_DIGEST: 'Ringkasan staf', DECISION: 'Keputusan pengajuan', TEST: 'Tes' };
+function notifHtml() {
+  var d = S.d, s = d.settings, list = d.notifications || [];
+  var cnt = function (st) { return list.filter(function (x) { return x.status === st; }).length; };
+  var cfg = [['WhatsApp', s.waProvider === 'OFF' ? chip('VOID', 'Mati') : (s.waProvider === 'WEBHOOK' ? chip('APPROVED', 'Webhook') : (s.fonnteToken ? chip('APPROVED', 'Fonnte') : chip('REJECTED', 'Token belum diisi')))],
+    ['Email', s.emailNotify === 'OFF' ? chip('VOID', 'Mati') : chip('APPROVED', 'Google MailApp')],
+    ['Pengingat konsumen', s.customerReminders === 'OFF' ? chip('VOID', 'Mati') : 'H-' + esc(s.reminderDaysBefore) + ' & H+' + esc(s.reminderDaysAfter) + ', pukul ' + esc(s.reminderHour) + '.00'],
+    ['Rekening di pesan', s.bankAccountNo ? esc(s.bankName + ' ' + s.bankAccountNo) : chip('REJECTED', 'Belum diisi')],
+    ['Tautan portal', s.appUrl ? esc(s.appUrl) : chip('REJECTED', 'Belum diisi')],
+    ['Direktur Proyek', (d.directors || []).length ? (d.directors || []).map(function (r) { return esc(r.name) + (r.phone ? ' (WA ' + r.phone + ')' : '') + (r.email ? ' (' + esc(r.email) + ')' : ''); }).join(', ') : chip('REJECTED', 'Belum ada — tambah pengguna berperan Direktur Proyek')]];
+  return '<div class="kpis">' + kpi('Terkirim', String(cnt('SENT')), '150 log terakhir', 'ok') + kpi('Gagal', String(cnt('FAILED')), '', cnt('FAILED') ? 'bad' : '') + kpi('Dilewati', String(cnt('SKIPPED')), 'belum dikonfigurasi / nomor kosong') + '</div>' +
+    '<div class="grid g2" style="align-items:start">' + panel('Konfigurasi', '<dl class="kv">' + cfg.map(function (r) { return '<dt>' + r[0] + '</dt><dd>' + r[1] + '</dd>'; }).join('') + '</dl>', can('COMPANY_MANAGE') ? btn('settings-edit', 'Ubah pengaturan') + btn('notify-test', 'Kirim tes') : '') +
+    panel('Yang dikirim otomatis', '<ul class="small" style="margin:0;padding-left:18px"><li><b>Pengingat jatuh tempo termin</b> ke WhatsApp/email konsumen (bukan tagihan bank KPR), tiap hari pada jam pengiriman; tiap tagihan+hari hanya sekali.</li><li><b>Perlu persetujuan</b> ke Direktur Proyek saat ada MR, revisi RAB, atau opname baru — berisi ringkasan & tautan.</li><li><b>Tanda terima pembayaran</b> ke konsumen saat pembayaran dibukukan atau mutasi bank dicocokkan.</li><li><b>Klaim garansi</b>: tanda terima & kabar perbaikan ke pemilik rumah.</li><li>Pemohon MR diberi tahu saat disetujui/ditolak.</li></ul>') + '</div><div style="height:12px"></div>' +
+    panel('Log notifikasi', table([{ l: 'Waktu', f: function (x) { return dtt(x.createdAt); } }, { l: 'Jenis', f: function (x) { return esc(NK[x.kind] || x.kind) + '<br><span class="small muted">' + esc(x.channel === 'WA' ? 'WhatsApp' : 'Email') + (x.refNo ? ' · ' + esc(x.refNo) : '') + '</span>'; } }, { l: 'Penerima', f: function (x) { return esc(x.recipientName || '') + '<br><span class="small muted">' + esc(x.recipient) + '</span>'; } }, { l: 'Status', f: function (x) { return chip(x.status === 'SENT' ? 'APPROVED' : x.status === 'FAILED' ? 'REJECTED' : 'SUBMITTED', x.status === 'SENT' ? 'Terkirim' : x.status === 'FAILED' ? 'Gagal' : 'Dilewati') + (x.status !== 'SENT' ? '<br><span class="small muted">' + esc(x.detail) + '</span>' : ''); } }], list, { empty: 'Belum ada notifikasi', actions: function (x) { return btn('notif-view', 'Isi', 'data-id="' + x.id + '"'); } }));
+}
+ACT['notif-view'] = function (el) { var x = (S.d.notifications || []).filter(function (y) { return y.id === el.dataset.id; })[0]; showInfo(NK[x.kind] || x.kind, '<pre class="msg">' + esc(x.message) + '</pre>'); };
+ACT['rem-preview'] = function () {
+  call('notify.reminders', { projectId: S.projectId, dryRun: true }).then(function (r) {
+    showInfo('Pengingat yang akan dikirim hari ini', (r.messages.length ? r.messages.map(function (m) { return '<div class="panel" style="margin-bottom:8px"><div class="small muted">' + (m.channel === 'WA' ? 'WhatsApp ' : 'Email ') + esc(m.to) + ' · ' + esc(m.invoiceNumber) + '</div><pre class="msg">' + esc(m.text) + '</pre></div>'; }).join('') : '<p>Tidak ada pengingat terjadwal hari ini (atau semua sudah terkirim).</p>') +
+      (r.skipped.length ? '<p class="small" style="color:var(--bad)">Dilewati: ' + r.skipped.map(function (x) { return esc(x.invoiceNumber + ' — ' + x.reason); }).join('; ') + '</p>' : '') + (r.staffLines.length ? '<p class="small muted">Tagihan bank KPR (ringkasan ke staf): ' + r.staffLines.map(esc).join('; ') + '</p>' : ''), true);
+  }).catch(function (e) { toast(errMsg(e), 'err'); });
+};
+ACT['rem-run'] = function () { confirmBox('Kirim pengingat', '<p>Kirim semua pengingat jatuh tempo yang terjadwal hari ini sekarang? Pengingat yang sudah terkirim hari ini tidak dikirim ulang.</p>', 'Kirim', function () { return call('notify.reminders', { projectId: S.projectId }).then(function (r) { toast(r.sent + ' pesan terkirim.', r.sent ? 'ok' : ''); return refresh(); }); }); };
+ACT['inv-remind'] = function (el) {
+  var i = byId(S.d.invoices)[el.dataset.id];
+  confirmBox('Ingatkan konsumen', '<p>Kirim pengingat ' + esc(i.invoiceNumber) + ' (' + esc(i.sourceDocNumber || '') + ', sisa ' + rp(n(i.netAmount) - n(i.paidAmount)) + ', jatuh tempo ' + dt(i.dueDate) + ') ke WhatsApp/email pemilik kavling sekarang?</p>', 'Kirim', function () {
+    return call('notify.reminders', { invoiceId: i.id }).then(function (r) { toast('Pengingat terkirim (' + r.sent + ' pesan).', 'ok'); return refresh(); });
+  });
+};
+
+/* ---------- Impor mutasi rekening ---------- */
+var BANK = { rows: [], res: null };
+function bankHtml() {
+  var res = BANK.res;
+  var head = panel('Impor mutasi rekening', '<p class="small" style="margin-top:0">Unduh mutasi rekening dari internet banking (CSV/Excel → simpan sebagai CSV), lalu pilih berkasnya. Sistem mencocokkan dana masuk dengan tagihan konsumen/KPR yang terbuka berdasarkan <b>nomor tagihan di berita transfer</b>, nomor kavling, nama pembeli, dan nominal. Pasangan yang Anda setujui dibukukan sebagai pembayaran yang sudah direkonsiliasi, dan konsumen menerima tanda terima.</p>' +
+    '<div class="row"><span class="btn photo-btn">' + ico('download') + ' Pilih berkas CSV<input type="file" accept=".csv,text/csv,text/plain" id="bankFile" aria-label="Berkas mutasi CSV"></span><span class="small muted">Kolom dikenali otomatis: tanggal, keterangan/berita, kredit/jumlah, referensi.</span></div>' +
+    (BANK.rows.length && !res ? '<p class="small">' + BANK.rows.length + ' baris terbaca.</p>' : ''));
+  if (!res) return head;
+  var good = res.filter(function (r) { return r.match && r.score >= 50; });
+  return head + '<div style="height:12px"></div>' + panel('Hasil pencocokan', '<p class="small muted" style="margin-top:0">' + good.length + ' cocok yakin, ' + res.filter(function (r) { return r.match && r.score < 50; }).length + ' perlu dicek, ' + res.filter(function (r) { return !r.match; }).length + ' tidak cocok/dilewati.</p>' +
+    table([{ l: '', f: function (r) { return r.match ? '<input type="checkbox" class="bankPick" value="' + r.row + '"' + (r.score >= 50 ? ' checked' : '') + ' aria-label="Pilih baris ' + (r.row + 1) + '">' : ''; } },
+      { l: 'Mutasi', f: function (r) { return '<b>' + rp(r.amount) + '</b> <span class="small muted">' + esc(r.date) + '</span><br><span class="small">' + esc(r.description) + '</span><br><span class="tiny muted">Ref ' + esc(r.reference) + '</span>'; } },
+      { l: 'Tagihan', f: function (r) { return r.match ? '<b>' + esc(r.match.invoiceNumber) + '</b><br><span class="small">' + esc(r.match.label || '') + ' · ' + esc(r.match.unitNumber) + ' · ' + esc(r.match.buyerName) + '</span><br><span class="small muted">sisa ' + rp(r.match.open) + (r.match.partial ? ' (bayar sebagian)' : '') + '</span>' : '—'; } },
+      { l: 'Keyakinan', f: function (r) { return r.match ? chip(r.score >= 80 ? 'APPROVED' : r.score >= 50 ? 'SUBMITTED' : 'REJECTED', r.score + '%') + '<br><span class="small muted">' + esc(r.reason) + '</span>' : '<span class="small muted">' + esc(r.reason) + '</span>'; } }], res, { cards: false }) +
+    '<div class="row" style="margin-top:10px"><label class="row small" style="gap:6px"><input type="checkbox" id="bankNotify" checked> Kirim tanda terima ke konsumen</label><span class="grow"></span>' + btn('bank-reset', 'Ulangi') + btn('bank-apply', 'Bukukan yang dipilih', '', 'primary') + '</div>');
+}
+function parseCsv(text) {
+  text = text.replace(/^﻿/, '');
+  var first = text.split(/\r?\n/)[0] || '', sep = (first.match(/;/g) || []).length > (first.match(/,/g) || []).length ? ';' : (first.indexOf('\t') >= 0 ? '\t' : ',');
+  var rows = [], cur = [], f = '', q = false;
+  for (var i = 0; i < text.length; i++) {
+    var c = text[i];
+    if (q) { if (c === '"') { if (text[i + 1] === '"') { f += '"'; i++; } else q = false; } else f += c; }
+    else if (c === '"') q = true; else if (c === sep) { cur.push(f); f = ''; } else if (c === '\n' || c === '\r') { if (c === '\r' && text[i + 1] === '\n') i++; cur.push(f); rows.push(cur); cur = []; f = ''; } else f += c;
+  }
+  if (f || cur.length) { cur.push(f); rows.push(cur); }
+  rows = rows.filter(function (r) { return r.some(function (x) { return String(x).trim(); }); });
+  if (!rows.length) return [];
+  var h = rows[0].map(function (x) { return String(x).toLowerCase().trim(); });
+  var col = function (re) { for (var k = 0; k < h.length; k++) if (re.test(h[k])) return k; return -1; };
+  var cD = col(/tanggal|tgl|date/), cK = col(/keterangan|berita|uraian|deskripsi|description|remark/), cC = col(/kredit|credit|masuk|^cr$/), cA = col(/jumlah|nominal|amount|mutasi/), cR = col(/referensi|reference|ref|no\.? ?transaksi/), cT = col(/^(db\/cr|d\/k|tipe|type)$/);
+  return rows.slice(1).map(function (r) {
+    var amt = cC >= 0 ? r[cC] : (cA >= 0 ? r[cA] : '');
+    if (cC < 0 && cT >= 0 && /^(d|db|debit)$/i.test(String(r[cT]).trim())) amt = '-' + amt;
+    if (cC < 0 && /\bDB\b/i.test(String(amt))) amt = '-' + amt;
+    return { date: cD >= 0 ? r[cD] : '', description: cK >= 0 ? r[cK] : r.join(' '), amount: String(amt || '').replace(/\s|CR/gi, ''), reference: cR >= 0 ? r[cR] : '' };
+  }).filter(function (x) { return x.amount; });
+}
+document.addEventListener('change', function (e) {
+  if (e.target.id !== 'bankFile') return;
+  var f = e.target.files[0]; if (!f) return;
+  var rd = new FileReader();
+  rd.onload = function () {
+    BANK.rows = parseCsv(String(rd.result)); BANK.res = null;
+    if (!BANK.rows.length) return toast('Tidak ada baris mutasi yang dikenali.', 'err');
+    call('bank.match', { projectId: S.projectId, rows: BANK.rows }).then(function (r) { BANK.res = r; rerenderBody(); }).catch(function (er) { toast(errMsg(er), 'err'); });
+  };
+  rd.readAsText(f);
+});
+ACT['bank-reset'] = function () { BANK.rows = []; BANK.res = null; rerenderBody(); };
+ACT['bank-apply'] = function (el) {
+  var pick = $$('.bankPick').filter(function (c) { return c.checked; }).map(function (c) { return BANK.res[Number(c.value)]; });
+  if (!pick.length) return toast('Pilih minimal satu pasangan.', 'err');
+  el.disabled = true;
+  call('bank.apply', { projectId: S.projectId, notifyCustomer: $('#bankNotify').checked, items: pick.map(function (r) { return { invoiceId: r.match.invoiceId, amount: r.amount, reference: r.reference, reason: r.reason, method: /KPR/i.test(r.match.label || '') ? 'ESCROW_KPR' : 'BANK_TRANSFER' }; }) }, null, { refresh: S.projectId })
+    .then(function (r) { BANK.rows = []; BANK.res = null; toast(r.posted.length + ' pembayaran dibukukan & direkonsiliasi.', 'ok'); if (S.lastBoot) { var b = S.lastBoot; S.lastBoot = null; applyBoot(b); } else refresh(); })
+    .catch(function (e) { el.disabled = false; toast(errMsg(e), 'err'); });
+};
 
 boot();
 </script>
