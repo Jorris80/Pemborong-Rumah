@@ -4,7 +4,7 @@
  * - Background Sync: antrean offline (IndexedDB 'hcerp' → outbox) dikirim walau aplikasi sudah ditutup, begitu sinyal kembali.
  * - Naikkan VERSION setiap kali index.html diperbarui agar pengguna mendapat versi baru.
  */
-var VERSION = 'hcerp-v2.3.0b';
+var VERSION = 'hcerp-v2.5.0';
 var SHELL = ['./', './index.html', './manifest.webmanifest', './icon.svg'];
 
 self.addEventListener('install', function (e) {
@@ -13,7 +13,7 @@ self.addEventListener('install', function (e) {
 
 self.addEventListener('activate', function (e) {
   e.waitUntil(caches.keys().then(function (keys) {
-    return Promise.all(keys.filter(function (k) { return k !== VERSION; }).map(function (k) { return caches.delete(k); }));
+    return Promise.all(keys.filter(function (k) { return k !== VERSION && k !== VERSION + '-img' && k !== 'hcerp-map'; }).map(function (k) { return caches.delete(k); }));
   }).then(function () { return self.clients.claim(); }));
 });
 
@@ -23,6 +23,16 @@ self.addEventListener('fetch', function (e) {
   var url = new URL(req.url);
   if (url.origin !== self.location.origin) {
     // foto Drive / peta: coba jaringan, jatuh ke cache bila offline
+    // pustaka peta & tile citra: simpan di cache 'hcerp-map' (maks ±600 entri) agar peta tetap tampil saat sinyal lemah
+    if (/cdnjs\.cloudflare\.com|arcgisonline\.com|tile\.openstreetmap\.org/.test(url.host)) {
+      e.respondWith(caches.open('hcerp-map').then(function (c) {
+        return fetch(req).then(function (res) {
+          if (res && (res.ok || res.type === 'opaque')) { c.put(req, res.clone()); c.keys().then(function (k) { if (k.length > 600) k.slice(0, k.length - 600).forEach(function (x) { c.delete(x); }); }); }
+          return res;
+        }).catch(function () { return c.match(req); });
+      }));
+      return;
+    }
     e.respondWith(fetch(req).then(function (res) {
       if (res && (res.ok || res.type === 'opaque') && /googleusercontent|drive\.google/.test(url.host)) {
         var copy = res.clone(); caches.open(VERSION + '-img').then(function (c) { c.put(req, copy); });
