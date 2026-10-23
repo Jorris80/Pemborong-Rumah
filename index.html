@@ -2761,8 +2761,10 @@ function ownersHtml() {
   var d = S.d, U = L().units, hs = d.homeowners || [];
   var linked = {}; hs.forEach(function (h) { h.houseUnitIds.forEach(function (id) { linked[id] = h; }); });
   var noAcc = (d.houseUnits || []).filter(function (u) { return u.buyerName && !linked[u.id]; });
-  var link = d.settings.appUrl ? String(d.settings.appUrl).replace(/#.*$/, '') + '#portal' : '';
-  return '<div class="alert">Konsumen masuk ke <b>Portal Pemilik Rumah</b> dengan nomor HP & kata sandi untuk melihat progres dan foto mingguan, riwayat termin/KPR, dan mengajukan klaim garansi. ' + (link ? 'Tautan portal: <b>' + esc(link) + '</b>' : 'Isi <b>Alamat aplikasi</b> di Admin → Pengaturan agar tautan portal ikut terkirim di WhatsApp.') + '</div>' +
+  var here = (!IS_GAS && /^https:/.test(location.protocol)) ? location.origin + location.pathname : '';
+  var link = d.portalUrl || '';
+  return '<section class="panel" style="margin-bottom:12px"><div class="panel-h"><h2>Tautan Portal Pemilik Rumah</h2></div>' + (link ? '<div class="pt-bank"><code class="small" style="word-break:break-all">' + esc(link) + '</code><span class="row" style="gap:6px;flex-wrap:nowrap">' + btn('pt-copy', 'Salin', 'data-v="' + esc(link) + '"') + '<a class="btn sm" href="' + esc(link) + '" target="_blank" rel="noopener">Buka</a></span></div>' : '<div class="alert warn">Tautan belum tersedia: isi <b>Alamat aplikasi</b> di Admin & Sistem → Pengaturan.</div>') + (!d.settings.appUrl && here && can('COMPANY_MANAGE') ? '<div class="row" style="margin-top:8px"><span class="small">Alamat aplikasi ini: <code>' + esc(here) + '</code></span>' + btn('use-app-url', 'Jadikan alamat portal', 'data-v="' + esc(here) + '"', 'sm primary') + '</div>' : '') +
+    '<p class="small muted" style="margin:8px 0 0">Konsumen membuka tautan ini, lalu masuk dengan nomor HP & kata sandi untuk melihat progres dan foto mingguan, riwayat termin/KPR, dan mengajukan klaim garansi. Tautan ini otomatis disertakan di WhatsApp undangan akun, tagihan, dan pengingat jatuh tempo.' + (d.settings.appUrl ? '' : ' <b>Disarankan</b>: isi <b>Alamat aplikasi</b> (alamat PWA GitHub Pages, mis. https://akun.github.io/hc-erp/) di Admin & Sistem → Pengaturan agar konsumen memakai versi PWA yang bisa dipasang di HP; saat ini memakai alamat Web App GAS.') + '</p></section>' +
     panel('Akun pemilik rumah', table([
       { l: 'Nama', f: function (h) { return '<b>' + esc(h.fullName) + '</b><br><span class="small muted">' + esc(h.phone) + (h.email ? ' · ' + esc(h.email) : '') + '</span>'; } },
       { l: 'Kavling', f: function (h) { return h.houseUnitIds.map(function (id) { return U[id] ? '<span class="chip">' + esc(U[id].unitNumber) + '</span>' : ''; }).join(' '); } },
@@ -2795,7 +2797,7 @@ function hoForm(h, unitId) {
   } });
 }
 function hoCredInfo(r) {
-  var s = S.d.settings, link = s.appUrl ? String(s.appUrl).replace(/#.*$/, '') + '#portal' : '(alamat aplikasi)#portal';
+  var link = S.d.portalUrl || '(isi Alamat aplikasi di Pengaturan)';
   showInfo('Akses portal dibuat', '<p>Berikan kepada <b>' + esc(r.homeowner.fullName) + '</b>:</p><dl class="kv"><dt>Alamat</dt><dd>' + esc(link) + '</dd><dt>Nomor HP</dt><dd>' + esc(r.homeowner.phone) + '</dd><dt>Sandi sementara</dt><dd><b class="num">' + esc(r.tempPassword) + '</b></dd></dl><p class="small muted">Sandi hanya ditampilkan sekali dan wajib diganti saat masuk pertama. Bila opsi WhatsApp dicentang, pesan sudah dikirim — cek tab Keuangan → Notifikasi untuk status kirim.</p>');
 }
 ACT['ho-new'] = function () { hoForm(); };
@@ -2826,10 +2828,10 @@ function notifHtml() {
     ['Email', s.emailNotify === 'OFF' ? chip('VOID', 'Mati') : chip('APPROVED', 'Google MailApp')],
     ['Pengingat konsumen', s.customerReminders === 'OFF' ? chip('VOID', 'Mati') : 'H-' + esc(s.reminderDaysBefore) + ' & H+' + esc(s.reminderDaysAfter) + ', pukul ' + esc(s.reminderHour) + '.00'],
     ['Rekening di pesan', s.bankAccountNo ? esc(s.bankName + ' ' + s.bankAccountNo) : chip('REJECTED', 'Belum diisi')],
-    ['Tautan portal', s.appUrl ? esc(s.appUrl) : chip('REJECTED', 'Belum diisi')],
+    ['Tautan portal', d.portalUrl ? esc(d.portalUrl) + (s.appUrl ? '' : ' <span class="small muted">(Web App GAS — isi Alamat aplikasi untuk PWA)</span>') : chip('REJECTED', 'Belum diisi')],
     ['Direktur Proyek', (d.directors || []).length ? (d.directors || []).map(function (r) { return esc(r.name) + (r.phone ? ' (WA ' + r.phone + ')' : '') + (r.email ? ' (' + esc(r.email) + ')' : ''); }).join(', ') : chip('REJECTED', 'Belum ada — tambah pengguna berperan Direktur Proyek')]];
   return '<div class="kpis">' + kpi('Terkirim', String(cnt('SENT')), '150 log terakhir', 'ok') + kpi('Gagal', String(cnt('FAILED')), '', cnt('FAILED') ? 'bad' : '') + kpi('Dilewati', String(cnt('SKIPPED')), 'belum dikonfigurasi / nomor kosong') + '</div>' +
-    '<div class="grid g2" style="align-items:start">' + panel('Konfigurasi', '<dl class="kv">' + cfg.map(function (r) { return '<dt>' + r[0] + '</dt><dd>' + r[1] + '</dd>'; }).join('') + '</dl>', (can('COMPANY_MANAGE') ? btn('settings-edit', 'Ubah pengaturan') + btn('notify-test', 'Kirim tes') : '') + btn('wa-device', 'Cek perangkat WhatsApp')) +
+    '<div class="grid g2" style="align-items:start">' + panel('Konfigurasi', '<dl class="kv">' + cfg.map(function (r) { return '<dt>' + r[0] + '</dt><dd>' + r[1] + '</dd>'; }).join('') + '</dl>', (can('COMPANY_MANAGE') ? btn('settings-edit', 'Ubah pengaturan') + btn('notify-test', 'Kirim tes') : '') + btn('wa-device', 'Cek perangkat WhatsApp') + (can('COMPANY_MANAGE') ? btn('srv-diag', 'Diagnosa server') : '')) +
     panel('Yang dikirim otomatis', '<ul class="small" style="margin:0;padding-left:18px"><li><b>Pengingat jatuh tempo termin</b> ke WhatsApp/email konsumen (bukan tagihan bank KPR), tiap hari pada jam pengiriman; tiap tagihan+hari hanya sekali.</li><li><b>Perlu persetujuan</b> ke Direktur Proyek saat ada MR, revisi RAB, atau opname baru — berisi ringkasan & tautan.</li><li><b>Tanda terima pembayaran</b> ke konsumen saat pembayaran dibukukan atau mutasi bank dicocokkan.</li><li><b>Klaim garansi</b>: tanda terima & kabar perbaikan ke pemilik rumah.</li><li>Pemohon MR diberi tahu saat disetujui/ditolak.</li></ul>') + '</div><div style="height:12px"></div>' +
     panel('Log notifikasi', table([{ l: 'Waktu', f: function (x) { return dtt(x.createdAt); } }, { l: 'Jenis', f: function (x) { return esc(NK[x.kind] || x.kind) + '<br><span class="small muted">' + esc(x.channel === 'WA' ? 'WhatsApp' : 'Email') + (x.refNo ? ' · ' + esc(x.refNo) : '') + '</span>'; } }, { l: 'Penerima', f: function (x) { return esc(x.recipientName || '') + '<br><span class="small muted">' + esc(x.recipient) + '</span>'; } }, { l: 'Status', f: function (x) { return chip(x.status === 'SENT' ? 'APPROVED' : x.status === 'FAILED' ? 'REJECTED' : 'SUBMITTED', x.status === 'SENT' ? 'Terkirim' : x.status === 'FAILED' ? 'Gagal' : 'Dilewati') + (x.status !== 'SENT' ? '<br><span class="small muted">' + esc(x.detail) + '</span>' : ''); } }], list, { empty: 'Belum ada notifikasi', actions: function (x) { return btn('notif-view', 'Isi', 'data-id="' + x.id + '"'); } }));
 }
@@ -2918,6 +2920,17 @@ ACT['wa-device'] = function () {
   }).catch(function (e) { toast(errMsg(e), 'err'); });
 };
 var WA_GUIDE = '<h3 style="margin:14px 0 6px">Langkah setting Fonnte</h3><ol class="small" style="padding-left:18px;margin:0"><li>Daftar di fonnte.com dengan nomor admin.</li><li>Menu <b>Device → Add device</b>: isi nama & nomor WhatsApp perusahaan yang akan mengirim pesan.</li><li>Klik <b>Connect</b>, lalu di HP pemilik nomor: WhatsApp → ⋮ → <b>Perangkat tertaut → Tautkan perangkat</b> → pindai QR. Status harus <b>connect</b>.</li><li>Klik <b>Token</b> pada device itu (bukan Account Token) dan tempel di Admin & Sistem → Pengaturan → <b>Token Fonnte</b>; gateway WhatsApp = Fonnte.</li><li>Isi <b>Nomor tujuan notifikasi</b> (grup staf, pisahkan koma), lalu <b>Kirim tes</b> ke nomor Anda sendiri.</li></ol>';
+
+ACT['use-app-url'] = function (el) { call('settings.save', { appUrl: el.dataset.v }).then(function () { toast('Alamat aplikasi disimpan. Tautan portal: ' + el.dataset.v + '#portal', 'ok'); return refresh(); }).catch(function (e) { toast(errMsg(e), 'err'); }); };
+
+ACT['srv-diag'] = function () {
+  call('notify.diag', {}).then(function (r) {
+    var api = IS_GAS ? '(dibuka langsung dari Web App)' : apiUrl();
+    var mailOk = r.mail === 'OK';
+    showInfo('Diagnosa server', '<dl class="kv"><dt>URL server dipakai aplikasi ini</dt><dd style="word-break:break-all"><code>' + esc(api) + '</code></dd><dt>URL deployment menurut Google</dt><dd style="word-break:break-all"><code>' + esc(r.serviceUrl || '-') + '</code></dd><dt>Versi kode berjalan</dt><dd>' + esc(r.version) + ' (stempel ' + esc(r.codeStamp) + ')</dd><dt>Dijalankan sebagai</dt><dd>' + esc(r.runAs || '-') + '</dd><dt>Izin email</dt><dd>' + (mailOk ? chip('APPROVED', 'Aktif') : chip('REJECTED', 'Belum aktif') + '<br><span class="small">' + esc(r.mail) + '</span>') + '</dd><dt>Status otorisasi</dt><dd>' + esc(r.authStatus) + '</dd></dl>' +
+      (mailOk ? '' : '<div class="alert danger" style="margin-top:10px"><b>Deployment yang dipanggil aplikasi ini belum membawa izin email.</b><ol class="small" style="margin:6px 0 0;padding-left:18px"><li>Pastikan <code>appsscript.json</code> di editor memuat <code>script.send_mail</code> dan sudah disimpan, lalu jalankan <b>cekWhatsApp</b> sampai tertulis “Email: izin AKTIF”.</li><li>Terapkan → <b>Kelola deployment</b> → pilih deployment yang URL-nya <b>sama dengan baris pertama di atas</b> → ✎ → Versi: <b>Versi baru</b> → Terapkan. (Jangan “Deployment baru” — itu membuat URL lain yang tidak dipakai aplikasi.)</li><li>Bila “Dijalankan sebagai” bukan email pemilik skrip, ubah setelan deployment “Jalankan sebagai” menjadi <b>Saya</b>.</li></ol></div>'), true);
+  }).catch(function (e) { toast(errMsg(e), 'err'); });
+};
 
 boot();
 </script>
